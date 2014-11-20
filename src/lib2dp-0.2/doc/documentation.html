@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.3  (Linux)">
+	<META NAME="CREATED" CONTENT="20050807;22003800">
+	<META NAME="CHANGED" CONTENT="20051018;16223000">
+	<STYLE>
+	<!--
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		P { margin-bottom: 0.21cm }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P ALIGN=CENTER STYLE="margin-bottom: 0cm"><FONT COLOR="#0066cc"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>2DPathfinder
+documentation</B></FONT></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2><U><B>Theory</B></U></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Finding
+paths between locations is one interesting problem that can be solved
+with the “informed search” theory. </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>A
+“general search” consists in expanding the start node, placing
+its successors in a queue, and then examining the next node in the
+queue.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<PRE><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2><B>function</B> general_search(start_state, target_state, push_function())</FONT></FONT>
+        <FONT FACE="Nimbus Mono L, Courier New">start_node &lt;- make_node(start_state)</FONT>
+        <FONT FACE="Nimbus Mono L, Courier New">queue &lt;- start_node</FONT>
+        <B><FONT FACE="Nimbus Mono L, Courier New">loop</FONT></B>
+                <FONT FACE="Nimbus Mono L, Courier New"><B>if</B> empty(queue) <B>then</B></FONT>
+                        <FONT FACE="Nimbus Mono L, Courier New"><B>return</B> no_solution</FONT>
+                <FONT FACE="Nimbus Mono L, Courier New">current_node &lt;- pop(queue)</FONT>
+                <FONT FACE="Nimbus Mono L, Courier New">mark_closed(current_node)</FONT>
+                <FONT FACE="Nimbus Mono L, Courier New"><B>if</B> state(current_node) = target_state <B>then</B></FONT>
+                        <FONT FACE="Nimbus Mono L, Courier New"><B>return</B> solution</FONT>
+                <FONT FACE="Nimbus Mono L, Courier New"><B>for each</B> node <B>in</B> successors(current_node) <B>do</B></FONT>
+                        <FONT FACE="Nimbus Mono L, Courier New"><B>if not</B> closed(node) then</FONT>
+                                <FONT FACE="Nimbus Mono L, Courier New">queue &lt;- push_function(node)</FONT>
+        <B><FONT FACE="Nimbus Mono L, Courier New">end</FONT></B></PRE><P STYLE="margin-bottom: 0cm">
+<FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Many different
+algorithms can be obtained by defining the push_function().</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+successors() function depends on the structure that represents the
+space of the states (a graph, a 2D map...).</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+“ramification factor” (<B>b</B>) is the number of states that can
+succeed to each state; <B>d</B> is the total number of expansion
+levels.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+complexity of the search is, in the worst case, O(b<SUP>d</SUP>).</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+mark_closed() function is used to avoid to re-consider a node that
+has already been analyzed.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>While
+there are different ways to implement every single search strategy,
+one of them is always derived from a general search.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>So
+the different strategies are determined by how the nodes' data
+structures and algorithms are implemented.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>For
+example, a “best-first search” is obtained by maintaining the
+open nodes sorted by a function that evaluates their states.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>To
+estimate the “goodness” of a node, a heuristic function can be
+used (<B>h()</B>). This is a “greedy” strategy.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<PRE><FONT FACE="Nimbus Mono L, Courier New"><B>function</B> best_first_search(start_state, target_state, eval_function())</FONT>
+        <FONT FACE="Nimbus Mono L, Courier New">push_function() &lt;- a function that sorts the nodes using eval_function()</FONT>
+        <FONT FACE="Nimbus Mono L, Courier New"><B>return</B> general_search(start_state, target_state, push_function())</FONT></PRE><P STYLE="margin-bottom: 0cm">
+<FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>A greedy search is
+generally very efficient, but minimizes only the estimated cost.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Another
+strategy is the “uniform-cost search”, which minimizes the
+current path cost: it is optimal but very little efficient on large
+data.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+function that returns the current (and effective) path cost is
+usually called <B>g()</B>.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<PRE><FONT FACE="Nimbus Mono L, Courier New"><B>function</B> greedy_search(start_state, target_state)</FONT>
+        <FONT FACE="Nimbus Mono L, Courier New"><B>return</B> best_first_search(start_state, target_state, h())</FONT></PRE><P STYLE="margin-bottom: 0cm">
+<FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Such a search can
+also be implemented with “dynamic programming” or with
+“memoization” (see Dijkstra's algorithm).</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+A* (pronounced “A-star”) search combines the advantages of the
+greedy and uniform-cost searches: it minimizes the total search cost
+by using the sum of the two functions as the evaluation function
+(<B>f()</B>):</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2><B>f
+= g + h</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>In
+other words, the f cost of a node is the sum of the path generated to
+get there from the start node and the path estimated to reach the
+target.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<PRE><FONT FACE="Nimbus Mono L, Courier New"><B>function</B> A_star_search(start_state, target_state)</FONT>
+        <FONT FACE="Nimbus Mono L, Courier New"><B>return</B> best_first_search(start_state, target_state, f())</FONT></PRE><P STYLE="margin-bottom: 0cm">
+<FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>In a 2D map,
+typical heuristics can be the Euclidean distance, the “Manhattan”
+distance or the Diagonal distance.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>After
+a few benchmarks, I realized that the Diagonal distance performs very
+well and is good for finding paths where diagonal movement is
+allowed.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="ucida Sans, sans-serif"><FONT SIZE=2><B>Diagonal
+= sqrt(2) * min(∆x, ∆y) + (∆x + ∆y - 2 * min(∆x, ∆y))</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT SIZE=2><FONT FACE="Lucida Sans, sans-serif">I
+used integer values to store the costs to make the computations
+faster</FONT><FONT FACE="ucida Sans, sans-serif">, so sqrt(2) is
+approximated to 1.4 and all costs are multiplied by 10.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Another
+improvement I made is the POS() macro, that makes it possible to
+represent a state (a position in the map) with only one 32bit integer
+instead of x and y explicitly. This halves the memory that should be
+allocated, and also halves the number of comparisons to compute.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>But
+the most significant choice is the data structure used for the open
+list: a simple array of booleans would require O(1) to access to an
+element, but also O(n) to find the high priority node, and it would
+require (n * size of one node) memory; a sorted array would require
+at least O(n log n) at each loop to keep it sorted, and O(1) to find
+the high priority node; a linked list would decrease the amount of
+memory to be allocated, but the complexity would be the same as that
+of a simple array.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>My
+choice was a “binary heap”, which requires the same memory as a
+linked list (the actual number of nodes in the open list), and takes
+O(1) to get the high priority node, O(log n) to pop it from the heap
+and O(log n) to insert a node.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>An
+array of “flags” was used to know in O(1) if a node is already in
+the heap.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+choice of a binary heap dramatically increased the efficiency of the
+algorithm, allowing to make it work on larger data.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Since
+an array is used to store the nodes of the heap, it is necessary to
+reallocate all the memory every time a node is added to the heap; </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>I
+avoided this problem by setting a default block of memory to be
+allocated instead of one single node.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Anyway,
+if possible (i.e. if the map isn't too big), it is better to allocate
+all the memory at one time.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2><U><B>Tutorial</B></U></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+Unix makefile included in the package can be used to automatically
+build the library and the demonstration binaries.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Open
+a shell and type:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>make</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>This
+will compile all the C sources in object files, then archive them in
+a static library (lib/lib2dp.a), and link the demo to the library.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>If
+you want to compile them separately, the make targets are “lib2dp”
+for the library, “demo” for the demo binary and “genmap” for
+the map generator used by the demo.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>make
+clean</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>will
+remove all the object files from the source directory.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>To
+compile an application linking it statically with the library (let's
+assume that “lib2dp.a” is in the same directory of “MyApp.c”):</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>gcc
+-o MyApp MyApp.c -L. -l2dp</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>If
+you use a different OS (like Windows), follow the instructions of
+your compiler/IDE to build the library, or simply add all the sources
+to your project. </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Now,
+let's have a look at the demonstration binaries.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>To
+generate a 500x500 random map (40% probability to have an unwalkable
+tile):</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>./genmap
+500 500</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>A
+plain text file (“map.txt”) should be created: the “0”'s
+represent walkable tiles, the “1”'s represent unwalkable tiles.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Then
+run the demo and enter any key when asked:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>./demo</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>If
+at least a path exists between (0;0) and (499,499), the program finds
+it and writes it on the same file: “S” is the starting point, “T”
+the target, and the path is made of “x”'s.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+cost of the path is also displayed by the sample program.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Now
+let's learn how to use the library:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>First
+of all, “pathfinder_t.h” should be included in your code:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>#include
+“pathfinder_t.h”</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Remember
+that a position is compressed as follows:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>int
+x, y;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>int
+position = POS(x, y, width);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+cells are represented by an array of short integers:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>short
+cells[width * height];</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>or</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>short
+*cells;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>cells
+= calloc(width * height, sizeof(short));</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>An
+instance of map_t must be declared properly:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>map_t
+map;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>map.x_limit
+= width;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>map.y_limit
+= height;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>map.cells
+= cells; /* pointer to the first element of the array */</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Then
+comes the pathfinder:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>pathfinder_t
+*pathfinder;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>pathfinder
+= pfAlloc(100, width * height);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>pfSetMap(pathfinder,
+&amp;map);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>The
+first parameter of pfAlloc is the initial memory to be allocated for
+the open list (we used 100 as an example); the second parameter is
+the total number of states in the space of the states.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>pfAlloc()
+allocates the memory for a pathfinder_t instance and returns a
+pointer to it.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Remember
+to call </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>pfFree(pathfinder);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>when
+you don't need the pathfinder anymore, or you need to use it with a
+map of different dimension.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>To
+perform a pathfinding, you must first allocate space for a list which
+will host the path:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>list_t
+path;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>path
+= lAlloc(); </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>and
+two integers, one to store the result (SOLVED or NO_SOLUTION) and one
+to store the cost of the path (which is the number of tiles of the
+path).</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Now
+you can call pfFindPath() (remember that positions are passed after
+being compressed):</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>int
+result, cost;</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>start
+= POS(start_x, start_y, width);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>target
+= POS(target_x, target_y, width);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>result
+= pfFindPath(pathfinder, start, target, path, &amp;cost);</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>If
+the result is SOLVED, you can go through the path using a
+list_iterator_t:</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>list_iterator_t
+lit;</FONT></FONT></P>
+<PRE><FONT FACE="Nimbus Mono L, Courier New"><FONT SIZE=2>for (lit = path-&gt;front; lit != 0; lit = lit-&gt;next)</FONT></FONT>
+        <FONT FACE="Nimbus Mono L, Courier New">&lt;lit is a pointer to the current step of the path&gt;</FONT></PRE><P STYLE="margin-bottom: 0cm">
+<FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>See “demo.c”
+for a complete and working code.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2><U><B>Further
+improvements</B></U></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Even
+if it performs well, this software is only a little experiment.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>When
+I have the time to work on it, I'm probably going to write a more
+comprehensive library in C++ (and perhaps a bit of Assembly), using
+the STL library as much as possible, on informed search in general.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Using
+templates and inheritance, it should be easy to define custom search
+algorithms, heuristics, data structures and so on, which can be
+useful not only for pathfinding but for pianification in general.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Also
+a dedicated file format (for graphs and maps) and precomputing
+capabilities could be some interesting features. </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0cm"><FONT FACE="Lucida Sans, sans-serif"><FONT SIZE=2>Copyright
+&copy; 2005 Alessandro Presta</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+</BODY>
+</HTML>
