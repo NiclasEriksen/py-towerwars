@@ -13,3 +13,6 @@ class Wall(Sprite):
         self.gy = gy
         self.x = game.get_windowpos(gx, gy)[0]
         self.y = game.get_windowpos(gx, gy)[1]
+
+    def updatePos(self):
+        self.x, self.y = self.game.get_windowpos(self.gx, self.gy)

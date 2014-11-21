@@ -74,7 +74,10 @@ class Mob(Sprite):
         elif self.debug:
             print("Could not set debuff for type {0}".format(d_type))
 
-
+    def updateOffset(self):
+        s = self.currentpoint
+        self.x, self.y = self.g.get_windowpos(s[0], s[1])
+        self.rx, self.ry = self.x, self.y
 
     def updatePos(self):
         if not self.stall_timer or not self in self.g.pf_queue:

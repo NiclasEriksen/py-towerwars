@@ -72,7 +72,7 @@ class Game(pyglet.window.Window):  # Main game window
         super(Game, self).__init__(
             context=gl_context,
             config=gl_config,
-            resizable=False,
+            resizable=True,
             vsync=VSYNC
             )
         ### GL and graphics variables ###
@@ -95,7 +95,6 @@ class Game(pyglet.window.Window):  # Main game window
         self.loadTextures()
 
         ### Particle group ###
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE)
         glShadeModel(GL_SMOOTH)
         glEnable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
@@ -192,6 +191,8 @@ class Game(pyglet.window.Window):  # Main game window
         w = self.squaresize
         points = []
         rects = []
+        self.batches["bg"] = pyglet.graphics.Batch()
+        self.batches["bg2"] = pyglet.graphics.Batch()
         for p in self.grid.grid:
             wp = self.get_windowpos(p[0], p[1])
             x = wp[0] - w // 2
@@ -427,6 +428,37 @@ class Game(pyglet.window.Window):  # Main game window
             self.selected.updatePos(x, y, None, None)
         self.cx, self.cy = x, y
 
+    def on_resize(self, width, height):
+        glViewport(0, 0, width, height)
+        glMatrixMode(gl.GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, width, 0, height, -1, 1)
+        glMatrixMode(gl.GL_MODELVIEW)
+
+        self.generateGridSettings()
+        self.generateGridIndicators()
+
+        for w in self.walls:
+            w.updatePos()
+
+        for t in self.towers:
+            t.updateOffset()
+
+        for m in self.mobs:
+            m.updateOffset()
+
+        sx, sy = self.get_windowpos(self.grid.start[0], self.grid.start[1])
+        for p in self.gas_emitter_group:
+            p.position = sx, sy, 0
+        
+
+        gx, gy = self.get_windowpos(self.grid.goal[0], self.grid.goal[1])
+        for p in self.flame_emitter_group:
+            p.position = gx, gy, 0
+
+
+        self.gas_emitter.template.position = sx, sy, 0
+        self.flame_emitter.template.position = gx, gy, 0
 
     def updateState(self):
         for t in self.towers:

@@ -62,6 +62,10 @@ class Tower(Sprite):
         self.turret.x = self.x
         self.turret.y = self.y
 
+    def updateOffset(self):
+        self.x, self.y = self.game.get_windowpos(self.gx, self.gy)
+        self.turret.x, self.turret.y = self.x, self.y
+
     def setCD(self, n):
         self.cd = True
         self.cd_count = n * 60  # FPS

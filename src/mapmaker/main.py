@@ -4,6 +4,7 @@ import math
 import random
 import os,sys,inspect
 from collections import OrderedDict
+from grid import *
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
@@ -12,7 +13,7 @@ from pyglet.window import key, mouse
 from pyglet.gl import *
 
 DEBUG = False
-RES_PATH = "../../resources/"
+RES_PATH = "../../resources/tiles/"
 SCREENRES = (1280, 720)
 VSYNC = True
 SCREEN_MARGIN = 15  # %
@@ -51,21 +52,32 @@ class Editor(pyglet.window.Window):  # Main game window
             vsync=VSYNC
             )
 
+        glClearColor(0.1, 0.1, 0.1, 1)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glShadeModel(GL_SMOOTH)
+        glEnable(GL_BLEND)
+        glDisable(GL_DEPTH_TEST)
+
         self.width, self.height = SCREENRES
+        self.squaresize = 32
         self.tiles = []
         self.generateGridSettings()
+        self.grid = Grid(self)
         self.loadTextures()
 
         self.batches = OrderedDict()
         self.batches["0"] = pyglet.graphics.Batch()
         self.batches["1"] = pyglet.graphics.Batch()
         self.batches["2"] = pyglet.graphics.Batch()
+        self.batches["3"] = pyglet.graphics.Batch()
 
-        self.test = pyglet.sprite.Sprite(
-            self.textures["pang_01"],
-            50, 50,
-            batch=self.batches["2"]
-        )
+        self.bg_group = pyglet.graphics.OrderedGroup(0)
+
+        self.generateTileMenuItems()
+        self.generateGridIndicators()
+        self.tile_menu_enabled = False
+
+        self.coord_label = pyglet.text.Label()
 
         self.addBackgroundTile("tsk", (10, 10))
 
@@ -77,14 +89,13 @@ class Editor(pyglet.window.Window):  # Main game window
             if file.endswith(".png"):
                 self.texturefiles.append(file)
 
+        self.texturefiles = sorted(self.texturefiles)
+
         self.textures = dict()
         for fname in self.texturefiles:
             load_file = pyglet.image.load(RES_PATH + fname)
             fname = fname.split(".")[0]
             self.textures[fname] = load_file
-
-        print self.textures
-
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
@@ -95,15 +106,47 @@ class Editor(pyglet.window.Window):  # Main game window
         self.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
         self.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
 
+    def generateGridIndicators(self):
+        """ Generates the squares that indicates available blocks """
+        w = self.squaresize
+        rects = []
+        for p in self.grid.grid:
+            wp_x, wp_y = self.getWindowPos((p[0], p[1]))
+            x = wp_x - w // 2
+            y = wp_y - w // 2
+            r_points = [x, y, x + w, y, x + w, y + w, x, y + w]
+            rects = rects + r_points
+
+        self.batches["0"] = pyglet.graphics.Batch()
+
+        rect = self.batches["0"].add(
+            len(rects) / 2,
+            GL_QUADS,
+            self.bg_group,
+            ('v2f', (rects))
+        )
+
+    def generateTileMenuItems(self):
+        tex = self.textures
+        items = []
+        for key in tex:
+            s = pyglet.sprite.Sprite(tex[key], batch=self.batches["3"])
+            s.name = key
+            s.x, s.y = 0, 0
+            items.append(s)
+
+        items.sort(key=lambda x: x.name)
+        self.tilemenu_items = items
+
     def addForegroundTile(self, variant, gridpos):
-        tile = ForegroundTile(self, gridpos, "pang_01")
+        tile = ForegroundTile(self, gridpos, "tower_blue")
         x, y = self.getWindowPos(gridpos)
         tile.placeTile(x, y)
 
         self.tiles.append(tile)
 
     def addBackgroundTile(self, variant, gridpos):
-        tile = BackgroundTile(self, gridpos, "particle_pang")
+        tile = BackgroundTile(self, gridpos, "tower_poison")
         x, y = self.getWindowPos(gridpos)
         tile.placeTile(x, y)
 
@@ -124,6 +167,9 @@ class Editor(pyglet.window.Window):  # Main game window
             print("Exiting...")
             pyglet.app.exit()
 
+        elif symbol == key.TAB:
+            self.tile_menu_enabled = not self.tile_menu_enabled
+
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
@@ -133,8 +179,54 @@ class Editor(pyglet.window.Window):  # Main game window
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         pass
 
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.coord_label.text = "{0}, {1}".format(x, y)
+        self.coord_label.x = x
+        self.coord_label.y = y
+
+    def on_resize(self, width, height):
+        glViewport(0, 0, width, height)
+        glMatrixMode(gl.GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, width, 0, height, -1, 1)
+        glMatrixMode(gl.GL_MODELVIEW)
+
+        self.generateGridSettings()
+        self.generateGridIndicators()
+
     def render(self, dt):
+        self.clear()
+        glColor4f(0.2, 0.2, 0.2, 1)
+        self.batches["0"].draw()
         self.batches["2"].draw()
+
+        if self.tile_menu_enabled:
+            mx = int(self.width * (SCREEN_MARGIN / 100.0))
+            my = int(self.height * (SCREEN_MARGIN / 100.0))
+            w, h = self.width, self.height
+            glColor4f(0.3, 0.3, 0.3, 0.8)
+            pyglet.graphics.draw(
+                4,
+                GL_QUADS,
+                ('v2f', [mx, my, w - mx, my, w - mx, h - my, mx, h - my])
+            )
+
+            mx += 10
+            my += 10
+            max_x = w - mx
+            max_y = h - my
+            ss = self.squaresize + 3
+            i = 0
+            for s in self.tilemenu_items:
+                s.x = (mx + ss * i)
+                s.y = max_y - ss
+                i += 1
+                s.draw()
+
+        self.coord_label.draw()
+
+            # self.batches["3"].draw()
+
 
 
 class ForegroundTile(pyglet.sprite.Sprite):
