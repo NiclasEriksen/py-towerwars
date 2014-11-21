@@ -138,6 +138,9 @@ class Game(pyglet.window.Window):  # Main game window
         ts_img = center_image(pyglet.image.load(
             RES_PATH + 'tower_splash.png')
         )
+        ts_t_img = center_image(pyglet.image.load(
+            RES_PATH + 'tower_splash_turret.png')
+        )
         tb_img = center_image(pyglet.image.load(RES_PATH + 'tower_blue.png'))
         mob_1w = center_image(pyglet.image.load(RES_PATH + 'mob_1w.png'))
         mob_1q = center_image(pyglet.image.load(RES_PATH + 'mob.png'))
@@ -148,6 +151,7 @@ class Game(pyglet.window.Window):  # Main game window
             tower_wood=tw_img,
             tower_poison=tp_img,
             tower_splash=ts_img,
+            tower_splash_turret=ts_t_img,
             mob1Q=mob_1q,
             mob1W=mob_1w
         )
@@ -445,7 +449,7 @@ class Game(pyglet.window.Window):  # Main game window
                 if t.target:
                     if t.target.state == "alive":
                         rads = get_angle(t.x, t.y, t.target.x, t.target.y)
-                        t.angle = -math.degrees(rads)
+                        t.setAngle(rads)
                         t.doDamage(t.target)  # Do damage
                     if t.target.state == "dead":
                         t.target = None
@@ -549,18 +553,18 @@ class Game(pyglet.window.Window):  # Main game window
 
         self.batches["fg"].draw()
         ## Draw turrets ###
-        for t in self.towers:
-            r, g, b = t.turret_color[0], t.turret_color[1], t.turret_color[2]
-            a = 1.0
-            glLineWidth(t.turret_width)
-            glColor4f(r, g, b, a)
-            x = t.x + t.turret_size * math.cos(math.radians(t.angle))
-            y = t.y + t.turret_size * math.sin(math.radians(t.angle))
-            pyglet.graphics.draw(
-                2,
-                GL_LINES,
-                ('v2f', (t.x, t.y, x, y))
-                )
+        # for t in self.towers:
+        #     r, g, b = t.turret_color[0], t.turret_color[1], t.turret_color[2]
+        #     a = 1.0
+        #     glLineWidth(t.turret_width)
+        #     glColor4f(r, g, b, a)
+        #     x = t.x + t.turret_size * math.cos(math.radians(t.angle))
+        #     y = t.y + t.turret_size * math.sin(math.radians(t.angle))
+        #     pyglet.graphics.draw(
+        #         2,
+        #         GL_LINES,
+        #         ('v2f', (t.x, t.y, x, y))
+        #         )
         self.setGL("on")
         self.batches["mobs"].draw()
         self.batches["walls"].draw()
@@ -595,18 +599,19 @@ class Game(pyglet.window.Window):  # Main game window
         glLineWidth(3)
         for m in self.mobs:
             # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
-            pyglet.graphics.draw(
-                2,
-                GL_LINES,
-                (
-                    'v2f',
+            if m.hp < m.hp_max:
+                pyglet.graphics.draw(
+                    2,
+                    GL_LINES,
                     (
-                        m.x - 1 - int((m.hp / m.hp_max) * 8),
-                        m.y + 10,
-                        m.x - 1 + int((m.hp / m.hp_max) * 8),
-                        m.y + 10)
+                        'v2f',
+                        (
+                            m.x - 1 - int((m.hp / m.hp_max) * 8),
+                            m.y + 10,
+                            m.x - 1 + int((m.hp / m.hp_max) * 8),
+                            m.y + 10)
+                        )
                     )
-                )
 
         ### Update animations ###
         for a in self.animations:

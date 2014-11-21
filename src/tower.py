@@ -23,16 +23,6 @@ class Tower(Sprite):
         self.name = name
         self.game = game
         self.size = game.squaresize
-        self.dmg = 4.0
-        self.crit = 15
-        self.spd = 0.4
-        self.cd = False
-        self.dmg_type = 0  # 0 Normal, 1 Magic, 2 Chaos
-        self.range = int(game.squaresize * 3)
-        self.target = None
-        self.turret_size = 14
-        self.turret_width = 3
-        self.turret_color = (0.28, 0.22, 0.16, 1)
         self.gx = x
         self.gy = y
         if x and y:  # If position is supplied, set it
@@ -41,14 +31,36 @@ class Tower(Sprite):
         else:  # Sets the tower position to cursor position
             self.x = self.game.cx
             self.y = self.game.cy
+        self.turret = Sprite(
+            game.textures["tower_splash_turret"],
+            x=self.x, y=self.y,
+            batch=game.batches["anim"]
+        )
+        self.dmg = 4.0
+        self.crit = 15
+        self.spd = 0.4
+        self.cd = False
+        self.dmg_type = 0  # 0 Normal, 1 Magic, 2 Chaos
+        self.range = int(game.squaresize * 3)
+        self.target = None
+        self.turret_size = 14
         self.selected = False
-        self.angle = random.randrange(0, 360)
+        self.setAngle()
+
+    def setAngle(self, angle=None):
+        if not angle:
+            self.angle = random.randrange(-10, 10)
+        else:
+            self.angle = angle
+        self.turret.rotation = math.degrees(self.angle) + 90
 
     def updatePos(self, x, y, gx, gy):
         self.x = x
         self.y = y
         self.gx = gx
         self.gy = gy
+        self.turret.x = self.x
+        self.turret.y = self.y
 
     def setCD(self, n):
         self.cd = True
@@ -67,8 +79,8 @@ class Tower(Sprite):
             t.state = "dead"
         else:
             if not self.cd:
-                x = int(self.x + self.turret_size * math.cos(math.radians(self.angle)))
-                y = int(self.y + self.turret_size * math.sin(math.radians(self.angle)))
+                x = int(self.x + self.turret_size * math.cos(-self.angle))
+                y = int(self.y + self.turret_size * math.sin(-self.angle))
                 self.game.muzzle_fx.addParticle(
                     x, y, (1, 1, 1, 1)
                 )
@@ -97,18 +109,6 @@ class SplashTower(Tower):
         self.name = name
         self.game = game
         self.size = game.squaresize
-        self.dmg = 20.0
-        self.crit = 0
-        self.spd = 1.5
-        self.cd = False
-        self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
-        self.range = int(game.squaresize * 4)
-        self.splash_range = game.squaresize * 2
-        self.splash_limit = 4
-        self.target = None
-        self.turret_size = 18
-        self.turret_width = 5
-        self.turret_color = (0.28, 0.18, 0.16, 1)
         self.gx = x
         self.gy = y
         if x and y:  # If position is supplied, set it
@@ -117,8 +117,23 @@ class SplashTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.game.cx
             self.y = self.game.cy
+        self.dmg = 20.0
+        self.crit = 0
+        self.spd = 1.5
+        self.cd = False
+        self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
+        self.range = int(game.squaresize * 4)
+        self.splash_range = game.squaresize * 2
+        self.turret = Sprite(
+            game.textures["tower_splash_turret"],
+            x=self.x, y=self.y,
+            batch=game.batches["anim"]
+        )
+        self.splash_limit = 6
+        self.target = None
+        self.turret_size = 18
         self.selected = False
-        self.angle = random.randrange(0, 360)
+        self.setAngle()
 
     def doDamage(self, t):
         if t.hp <= 0:
@@ -127,8 +142,8 @@ class SplashTower(Tower):
             if not self.cd:
                 t.hp -= self.dmg
                 # Spawns muzzle particle effect
-                x = int(self.x + self.turret_size * math.cos(math.radians(self.angle)))
-                y = int(self.y + self.turret_size * math.sin(math.radians(self.angle)))
+                x = int(self.x + self.turret_size * math.cos(-self.angle))
+                y = int(self.y + self.turret_size * math.sin(-self.angle))
                 self.game.muzzle_fx.addParticle(
                     x, y, (1, 1, 1, 1)
                 )
@@ -159,8 +174,11 @@ class SplashTower(Tower):
                     if count >= self.splash_limit:
                         break
                     if not m.id == t.id:
-                        if get_dist(t.rx, t.ry, m.x, m.y) <= self.splash_range:
-                            m.hp -= self.dmg
+                        dist = get_dist(t.rx, t.ry, m.x, m.y)
+                        if dist <= self.splash_range:
+                            dmg = int((dist / self.splash_range) * self.dmg)
+                            m.hp -= dmg
+                            print dmg
                             if m.hp <= 0:
                                 m.state = "dead"
 
@@ -194,8 +212,6 @@ class PoisonTower(Tower):
         self.range = int(game.squaresize * 4.5)
         self.target = None
         self.turret_size = 14
-        self.turret_width = 2
-        self.turret_color = (0.45, 0.65, 0.55, 1)
         self.gx = x
         self.gy = y
         if x and y:  # If position is supplied, set it
@@ -204,8 +220,13 @@ class PoisonTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.game.cx
             self.y = self.game.cy
+        self.turret = Sprite(
+            game.textures["tower_splash_turret"],
+            x=self.x, y=self.y,
+            batch=game.batches["anim"]
+        )
         self.selected = False
-        self.angle = random.randrange(0, 360)
+        self.setAngle()
 
     def doDamage(self, t):
         if t.hp <= 0:
@@ -218,16 +239,8 @@ class PoisonTower(Tower):
                 self.setCD(self.spd)
 
                 # Spawns muzzle particle effect
-                x = int(
-                    self.x + self.turret_size * math.cos(
-                        math.radians(self.angle)
-                    )
-                )
-                y = int(
-                    self.y + self.turret_size * math.sin(
-                        math.radians(self.angle)
-                    )
-                )
+                x = int(self.x + self.turret_size * math.cos(-self.angle))
+                y = int(self.y + self.turret_size * math.sin(-self.angle))
 
                 self.game.puff_fx.addParticle(
                     x, y, (0.65, 0.9, 0.40, 0.9)
