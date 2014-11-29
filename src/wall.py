@@ -7,7 +7,7 @@ class Wall(Sprite):
         self.game = game
         super(Wall, self).__init__(
             game.textures["wall_stone"],
-            batch=game.batches["fg"],
+            batch=game.batches["walls"],
         )
         self.gx = gx
         self.gy = gy

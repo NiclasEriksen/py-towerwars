@@ -85,7 +85,7 @@ class Mob(Sprite):
             points = self.path
             tp = self.targetpoint
 
-            if tp in points and tp in self.g.grid.grid:
+            if tp in points and tp in self.g.grid.w_grid:
                 targetpos = self.g.get_windowpos(tp[0], tp[1])
 
                 if get_dist(targetpos[0], targetpos[1], self.rx, self.ry) < 2:
@@ -149,12 +149,12 @@ class Mob(Sprite):
             for p in g.path:
                 if abs(self.targetpoint[0] - p[0]) <= 1 and \
                 abs(self.targetpoint[1] - p[1]) <= 1:
-                    if self.targetpoint in get_diagonal(g.grid, p[0], p[1]):
+                    if self.targetpoint in get_diagonal(g.w_grid, p[0], p[1]):
                         genpath = False
                         share = True
                         self.targetpoint = p
                         break
-                    elif self.targetpoint in get_neighbors(g.grid, p[0], p[1]):
+                    elif self.targetpoint in get_neighbors(g.w_grid, p[0], p[1]):
                         genpath = False
                         share = True
                         self.targetpoint = p
@@ -311,9 +311,20 @@ class Debuff:
                 if self.owner.hp > 0:
                     self.owner.hp -= self.dmg
                     self.owner.g.puff_fx.addParticle(
-                        self.owner.x + random.randrange(-4, 5),
-                        self.owner.y + random.randrange(-4, 5),
-                        (0.55 ,1, 0.45, 1)
+                        self.owner.x + random.randrange(-8, 9),
+                        self.owner.y + random.randrange(-6, 7),
+                        (0.55 ,1, 0.45, 0.5)
+                    )
+                    self.owner.g.skull_fx.addParticle(
+                        self.owner.x + random.randrange(0, 12),
+                        self.owner.y + random.randrange(0, 12),
+                        (0.10 ,0.3, 0.10, 0.8),
+                        velocity=(
+                            random.randrange(-6, 6),
+                            random.randrange(8, 24),
+                            0
+                        )
+
                     )
                 else:
                     self.owner.state = "dead"

@@ -40,7 +40,7 @@ def get_score(c, node, goal):
         score += 10
 
     gx = abs(goal[0] - c.node[0])
-    gy = abs(goal[1] - c.node[1])
+    gy = abs(goal[1] - c.node[1]) * 2
     score += (gx + gy) * 10
     return score
 

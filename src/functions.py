@@ -21,20 +21,21 @@ def check_path(m, grid, new):
             #     m.currentpoint = m.lastpoint
 
     else:
-        for p in reversed(m.path):
-            if m.path.index(p) >= m.path.index(m.targetpoint):
-                dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-                ddirs = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
-                for dir in dirs:
-                    neighbor = (p[0] + dir[0], p[1] + dir[1])
-                    if neighbor == new:
-                        update = True
-                        break
-                for dir in ddirs:
-                    neighbor = (p[0] + dir[0], p[1] + dir[1])
-                    if neighbor == new:
-                        update = True
-                        break
+        if m.targetpoint in m.path:
+            for p in reversed(m.path):
+                if m.path.index(p) >= m.path.index(m.targetpoint):
+                    dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+                    ddirs = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
+                    for dir in dirs:
+                        neighbor = (p[0] + dir[0], p[1] + dir[1])
+                        if neighbor == new:
+                            update = True
+                            break
+                    for dir in ddirs:
+                        neighbor = (p[0] + dir[0], p[1] + dir[1])
+                        if neighbor == new:
+                            update = True
+                            break
 
     return update
 

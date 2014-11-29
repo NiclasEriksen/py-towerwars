@@ -10,6 +10,8 @@ class Grid:
         self.path = []
         self.dim = self.g.grid_dim
         self.generate()
+        self.t_grid = self.fullgrid
+        self.w_grid = self.fullgrid
         self.grid = self.fullgrid
         self.start = (0, self.dim[1]//2)
         self.goal = (self.dim[0] - 1, self.dim[1]//2)

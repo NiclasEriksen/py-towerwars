@@ -28,6 +28,8 @@ class ParticleCategory:
             self.createSimpleSmoke()
         elif t == "simple" and e == "pang":
             self.createSimplePang()
+        elif t == "simple" and e == "skull":
+            self.createSimpleSkull()
 
     def draw(self):
         self.group.draw()
@@ -35,23 +37,23 @@ class ParticleCategory:
     def update(self, dt):
         self.group.update(dt)
 
-    def addParticle(self, x, y, color):
+    def addParticle(self, x, y, color, velocity=(0, 0.6, 0)):
         x, y = float(x), float(y)
         self.group.new(Particle(
             color=color,
-            velocity=(0, 0.6, 0), position=(x, y, 0))
+            velocity=velocity, position=(x, y, 0))
         )
 
     def createSimplePuff(self):
         self.group = ParticleGroup(
             controllers=[
-                Lifetime(0.8),
+                Lifetime(0.6),
                 Movement(min_velocity=0.8, max_velocity=16.0, damping=0.20),
                 Growth(0.5),
                 Fader(
                     fade_in_start=0, start_alpha=0,
                     fade_in_end=0.20, max_alpha=0.8,
-                    fade_out_start=0.35, fade_out_end=0.7
+                    fade_out_start=0.35, fade_out_end=0.55
                 )
             ],
             system=self.system,
@@ -64,13 +66,13 @@ class ParticleCategory:
     def createSimpleSmoke(self):
         self.group = ParticleGroup(
             controllers=[
-                Lifetime(2),
+                Lifetime(1.5),
                 Movement(min_velocity=0.8, max_velocity=0.9, damping=0.20),
                 Growth(0.5),
                 Fader(
                     fade_in_start=0, start_alpha=0,
-                    fade_in_end=0.20, max_alpha=0.5,
-                    fade_out_start=0.35, fade_out_end=2.0
+                    fade_in_end=0.15, max_alpha=0.5,
+                    fade_out_start=0.25, fade_out_end=1.5
                 )
             ],
             system=self.game.particle_system,
@@ -87,7 +89,7 @@ class ParticleCategory:
                 Growth(4, damping=0.5),
                 Fader(
                     fade_in_start=0, start_alpha=0,
-                    fade_in_end=0.10, max_alpha=0.8
+                    fade_in_end=0.10, max_alpha=0.9
                 )
             ],
             system=self.game.particle_system,
@@ -95,6 +97,25 @@ class ParticleCategory:
                 10,
                 SpriteTexturizer(
                     self.tex["pang"].texture.id))
+        )
+
+    def createSimpleSkull(self):
+        self.group = ParticleGroup(
+            controllers=[
+                Lifetime(0.6),
+                Growth(3, damping=0.6),
+                Movement(damping=0.95),
+                Fader(
+                    fade_in_start=0, start_alpha=0,
+                    fade_in_end=0.10, max_alpha=1,
+                    fade_out_start=0.15, fade_out_end=0.6
+                )
+            ],
+            system=self.game.particle_system,
+            renderer=PointRenderer(
+                12,
+                SpriteTexturizer(
+                    self.tex["skull"].texture.id))
         )
 
     def createSmokeEmitter(self, color, size, x, y, lifetime=6, dx=-1.5, dy=0):
@@ -113,7 +134,7 @@ class ParticleCategory:
                 Gravity((dx, dy, 0)), Movement(),
                 Fader(
                     fade_in_start=0, start_alpha=0,
-                    fade_in_end=0.20, max_alpha=0.5,
+                    fade_in_end=0.20, max_alpha=0.7,
                     fade_out_start=lifetime / 3, fade_out_end=lifetime - 1
                 )
             ],

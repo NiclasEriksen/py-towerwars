@@ -14,10 +14,10 @@ class Tower(Sprite):
 
     'The main tower constructor'
 
-    def __init__(self, game, name="Default", x=None, y=None):
+    def __init__(self, game, name="Default", x=0, y=0):
         super(Tower, self).__init__(
             game.textures["tower_wood"],
-            batch=game.batches["fg"],
+            batch=game.batches["towers"],
             group=game.fg_group
         )
         self.name = name
@@ -91,7 +91,7 @@ class Tower(Sprite):
                 self.game.muzzle_fx.addParticle(
                     t.x + random.randrange(-2, 3),
                     t.y + random.randrange(-2, 3),
-                    (0.95, 0.88, 0.7, 0.9)
+                    (0.85, 0.78, 0.6, 0.9)
                 )
                 r = random.randint(1, 101)
                 if r <= self.crit:
@@ -104,10 +104,10 @@ class Tower(Sprite):
 
 class SplashTower(Tower):
 
-    def __init__(self, game, name="Splash Tower", x=None, y=None):
+    def __init__(self, game, name="Splash Tower", x=0, y=0):
         super(Tower, self).__init__(
             game.textures["tower_splash"],
-            batch=game.batches["fg"],
+            batch=game.batches["towers"],
             group=game.fg_group
         )
         self.name = name
@@ -162,7 +162,7 @@ class SplashTower(Tower):
                     x = t.x + random.randrange(-r / 2, r / 2)
                     y = t.y + random.randrange(-r / 2, r / 2)
                     self.game.smoke_fx.addParticle(
-                        x, y, (0.60, 0.57, 0.55, 0.5)
+                        x, y, (0.70, 0.67, 0.65, 0.4)
                     )
                     i += 1
                 i = 0
@@ -170,7 +170,7 @@ class SplashTower(Tower):
                     x = t.x + random.randrange(-r, r)
                     y = t.y + random.randrange(-r, r)
                     self.game.smoke_fx.addParticle(
-                        x, y, (0.80, 0.77, 0.75, 0.7)
+                        x, y, (0.80, 0.77, 0.75, 0.5)
                     )
                     i += 1
                 count = 0
@@ -180,16 +180,15 @@ class SplashTower(Tower):
                     if not m.id == t.id:
                         dist = get_dist(t.rx, t.ry, m.x, m.y)
                         if dist <= self.splash_range:
-                            dmg = int((dist / self.splash_range) * self.dmg)
+                            dmg = (dist / self.splash_range) * self.dmg
                             m.hp -= dmg
-                            print dmg
                             if m.hp <= 0:
                                 m.state = "dead"
 
                             x = m.x + random.randrange(-5, 6)
                             y = m.y + random.randrange(-4, 5)
                             self.game.smoke_fx.addParticle(
-                                x, y, (0.65, 0.60, 0.50, 0.7)
+                                x, y, (0.75, 0.70, 0.60, 0.5)
                             )
                             count += 1
                 self.setCD(self.spd)
@@ -197,10 +196,10 @@ class SplashTower(Tower):
 
 class PoisonTower(Tower):
 
-    def __init__(self, game, name="Poison Tower", x=None, y=None):
+    def __init__(self, game, name="Poison Tower", x=0, y=0):
         super(Tower, self).__init__(
             game.textures["tower_poison"],
-            batch=game.batches["fg"],
+            batch=game.batches["towers"],
             group=game.fg_group
         )
         self.name = name
@@ -225,7 +224,7 @@ class PoisonTower(Tower):
             self.x = self.game.cx
             self.y = self.game.cy
         self.turret = Sprite(
-            game.textures["tower_splash_turret"],
+            game.textures["tower_poison_turret"],
             x=self.x, y=self.y,
             batch=game.batches["anim"]
         )
@@ -255,7 +254,7 @@ class PoisonTower(Tower):
                     x = t.x + random.randrange(-4, 5)
                     y = t.y + random.randrange(-4, 5)
                     self.game.puff_fx.addParticle(
-                        x, y, (0.55, 1, 0.45, 1)
+                        x, y, (0.45, 0.8, 0.35, 1)
                     )
                     i += 1
 

@@ -8,9 +8,9 @@ class Grid:
     'The main grid constructor'
 
     def __init__(self, game):
-        self.grid = []
+        self.t_grid = []
+        self.w_grid = []
         self.fullgrid = []
-        self.hd_grid = []
         self.debug = game.debug
         self.g = game
         self.path = []
@@ -79,22 +79,32 @@ class Grid:
         self.debug = self.g.debug
         if self.debug:
             print("generating new grid")
-        self.grid = self.fullgrid
+        self.t_grid = []
+        self.w_grid = []
+        for p in self.fullgrid:
+            self.t_grid.append(p)
+            self.w_grid.append(p)
         tc, wc = 0, 0
+        for w in self.g.tiles_no_walk:
+            if w in self.w_grid:
+                self.w_grid.remove(w)
+                wc += 1
+        for b in self.g.tiles_no_build:
+            if b in self.t_grid:
+                self.t_grid.remove(b)
+                tc += 1
         for t in self.g.towers:
-            for g in self.grid:  # Checks for towers in grid, removes them
+            for g in self.w_grid:  # Checks for towers in grid, removes them
                 if t.gx == g[0] and t.gy == g[1]:
-                    self.grid.remove(g)
+                    if (t.gx, t.gy) in self.t_grid:
+                        self.t_grid.remove(g)
+                    if (t.gx, t.gy) in self.w_grid:
+                        self.w_grid.remove(g)
                     tc += 1
         if self.debug:
             print("removed {0} grid points for towers".format(tc))
-        for w in self.g.walls:
-            for g in self.grid:  # Checks for towers in grid, removes them
-                if w.gx == g[0] and w.gy == g[1]:
-                    self.grid.remove(g)
-                    wc += 1
         if self.debug:
-            print("removed {0} grid points for walls".format(wc))
+            print("removed {0} grid points for no walk".format(wc))
         if new:
             # x1, y1 = str(self.start[0]), str(self.start[1])
             # x2, y2 = str(self.goal[0]), str(self.goal[1])
@@ -109,7 +119,7 @@ class Grid:
 
     def getPath(self, start):
         path, success = pypf.get_path(
-                self.grid, self.fullgrid,
+                self.w_grid, self.w_grid,
                 start, self.goal
         )
 
