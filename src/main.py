@@ -1,4 +1,4 @@
-import pyglet
+import pyglet   # Version 1.2.2
 from collections import OrderedDict
 from pyglet.window import key, mouse
 from pyglet.gl import *
@@ -7,7 +7,7 @@ from lepton.emitter import StaticEmitter
 from lepton.renderer import PointRenderer
 from lepton.texturizer import SpriteTexturizer, create_point_texture
 from lepton.controller import Gravity, Lifetime, Movement, Fader, ColorBlender, Growth
-import pytmx    # Tiled map loader
+# import pytmx    # Tiled map loader
 
 from functions import *
 from grid import *
