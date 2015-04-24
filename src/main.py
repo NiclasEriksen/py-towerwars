@@ -7,6 +7,7 @@ from lepton.emitter import StaticEmitter
 from lepton.renderer import PointRenderer
 from lepton.texturizer import SpriteTexturizer, create_point_texture
 from lepton.controller import Gravity, Lifetime, Movement, Fader, ColorBlender, Growth
+import pytmx    # Tiled map loader
 
 from functions import *
 from grid import *
@@ -17,6 +18,7 @@ DEBUG = False
 RES_PATH = "../resources/"
 SCREENRES = (1280, 720)  # The resolution for the game window
 VSYNC = True
+PAUSED = False
 SCREEN_MARGIN = 15  # %
 NOWALK = [
     (17, 0), (17, 1), (17, 2), (17, 3), (17, 4), (17, 8), (17, 9), (17, 10), (17, 11),
@@ -118,7 +120,7 @@ class Game(pyglet.window.Window):  # Main game window
         # self.walls = []  # Wall sprite objects
         # self.placeWalls()  # Fills walls list and updates grid
         self.animations = []
-        self.selected = None
+        self.selected_mouse = None
         self.dragging = False
         self.highlighted = []
 
@@ -135,6 +137,11 @@ class Game(pyglet.window.Window):  # Main game window
         self.bg.y = self.offset_y
 
         self.grid.update()
+
+        # Pause
+        self.paused = False
+
+        self.autospawn = False
 
     def loadTextures(self):
 
@@ -357,9 +364,18 @@ class Game(pyglet.window.Window):  # Main game window
             self.towers.remove(t)
             grid.update(new=False)
 
-    def pathFinding(self, dt, limit=1):
-                #!/usr/bin/python
+    def autospawn_random(self, dt):
+        """Spawns a random mob"""
+        print "SPAWNING"
+        choice = random.randint(0, 1)
+        if choice:
+            mob = Mob(self, "YAY")
+        else:
+            mob = Mob1W(self, "YAY")
 
+        self.mobs.append(mob)
+
+    def pathFinding(self, dt, limit=1):
         if len(self.pf_queue) > 0:
             if self.debug:
                 print("Calculating paths for pf_queue.")
@@ -426,77 +442,98 @@ class Game(pyglet.window.Window):  # Main game window
             print("Exiting...")
             pyglet.app.exit()
             # return True  # Disable ESC to exit
-        elif symbol == key.Q:
-            mob = Mob(self, "YAY")
-            self.mobs.append(mob)
-        elif symbol == key.W:
-            mob = Mob1W(self, "YAY")
-            self.mobs.append(mob)
-        elif symbol == key.F11:
-            self.set_fullscreen(not self.fullscreen)
-            self.activate()
-        elif symbol == key.F12:
-            self.debug = not self.debug
-        elif symbol == key._1:
-            tower = Tower(self)
-            self.selected = tower
-        elif symbol == key._2:
-            tower = SplashTower(self)
-            self.selected = tower
-        elif symbol == key._3:
-            tower = PoisonTower(self)
-            self.selected = tower
-        elif symbol == key.LEFT:
-            self.span(32, 0)
-        elif symbol == key.RIGHT:
-            self.span(-32, 0)
-        elif symbol == key.UP:
-            self.span(0, -32)
-        elif symbol == key.DOWN:
-            self.span(0, 32)
+        elif symbol == key.SPACE:
+            self.paused = not self.paused
+            if self.paused:
+                pyglet.clock.unschedule(self.particle_system.update)
+            else:
+                pyglet.clock.schedule_interval(
+                    window.particle_system.update,
+                    1.0/30.0
+                )
+        if not self.paused: # Only listen for these keys when game is running
+            if symbol == key.Q:
+                mob = Mob(self, "YAY")
+                self.mobs.append(mob)
+            elif symbol == key.W:
+                mob = Mob1W(self, "YAY")
+                self.mobs.append(mob)
+            elif symbol == key.F11:
+                self.set_fullscreen(not self.fullscreen)
+                self.activate()
+            elif symbol == key.F12:
+                self.debug = not self.debug
+            elif symbol == key._1:
+                tower = Tower(self)
+                self.selected_mouse = tower
+            elif symbol == key._2:
+                tower = SplashTower(self)
+                self.selected_mouse = tower
+            elif symbol == key._3:
+                tower = PoisonTower(self)
+                self.selected_mouse = tower
+            elif symbol == key.LEFT:
+                self.span(32, 0)
+            elif symbol == key.RIGHT:
+                self.span(-32, 0)
+            elif symbol == key.UP:
+                self.span(0, -32)
+            elif symbol == key.DOWN:
+                self.span(0, 32)
+            elif symbol == key.F2:
+                self.autospawn = not self.autospawn
+                if self.autospawn:
+                    pyglet.clock.schedule_interval(
+                        self.autospawn_random,
+                        1.0
+                    )
+                else:
+                    pyglet.clock.unschedule(self.autospawn_random)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            if not self.selected:
-                for t in self.towers:
+            if not self.paused:
+                if not self.selected_mouse:
+                    for t in self.towers:
 
-                    if x < t.x + t.size//2 and x > t.x - t.size//2:
+                        if x < t.x + t.size//2 and x > t.x - t.size//2:
 
-                        if y < t.y + t.size//2 and y > t.y - t.size//2:
-                            self.selected = t
-                            self.grid.update()
-                            if t.gx and t.gy:
-                                self.grid.t_grid.append((t.gx, t.gy))
-                                self.grid.w_grid.append((t.gx, t.gy))
-                            break
+                            if y < t.y + t.size//2 and y > t.y - t.size//2:
+                                self.selected_mouse = t
+                                self.towers.remove(t)
+                                self.grid.update()
+                                if t.gx and t.gy:
+                                    self.grid.t_grid.append((t.gx, t.gy))
+                                    self.grid.w_grid.append((t.gx, t.gy))
+                                break
 
-                if not self.selected:
-                    tower = SplashTower(self, "Default", x=x, y=y)
-                    self.place_tower(tower, x, y, new=True)
+                    if not self.selected_mouse:
+                        tower = SplashTower(self, "Default", x=x, y=y)
+                        self.place_tower(tower, x, y, new=True)
 
-            else:
-                self.place_tower(self.selected, x, y, new=True)
-                self.selected = None
+                else:
+                    self.place_tower(self.selected_mouse, x, y, new=True)
+                    self.selected_mouse = None
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            if self.selected:
-                self.place_tower(self.selected, x, y, new=True)
-                self.selected = None
+            if self.selected_mouse:
+                self.place_tower(self.selected_mouse, x, y, new=True)
+                self.selected_mouse = None
                 self.dragging = False
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
-            if self.selected:
+            if self.selected_mouse:
                 self.dragging = True
-                self.selected.updatePos(x, y, None, None)
+                self.selected_mouse.updatePos(x, y, None, None)
 
         elif buttons & mouse.RIGHT:
             self.span(dx, dy)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        if self.selected:
-            self.selected.updatePos(x, y, None, None)
+        if self.selected_mouse:
+            self.selected_mouse.updatePos(x, y, None, None)
         self.cx, self.cy = x, y
 
     def on_resize(self, width, height):
@@ -632,117 +669,102 @@ class Game(pyglet.window.Window):  # Main game window
 
     def render(self, dt):
         """ Rendering method, need to remove game logic """
-        # Initialize Projection matrix
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
+        if not self.paused:
+            # Initialize Projection matrix
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
 
-        glMatrixMode(GL_MODELVIEW)
-        # # Initialize Modelview matrix
-        glLoadIdentity()
-        # # Save the default modelview matrix
-        # glPushMatrix()
-        glClear(GL_COLOR_BUFFER_BIT)
+            glMatrixMode(GL_MODELVIEW)
+            # # Initialize Modelview matrix
+            glLoadIdentity()
+            # # Save the default modelview matrix
+            # glPushMatrix()
+            glClear(GL_COLOR_BUFFER_BIT)
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnable(GL_LINE_SMOOTH)
-        glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            glEnable(GL_LINE_SMOOTH)
+            glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
 
-        # glOrtho(50, self.width - 50, 50, self.height - 50, 1, -1)
-        glOrtho(0, self.width, 0, self.height, 1, -1)
+            # glOrtho(50, self.width - 50, 50, self.height - 50, 1, -1)
+            glOrtho(0, self.width, 0, self.height, 1, -1)
 
-        glColor4f(0, 0, 0, 1)
+            glColor4f(0, 0, 0, 1)
 
-        # glColor4f(1, 1, 1, 0.2)
+            # glColor4f(1, 1, 1, 0.2)
 
-        glColor4f(0.3, 0.3, 0.3, 1.0)
-        glPointSize(3)
-        # self.batches["bg2"].draw()
+            glColor4f(0.3, 0.3, 0.3, 1.0)
+            glPointSize(3)
+            self.setGL("on")
+            glColor4f(1, 1, 1, 1)
+            self.batches["bg"].draw()
+            self.batches["mobs"].draw()
+            # if self.debug:
+            #     self.batches["walls"].draw()
+            self.batches["towers"].draw()
+            self.batches["anim"].draw()
+            self.setGL("off")
 
-        ## Draw turrets ###
-        # for t in self.towers:
-        #     r, g, b = t.turret_color[0], t.turret_color[1], t.turret_color[2]
-        #     a = 1.0
-        #     glLineWidth(t.turret_width)
-        #     glColor4f(r, g, b, a)
-        #     x = t.x + t.turret_size * math.cos(math.radians(t.angle))
-        #     y = t.y + t.turret_size * math.sin(math.radians(t.angle))
-        #     pyglet.graphics.draw(
-        #         2,
-        #         GL_LINES,
-        #         ('v2f', (t.x, t.y, x, y))
-        #         )
+            glShadeModel(GL_SMOOTH)
+            glEnable(GL_BLEND)
+            glDisable(GL_DEPTH_TEST)
+            self.particle_system.draw()
 
-        self.setGL("on")
-        glColor4f(1, 1, 1, 1)
-        self.batches["bg"].draw()
-        self.batches["mobs"].draw()
-        # if self.debug:
-        #     self.batches["walls"].draw()
-        self.batches["towers"].draw()
-        self.batches["anim"].draw()
-        self.setGL("off")
-
-        glShadeModel(GL_SMOOTH)
-        glEnable(GL_BLEND)
-        glDisable(GL_DEPTH_TEST)
-        self.particle_system.draw()
-
-        if self.debug:
-            glLineWidth(3)
-            points, count = self.generateGridPathIndicators()
-            glColor4f(0.4, 0.4, 0.8, 0.7)
-            pyglet.graphics.draw(
-                count,
-                GL_LINES,
-                ('v2f', points)
-            )
-
-            points, count = self.generateMobPathIndicators()
-            glColor4f(0.7, 0.5, 0.3, 1.0)
-            pyglet.graphics.draw(
-                count,
-                GL_POINTS,
-                ('v2f', points)
-            )
-
-        # for p in self.grid.w_grid:
-
-        #     glColor4f(1, 0, 1, 1)
-        #     x, y = self.get_windowpos(p[0], p[1])
-        #     pyglet.graphics.draw(
-        #         1,
-        #         GL_POINTS,
-        #         ('v2f', (x, y))
-        #         )
-        ### Draw mob health bars ###
-        glColor4f(0.6, 0.3, 0.3, 1.0)
-        glLineWidth(3)
-        for m in self.mobs:
-            # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
-            if m.hp < m.hp_max:
+            if self.debug:
+                glLineWidth(3)
+                points, count = self.generateGridPathIndicators()
+                glColor4f(0.4, 0.4, 0.8, 0.7)
                 pyglet.graphics.draw(
-                    2,
+                    count,
                     GL_LINES,
-                    (
-                        'v2f',
+                    ('v2f', points)
+                )
+
+                points, count = self.generateMobPathIndicators()
+                glColor4f(0.7, 0.5, 0.3, 1.0)
+                pyglet.graphics.draw(
+                    count,
+                    GL_POINTS,
+                    ('v2f', points)
+                )
+
+            # for p in self.grid.w_grid:
+
+            #     glColor4f(1, 0, 1, 1)
+            #     x, y = self.get_windowpos(p[0], p[1])
+            #     pyglet.graphics.draw(
+            #         1,
+            #         GL_POINTS,
+            #         ('v2f', (x, y))
+            #         )
+            ### Draw mob health bars ###
+            glColor4f(0.6, 0.3, 0.3, 1.0)
+            glLineWidth(3)
+            for m in self.mobs:
+                # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
+                if m.hp < m.hp_max:
+                    pyglet.graphics.draw(
+                        2,
+                        GL_LINES,
                         (
-                            m.x - 1 - int((m.hp / m.hp_max) * 8),
-                            m.y + 10,
-                            m.x - 1 + int((m.hp / m.hp_max) * 8),
-                            m.y + 10)
+                            'v2f',
+                            (
+                                m.x - 1 - int((m.hp / m.hp_max) * 8),
+                                m.y + 10,
+                                m.x - 1 + int((m.hp / m.hp_max) * 8),
+                                m.y + 10)
+                            )
                         )
-                    )
 
-        ### Update animations ###
-        for a in self.animations:
-            a.update()
-            if not a.playing:
-                self.animations.remove(a)
+            ### Update animations ###
+            for a in self.animations:
+                a.update()
+                if not a.playing:
+                    self.animations.remove(a)
 
-        if self.debug:
-            fps_display.draw()
+            if self.debug:
+                fps_display.draw()
 
-        self.updateState()
+            self.updateState()
 
 
 if __name__ == "__main__":
@@ -750,5 +772,5 @@ if __name__ == "__main__":
     pyglet.clock.schedule_interval(window.render, 1.0/60.0)
     window.particle_system.run_ahead(2.0, 30.0)
     pyglet.clock.schedule_interval(window.particle_system.update, 1.0/30.0)
-    pyglet.clock.schedule_interval(window.pathFinding, 1.0/20.0)
+    pyglet.clock.schedule_interval(window.pathFinding, 1.0/10.0)
     pyglet.app.run()
