@@ -50,6 +50,7 @@ fps_display = pyglet.clock.ClockDisplay()
 ### Import classes ###
 from tower import *
 from mob import *
+from ui import *
 # from wall import *
 from animation import *
 from particles import *
@@ -85,17 +86,18 @@ class Game(pyglet.window.Window):  # Main game window
         self.offset = (0, 0)
         self.cx, self.cy = 0, 0  # Cursor position
         glClearColor(0.1, 0.1, 0.1, 1)  # Background color
-        self.particle_system = default_system
+        # self.particle_system = default_system
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
         self.batches["bg"] = pyglet.graphics.Batch()
         self.batches["bg2"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
+        self.batches["buttons"] = pyglet.graphics.Batch()
+        self.batches["mm_buttons"] = pyglet.graphics.Batch()
         # self.batches["walls"] = pyglet.graphics.Batch()
         self.batches["anim"] = pyglet.graphics.Batch()
-        self.bg_group = pyglet.graphics.OrderedGroup(0)
-        self.fg_group = pyglet.graphics.OrderedGroup(1)
+        self.ui_group = pyglet.graphics.OrderedGroup(2)
 
         self.loadTextures()
 
@@ -103,15 +105,6 @@ class Game(pyglet.window.Window):  # Main game window
         glShadeModel(GL_SMOOTH)
         glEnable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
-        self.puff_fx = ParticleCategory(self, "simple", "puff")
-        self.smoke_fx = ParticleCategory(self, "simple", "smoke")
-        self.muzzle_fx = ParticleCategory(self, "simple", "pang")
-        self.skull_fx = ParticleCategory(self, "simple", "skull")
-        ### Generates grid parameters for game instance ###
-        self.tiles_no_build = NOBUILD
-        self.tiles_no_walk = NOWALK
-        self.generateGridSettings()
-        self.grid = Grid(self)
 
         ### Lists of game objects ###
         self.mobs = []  # Enemy mob sprite objects
@@ -127,10 +120,69 @@ class Game(pyglet.window.Window):  # Main game window
         ### Pathfinding stuff ###
         self.pf_queue = []
         self.pf_clusters = []
+        self.paused = True
 
+        self.generateGridSettings()
+
+        print "Creating UI"
+        self.userinterface = UI(self)
+
+        # Spawn main menu
+        self.mainmenu = MainMenu(self)
+        self.mainmenu.add_entry(title="New Game", action="newgame")
+        self.mainmenu.add_entry(title="Exit", action="quit")
+
+        # Start a new game
+        # self.newGame()
+
+
+    def newGame(self, level="default"):
+
+        print "Starting a new game."
+
+        ### Generates grid parameters for game instance ###
+        self.tiles_no_build = NOBUILD
+        self.tiles_no_walk = NOWALK
+        self.generateGridSettings()
+        self.grid = Grid(self)
+
+        self.bg_group = pyglet.graphics.OrderedGroup(0)
+        self.fg_group = pyglet.graphics.OrderedGroup(1)
+
+        ### Lists of game objects ###
+        self.mobs = []  # Enemy mob sprite objects
+        self.mob_count = 0  # This serve as mob's id
+        self.towers = []  # Tower sprite objects
+        self.animations = []
+        self.selected_mouse = None
+        self.dragging = False
+        self.highlighted = []
+
+        # Autospawn random mob every second
+        self.autospawn = False
+        try:
+            print "Removing old particle system."
+            pyglet.clock.unschedule(self.particle_system.update)
+        except AttributeError:
+            pass
+        self.particle_system = default_system
+        self.particle_system.run_ahead(2.0, 30.0)
+        pyglet.clock.schedule_interval(self.particle_system.update, 1.0/30.0)
+        pyglet.clock.schedule_interval(self.pathFinding, 1.0/10.0)
+
+        # Particles and stuff
+        self.puff_fx, self.smoke_fx, self.muzzle_fx, self.skull_fx = (
+            None,
+            None,
+            None,
+            None
+        ) 
+        self.puff_fx = ParticleCategory(self, "simple", "puff")
+        self.smoke_fx = ParticleCategory(self, "simple", "smoke")
+        self.muzzle_fx = ParticleCategory(self, "simple", "pang")
+        self.skull_fx = ParticleCategory(self, "simple", "skull")
+        self.flame_emitter, self.gas_emitter = None, None
         self.addParticleEmitters()
-        # self.generateGridIndicators()
-
         self.bg = pyglet.sprite.Sprite(
             self.textures["bg"], batch=self.batches["bg"])
         self.bg.x = self.offset_x
@@ -138,10 +190,11 @@ class Game(pyglet.window.Window):  # Main game window
 
         self.grid.update()
 
-        # Pause
+        # Adding buttons to UI
+        for b in ("1", "2", "3"):
+            self.userinterface.add_button(b)
         self.paused = False
 
-        self.autospawn = False
 
     def loadTextures(self):
 
@@ -367,7 +420,7 @@ class Game(pyglet.window.Window):  # Main game window
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         print "SPAWNING"
-        choice = random.randint(0, 1)
+        choice = random.randint(0, 2)
         if choice:
             mob = Mob(self, "YAY")
         else:
@@ -436,17 +489,26 @@ class Game(pyglet.window.Window):  # Main game window
                 0
             )
 
+    def quit_game(self):
+        print("Exiting...")
+        pyglet.app.exit()
+
     ### EVENT HANDLERS ###
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ESCAPE:
-            print("Exiting...")
-            pyglet.app.exit()
+            self.quit_game()
             # return True  # Disable ESC to exit
         elif symbol == key.SPACE:
             self.paused = not self.paused
             if self.paused:
+                # Spawn main menu
+                self.mainmenu = MainMenu(self)
+                self.mainmenu.add_entry(title="Resume", action="resume")
+                self.mainmenu.add_entry(title="New Game", action="newgame")
+                self.mainmenu.add_entry(title="Exit", action="quit")
                 pyglet.clock.unschedule(self.particle_system.update)
             else:
+                self.mainmenu = None
                 pyglet.clock.schedule_interval(
                     window.particle_system.update,
                     1.0/30.0
@@ -493,27 +555,43 @@ class Game(pyglet.window.Window):  # Main game window
     def on_mouse_press(self, x, y, button, modifiers):
         if button == mouse.LEFT:
             if not self.paused:
-                if not self.selected_mouse:
-                    for t in self.towers:
-
-                        if x < t.x + t.size//2 and x > t.x - t.size//2:
-
-                            if y < t.y + t.size//2 and y > t.y - t.size//2:
-                                self.selected_mouse = t
-                                self.towers.remove(t)
-                                self.grid.update()
-                                if t.gx and t.gy:
-                                    self.grid.t_grid.append((t.gx, t.gy))
-                                    self.grid.w_grid.append((t.gx, t.gy))
-                                break
-
-                    if not self.selected_mouse:
-                        tower = SplashTower(self, "Default", x=x, y=y)
-                        self.place_tower(tower, x, y, new=True)
-
+                # First, check if mouse is on a UI element
+                t_type = self.userinterface.check_mouse((x, y))
+                if t_type:  # check_mouse returns false if not on a button
+                    if t_type == "1":
+                        tower = Tower(self)
+                        self.selected_mouse = tower
+                    if t_type == "2":
+                        tower = SplashTower(self)
+                        self.selected_mouse = tower
+                    if t_type == "3":
+                        tower = PoisonTower(self)
+                        self.selected_mouse = tower
                 else:
-                    self.place_tower(self.selected_mouse, x, y, new=True)
-                    self.selected_mouse = None
+                    if not self.selected_mouse:
+                        for t in self.towers:
+
+                            if x < t.x + t.size//2 and x > t.x - t.size//2:
+
+                                if y < t.y + t.size//2 and y > t.y - t.size//2:
+                                    self.selected_mouse = t
+                                    self.towers.remove(t)
+                                    self.grid.update()
+                                    if t.gx and t.gy:
+                                        self.grid.t_grid.append((t.gx, t.gy))
+                                        self.grid.w_grid.append((t.gx, t.gy))
+                                    break
+
+                        if not self.selected_mouse:
+                            tower = SplashTower(self, "Default", x=x, y=y)
+                            self.place_tower(tower, x, y, new=True)
+
+                    else:
+                        self.place_tower(self.selected_mouse, x, y, new=True)
+                        self.selected_mouse = None
+            elif self.mainmenu:
+                pos = (x, y)
+                self.mainmenu.check_mouse(pos)
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
@@ -547,28 +625,29 @@ class Game(pyglet.window.Window):  # Main game window
         self.updateGridSettings()
         # self.generateGridIndicators()
 
-        self.bg.x = self.offset_x
-        self.bg.y = self.offset_y
+        if not self.mainmenu:
+            self.bg.x = self.offset_x
+            self.bg.y = self.offset_y
 
         # for w in self.walls:
         #     w.updatePos()
 
-        for t in self.towers:
-            t.updateOffset()
+            for t in self.towers:
+                t.updateOffset()
 
-        for m in self.mobs:
-            m.updateOffset()
+            for m in self.mobs:
+                m.updateOffset()
 
-        sx, sy = self.get_windowpos(self.grid.start[0], self.grid.start[1])
-        for p in self.gas_emitter_group:
-            p.position = sx, sy, 0
+            sx, sy = self.get_windowpos(self.grid.start[0], self.grid.start[1])
+            for p in self.gas_emitter_group:
+                p.position = sx, sy, 0
 
-        gx, gy = self.get_windowpos(self.grid.goal[0], self.grid.goal[1])
-        for p in self.flame_emitter_group:
-            p.position = gx, gy, 0
+            gx, gy = self.get_windowpos(self.grid.goal[0], self.grid.goal[1])
+            for p in self.flame_emitter_group:
+                p.position = gx, gy, 0
 
-        self.gas_emitter.template.position = sx, sy, 0
-        self.flame_emitter.template.position = gx, gy, 0
+            self.gas_emitter.template.position = sx, sy, 0
+            self.flame_emitter.template.position = gx, gy, 0
 
     def updateState(self):
         for t in self.towers:
@@ -610,6 +689,8 @@ class Game(pyglet.window.Window):  # Main game window
                 glDisable(self.textures[t].texture.target)
 
     def addParticleEmitters(self):
+        self.flame_emitter_group = []
+        self.gas_emitter_group = []
         sx = self.get_windowpos(self.grid.start[0], self.grid.start[1])[0]
         sy = self.get_windowpos(self.grid.start[0], self.grid.start[1])[1]
         gx = self.get_windowpos(self.grid.goal[0], self.grid.goal[1])[0]
@@ -669,7 +750,7 @@ class Game(pyglet.window.Window):  # Main game window
 
     def render(self, dt):
         """ Rendering method, need to remove game logic """
-        if not self.paused:
+        if not self.paused and not self.mainmenu:
             # Initialize Projection matrix
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
@@ -702,6 +783,10 @@ class Game(pyglet.window.Window):  # Main game window
             #     self.batches["walls"].draw()
             self.batches["towers"].draw()
             self.batches["anim"].draw()
+            
+            ### Draw UI ###
+            self.userinterface.render()
+
             self.setGL("off")
 
             glShadeModel(GL_SMOOTH)
@@ -766,11 +851,10 @@ class Game(pyglet.window.Window):  # Main game window
 
             self.updateState()
 
+        else:
+            self.mainmenu.render()
 
 if __name__ == "__main__":
     window = Game()
     pyglet.clock.schedule_interval(window.render, 1.0/60.0)
-    window.particle_system.run_ahead(2.0, 30.0)
-    pyglet.clock.schedule_interval(window.particle_system.update, 1.0/30.0)
-    pyglet.clock.schedule_interval(window.pathFinding, 1.0/10.0)
     pyglet.app.run()
