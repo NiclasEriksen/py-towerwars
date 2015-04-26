@@ -17,8 +17,8 @@ class Mob(Sprite):
 
     def __init__(self, game, variant, debug=False):
         super(Mob, self).__init__(
-            game.textures["mob1Q"],
-            batch=game.batches["mobs"]
+            game.window.textures["mob1Q"],
+            batch=game.window.batches["mobs"]
         )
         self.g = game
         self.id = self.g.mob_count
@@ -34,8 +34,8 @@ class Mob(Sprite):
             -self.g.squaresize // 8,
             self.g.squaresize // 8
         )
-        self.x = game.get_windowpos(s[0], s[1])[0]
-        self.y = game.get_windowpos(s[0], s[1])[1]  # Drawing position
+        self.x = game.window.get_windowpos(s[0], s[1])[0]
+        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
         self.rx = self.x
         self.ry = self.y  # Real position, which is used in game logic
         self.currentpoint = s
@@ -76,17 +76,17 @@ class Mob(Sprite):
 
     def updateOffset(self):
         s = self.currentpoint
-        self.x, self.y = self.g.get_windowpos(s[0], s[1])
+        self.x, self.y = self.g.window.get_windowpos(s[0], s[1])
         self.rx, self.ry = self.x, self.y
 
     def updatePos(self):
-        if not self.stall_timer or not self in self.g.pf_queue:
+        if not self.stall_timer and not self in self.g.pf_queue:
 
             points = self.path
             tp = self.targetpoint
 
             if tp in points and tp in self.g.grid.w_grid:
-                targetpos = self.g.get_windowpos(tp[0], tp[1])
+                targetpos = self.g.window.get_windowpos(tp[0], tp[1])
 
                 if get_dist(targetpos[0], targetpos[1], self.rx, self.ry) < 2:
                     self.lastpoint = self.currentpoint
@@ -123,91 +123,93 @@ class Mob(Sprite):
                     self.g.pf_queue.append(self)
 
     def updateTarget(self):
-        if self.debug:
-            print("Updating target for mob.")
-            print("currentpoint: {0}".format(self.currentpoint))
-            print("target_pos: {0}".format(self.targetpoint))
-            print("point: {0}".format(self.point))
+        if not self.state == "stalled":
+            if self.debug:
+                print("Updating target for mob.")
+                print("currentpoint: {0}".format(self.currentpoint))
+                print("target_pos: {0}".format(self.targetpoint))
+                print("point: {0}".format(self.point))
 
-        self.point = 0
-        g = self.g.grid
-        share = False
-        if self.targetpoint in g.path:
-            self.path = g.path
-            self.point = g.path.index(self.targetpoint)
-            try:
-                self.targetpoint = g.path[self.point + 1]
-            except IndexError:
-                if self.debug:
-                    print("Target point out of range, panick!")
-                self.targetpoint = g.goal
-            share = True
-
-        else:
-            genpath = True
-            share = True
-            for p in g.path:
-                if abs(self.targetpoint[0] - p[0]) <= 1 and \
-                abs(self.targetpoint[1] - p[1]) <= 1:
-                    if self.targetpoint in get_diagonal(g.w_grid, p[0], p[1]):
-                        genpath = False
-                        share = True
-                        self.targetpoint = p
-                        break
-                    elif self.targetpoint in get_neighbors(g.w_grid, p[0], p[1]):
-                        genpath = False
-                        share = True
-                        self.targetpoint = p
-                        break
-
-            if genpath:
-                if self.debug:
-                    print("Mob {0} had to generate a new path.".format(self.id))
-                newpath = g.getPath(self.currentpoint)
-
-                if newpath:
-                    self.path = newpath
-                    self.state = "alive"
-                    if len(newpath) > 1:
-                        self.targetpoint = newpath[1]
-                    else:
-                        self.targetpoint = newpath[0]
-
-                    ### Shares path if mobs nearby also is waiting for update ###
-
-                # if pathfinding is not successfull, stall for a second
-                else:
-                    print("Mob is stalling!")
-                    self.state == "stalled"
+            self.point = 0
+            g = self.g.grid
+            share = False
+            if self.targetpoint in g.path:
+                self.path = g.path
+                self.point = g.path.index(self.targetpoint)
+                try:
+                    self.targetpoint = g.path[self.point + 1]
+                except IndexError:
+                    if self.debug:
+                        print("Target point out of range, panick!")
+                    self.targetpoint = g.goal
+                share = True
 
             else:
-                if self.debug:
-                    print(
-                        "New path was nearby, mob {0} rejoined it.".format(
-                            self.id)
-                    )
-                self.path = g.path
-                self.point = g.path.index(self.targetpoint) - 1
+                genpath = True
+                share = True
+                for p in g.path:
+                    if abs(self.targetpoint[0] - p[0]) <= 1 and \
+                    abs(self.targetpoint[1] - p[1]) <= 1:
+                        if self.targetpoint in get_diagonal(g.w_grid, p[0], p[1]):
+                            genpath = False
+                            share = True
+                            self.targetpoint = p
+                            break
+                        elif self.targetpoint in get_neighbors(g.w_grid, p[0], p[1]):
+                            genpath = False
+                            share = True
+                            self.targetpoint = p
+                            break
 
-        if share:
-            for m in self.g.pf_queue:
-                if m.id != self.id:
-                    if m.currentpoint == self.currentpoint:
-                        m.point = self.point
-                        m.targetpoint = self.targetpoint
-                        m.path = self.path
-                        # m.x, m.y, m.rx, m.ry = self.x, \
-                        #     self.y, self.rx, self.ry
-                        m.state = "alive"
-                        self.g.pf_queue.remove(m)
-                        if self.debug:
-                            print("Shared path with nearby mob.")
+                if genpath:
+                    if self.debug:
+                        print("Mob {0} had to generate a new path.".format(self.id))
+                    newpath = g.getPath(self.currentpoint)
+
+                    if newpath:
+                        self.path = newpath
+                        if len(newpath) > 1:
+                            self.targetpoint = newpath[1]
+                        else:
+                            self.targetpoint = newpath[0]
+
+                        ### Shares path if mobs nearby also is waiting for update ###
+
+                    # if pathfinding is not successfull, stall for a second
+                    else:
+                        print("Mob is stalling!")
+                        self.state = "stalled"
+                        self.stall_timer = 60
+
+                else:
+                    if self.debug:
+                        print(
+                            "New path was nearby, mob {0} rejoined it.".format(
+                                self.id)
+                        )
+                    self.path = g.path
+                    self.point = g.path.index(self.targetpoint) - 1
+
+            if share and not self.state == "stalled":
+                for m in self.g.pf_queue:
+                    if m.id != self.id:
+                        if m.currentpoint == self.currentpoint:
+                            m.point = self.point
+                            m.targetpoint = self.targetpoint
+                            m.path = self.path
+                            # m.x, m.y, m.rx, m.ry = self.x, \
+                            #     self.y, self.rx, self.ry
+                            # m.state = "alive"
+                            self.g.pf_queue.remove(m)
+                            if self.debug:
+                                print("Shared path with nearby mob.")
+
 
     def updateState(self):
         self.debug = self.g.debug
         if self.state == "dead":
             anim = animation.Animation(
-                self.g, self.g.anim["mob1Qdeath"], self.x, self.y
+                self.g.window, self.g.window.anim["mob1Qdeath"], self.x, self.y
             )
             if self.debug:
                 print("Mob {0} died at x:{1}, y:{2}".format(
@@ -218,8 +220,6 @@ class Mob(Sprite):
             self.g.mobs.remove(self)
             self.delete()
         elif self.state == "stalled":
-            if not self.stall_timer:
-                self.stall_timer = 60
             if self.stall_timer > 0:
                 self.stall_timer -= 1
             else:
@@ -241,8 +241,8 @@ class Mob1W(Mob):
 
     def __init__(self, game, variant, debug=False):
         super(Mob, self).__init__(
-            game.textures["mob1W"],
-            batch=game.batches["mobs"]
+            game.window.textures["mob1W"],
+            batch=game.window.batches["mobs"]
         )
         self.g = game
         self.id = self.g.mob_count
@@ -258,8 +258,8 @@ class Mob1W(Mob):
             -self.g.squaresize // 8,
             self.g.squaresize // 8
         )
-        self.x = game.get_windowpos(s[0], s[1])[0]
-        self.y = game.get_windowpos(s[0], s[1])[1]  # Drawing position
+        self.x = game.window.get_windowpos(s[0], s[1])[0]
+        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
         self.rx = self.x
         self.ry = self.y  # Real position, which is used in game logic
         self.currentpoint = s
@@ -310,12 +310,12 @@ class Debuff:
             if self.time % 60 == 0:
                 if self.owner.hp > 0:
                     self.owner.hp -= self.dmg
-                    self.owner.g.puff_fx.addParticle(
+                    self.owner.g.window.puff_fx.addParticle(
                         self.owner.x + random.randrange(-8, 9),
                         self.owner.y + random.randrange(-6, 7),
                         (0.55 ,1, 0.45, 0.5)
                     )
-                    self.owner.g.skull_fx.addParticle(
+                    self.owner.g.window.skull_fx.addParticle(
                         self.owner.x + random.randrange(0, 12),
                         self.owner.y + random.randrange(0, 12),
                         (0.10 ,0.3, 0.10, 0.8),

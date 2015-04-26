@@ -16,12 +16,13 @@ class Tower(Sprite):
 
     def __init__(self, game, name="Default", x=0, y=0):
         super(Tower, self).__init__(
-            game.textures["tower_wood"],
-            batch=game.batches["towers"],
-            group=game.fg_group
+            game.window.textures["tower_wood"],
+            batch=game.window.batches["towers"],
+            group=game.window.fg_group
         )
         self.name = name
         self.game = game
+        self.window = game.window
         self.size = game.squaresize
         self.gx = x
         self.gy = y
@@ -29,19 +30,19 @@ class Tower(Sprite):
             self.x = x
             self.y = y
         else:  # Sets the tower position to cursor position
-            self.x = self.game.cx
-            self.y = self.game.cy
+            self.x = self.game.window.cx
+            self.y = self.game.window.cy
         self.turret = Sprite(
-            game.textures["tower_splash_turret"],
+            self.window.textures["tower_splash_turret"],
             x=self.x, y=self.y,
-            batch=game.batches["anim"]
+            batch=self.window.batches["anim"]
         )
         self.dmg = 4.0
         self.crit = 15
         self.spd = 0.4
         self.cd = False
         self.dmg_type = 0  # 0 Normal, 1 Magic, 2 Chaos
-        self.range = int(game.squaresize * 3)
+        self.range = int(self.size * 3)
         self.target = None
         self.turret_size = 14
         self.selected = False
@@ -63,7 +64,7 @@ class Tower(Sprite):
         self.turret.y = self.y
 
     def updateOffset(self):
-        self.x, self.y = self.game.get_windowpos(self.gx, self.gy)
+        self.x, self.y = self.window.get_windowpos(self.gx, self.gy)
         self.turret.x, self.turret.y = self.x, self.y
 
     def setCD(self, n):
@@ -85,10 +86,10 @@ class Tower(Sprite):
             if not self.cd:
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
                 y = int(self.y + self.turret_size * math.sin(-self.angle))
-                self.game.muzzle_fx.addParticle(
+                self.window.muzzle_fx.addParticle(
                     x, y, (1, 1, 1, 1)
                 )
-                self.game.muzzle_fx.addParticle(
+                self.window.muzzle_fx.addParticle(
                     t.x + random.randrange(-2, 3),
                     t.y + random.randrange(-2, 3),
                     (0.85, 0.78, 0.6, 0.9)
@@ -106,12 +107,13 @@ class SplashTower(Tower):
 
     def __init__(self, game, name="Splash Tower", x=0, y=0):
         super(Tower, self).__init__(
-            game.textures["tower_splash"],
-            batch=game.batches["towers"],
-            group=game.fg_group
+            game.window.textures["tower_splash"],
+            batch=game.window.batches["towers"],
+            group=game.window.fg_group
         )
         self.name = name
         self.game = game
+        self.window = game.window
         self.size = game.squaresize
         self.gx = x
         self.gy = y
@@ -119,8 +121,8 @@ class SplashTower(Tower):
             self.x = x
             self.y = y
         else:  # Sets the tower position to cursor position
-            self.x = self.game.cx
-            self.y = self.game.cy
+            self.x = self.window.cx
+            self.y = self.window.cy
         self.dmg = 20.0
         self.crit = 0
         self.spd = 1.5
@@ -129,9 +131,9 @@ class SplashTower(Tower):
         self.range = int(game.squaresize * 4)
         self.splash_range = game.squaresize * 2
         self.turret = Sprite(
-            game.textures["tower_splash_turret"],
+            self.window.textures["tower_splash_turret"],
             x=self.x, y=self.y,
-            batch=game.batches["anim"]
+            batch=self.window.batches["anim"]
         )
         self.splash_limit = 6
         self.target = None
@@ -148,20 +150,20 @@ class SplashTower(Tower):
                 # Spawns muzzle particle effect
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
                 y = int(self.y + self.turret_size * math.sin(-self.angle))
-                self.game.muzzle_fx.addParticle(
+                self.window.muzzle_fx.addParticle(
                     x, y, (1, 1, 1, 1)
                 )
 
                 r = self.splash_range / 4
                 # Spawns particle effects on mobs
                 anim = animation.Animation(
-                    self.game, self.game.anim["pang01"], t.x, t.y
+                    self.window, self.window.anim["pang01"], t.x, t.y
                 )
                 i = 0
                 while i < 5:
                     x = t.x + random.randrange(-r / 2, r / 2)
                     y = t.y + random.randrange(-r / 2, r / 2)
-                    self.game.smoke_fx.addParticle(
+                    self.window.smoke_fx.addParticle(
                         x, y, (0.70, 0.67, 0.65, 0.4)
                     )
                     i += 1
@@ -169,7 +171,7 @@ class SplashTower(Tower):
                 while i < 5:
                     x = t.x + random.randrange(-r, r)
                     y = t.y + random.randrange(-r, r)
-                    self.game.smoke_fx.addParticle(
+                    self.window.smoke_fx.addParticle(
                         x, y, (0.80, 0.77, 0.75, 0.5)
                     )
                     i += 1
@@ -187,7 +189,7 @@ class SplashTower(Tower):
 
                             x = m.x + random.randrange(-5, 6)
                             y = m.y + random.randrange(-4, 5)
-                            self.game.smoke_fx.addParticle(
+                            self.window.smoke_fx.addParticle(
                                 x, y, (0.75, 0.70, 0.60, 0.5)
                             )
                             count += 1
@@ -198,13 +200,14 @@ class PoisonTower(Tower):
 
     def __init__(self, game, name="Poison Tower", x=0, y=0):
         super(Tower, self).__init__(
-            game.textures["tower_poison"],
-            batch=game.batches["towers"],
-            group=game.fg_group
+            game.window.textures["tower_poison"],
+            batch=game.window.batches["towers"],
+            group=game.window.fg_group
         )
         self.name = name
         self.game = game
         self.size = game.squaresize
+        self.window = game.window
         self.dmg = 8.0
         self.crit = 10
         self.spd = 0.8
@@ -221,12 +224,12 @@ class PoisonTower(Tower):
             self.x = x
             self.y = y
         else:  # Sets the tower position to cursor position
-            self.x = self.game.cx
-            self.y = self.game.cy
+            self.x = self.window.cx
+            self.y = self.window.cy
         self.turret = Sprite(
-            game.textures["tower_poison_turret"],
+            self.window.textures["tower_poison_turret"],
             x=self.x, y=self.y,
-            batch=game.batches["anim"]
+            batch=self.window.batches["anim"]
         )
         self.selected = False
         self.setAngle()
@@ -245,7 +248,7 @@ class PoisonTower(Tower):
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
                 y = int(self.y + self.turret_size * math.sin(-self.angle))
 
-                self.game.puff_fx.addParticle(
+                self.window.puff_fx.addParticle(
                     x, y, (0.65, 0.9, 0.40, 0.9)
                 )
 
@@ -253,7 +256,7 @@ class PoisonTower(Tower):
                 while i < 5:
                     x = t.x + random.randrange(-4, 5)
                     y = t.y + random.randrange(-4, 5)
-                    self.game.puff_fx.addParticle(
+                    self.window.puff_fx.addParticle(
                         x, y, (0.45, 0.8, 0.35, 1)
                     )
                     i += 1
