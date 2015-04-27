@@ -53,6 +53,7 @@ class Mob(Sprite):
         self.stall_timer = None
         self.point = 0
         self.path = game.grid.path
+        self.bounty = 1    # Gold awarded for killing mob
         self.debug = debug
         if self.debug:
             print("Spawning mob!")
@@ -94,7 +95,7 @@ class Mob(Sprite):
                     if self.currentpoint == self.g.grid.goal:
                         if self.debug:
                             print("Mob reached goal.")
-                        self.state = "dead"
+                        self.state = "reached_goal"
                     else:
                         self.point += 1
                         try:
@@ -217,8 +218,13 @@ class Mob(Sprite):
                 ))
             if self in self.g.pf_queue:
                 self.g.pf_queue.remove(self)
+            self.g.gold += self.bounty
             self.g.mobs.remove(self)
-            self.delete()
+        elif self.state == "reached_goal":
+            print("You are leaking!")
+            if self in self.g.pf_queue:
+                self.g.pf_queue.remove(self)
+            self.g.mobs.remove(self)
         elif self.state == "stalled":
             if self.stall_timer > 0:
                 self.stall_timer -= 1
@@ -277,6 +283,7 @@ class Mob1W(Mob):
         self.stall_timer = None
         self.point = 0
         self.path = game.grid.path
+        self.bounty = 3
         self.debug = debug
         if self.debug:
             print("Spawning mob!")

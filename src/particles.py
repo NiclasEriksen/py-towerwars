@@ -16,7 +16,7 @@ class ParticleCategory:
         self.tex = game.effects
         self.game = game
         self.group = None
-        print "Creating new particle category"
+        # print "Creating new particle category"
 
         if t == "emitter" and e == "smoke":
             self.createSmokeEmitter(color, size, x, y)

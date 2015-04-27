@@ -38,13 +38,14 @@ class Tower(Sprite):
             batch=self.window.batches["anim"]
         )
         self.dmg = 4.0
-        self.crit = 15
-        self.spd = 0.4
+        self.crit = 15  # Percentage chance for a critical strike
+        self.spd = 0.4  # Time between attacks in seconds
+        self.price = 5   # Build price of tower
         self.cd = False
         self.dmg_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.range = int(self.size * 3)
         self.target = None
-        self.turret_size = 14
+        self.turret_size = 14   # Length of turret, in pixels
         self.selected = False
         self.setAngle()
 
@@ -127,6 +128,7 @@ class SplashTower(Tower):
         self.crit = 0
         self.spd = 1.5
         self.cd = False
+        self.price = 40
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
         self.range = int(game.squaresize * 4)
         self.splash_range = game.squaresize * 2
@@ -214,6 +216,7 @@ class PoisonTower(Tower):
         self.slow = 30
         self.slow_time = self.spd
         self.cd = False
+        self.price = 25
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
         self.range = int(game.squaresize * 4.5)
         self.target = None

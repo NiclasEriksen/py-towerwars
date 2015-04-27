@@ -8,9 +8,26 @@ class UI():
     def __init__(self, window):
         self.w = window
         self.buttons = []
+        self.texts = []
         self.sprites = []
         # self.b_size = self.game.squaresize
         self.b_size = 32
+
+    def add_text(self, t_type):
+        if t_type == "gold":
+            x = 20
+            y = self.w.height - 15
+
+            label = text.Label(
+                str(self.w.game.gold), font_name='UI font',
+                font_size=14,
+                x=x, y=y,
+                anchor_x="center", anchor_y="center",
+                color=(255, 255, 155, 255)
+            )
+            label.t_type = t_type
+
+            self.texts.append(label)
 
     def add_button(self, b_type):
         if b_type == "1":
@@ -50,6 +67,10 @@ class UI():
 
     def render(self):
         self.w.batches["buttons"].draw()
+        for t in self.texts:
+            if t.t_type == "gold":  # Updates gold count
+                t.text = str(self.w.game.gold)
+            t.draw()
 
 
 class MainMenu():
@@ -77,8 +98,8 @@ class MainMenu():
                 )
         b_sprite.action = action
         b_sprite.label = text.Label(
-            title, font_name='Times New Roman',
-            font_size=18,
+            title, font_name='UI font',
+            font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center"
         )
