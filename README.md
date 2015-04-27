@@ -1,9 +1,9 @@
 # py-towerwars
 A python implementation of the custom game mode Tower Wars from Warcraft III.
 
-It's built on Pyglet, lepton (particle system) and PyTMX (Tiled map loader)
+It's built on Pyglet, lepton (particle system) and PyTMX (Tiled map loader, not implemented yet)
 
-No UI yet, 'game' is controlled by keyboard shortcuts.
+Here's a list of keyboard shortcuts:
 
 F11: Fullscreen
 
