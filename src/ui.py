@@ -29,6 +29,49 @@ class UI():
 
             self.texts.append(label)
 
+        x = self.w.width - 20
+        y = self.w.height - 15
+
+        label = text.Label(
+            str(len(self.w.game.mobs)), font_name='UI font',
+            font_size=14,
+            x=x, y=y,
+            anchor_x="center", anchor_y="center",
+            color=(255, 155, 255, 255)
+        )
+
+        label.t_type = "mob_count"
+
+        self.texts.append(label)
+
+        y = self.w.height - 40
+
+        label = text.Label(
+            str(len(self.w.animations)), font_name='UI font',
+            font_size=14,
+            x=x, y=y,
+            anchor_x="center", anchor_y="center",
+            color=(255, 155, 255, 255)
+        )
+
+        label.t_type = "anim_count"
+
+        self.texts.append(label)
+
+        y = self.w.height - 65
+
+        label = text.Label(
+            str(len(self.w.game.pf_queue)), font_name='UI font',
+            font_size=14,
+            x=x, y=y,
+            anchor_x="center", anchor_y="center",
+            color=(255, 155, 255, 255)
+        )
+
+        label.t_type = "pf_count"
+
+        self.texts.append(label)
+
     def add_button(self, b_type):
         if b_type == "1":
             x = 20
@@ -70,6 +113,12 @@ class UI():
         for t in self.texts:
             if t.t_type == "gold":  # Updates gold count
                 t.text = str(self.w.game.gold)
+            elif t.t_type == "mob_count":
+                t.text = str(len(self.w.game.mobs))
+            elif t.t_type == "anim_count":
+                t.text = str(len(self.w.animations))
+            elif t.t_type == "pf_count":
+                t.text = str(len(self.w.game.pf_queue))
             t.draw()
 
 

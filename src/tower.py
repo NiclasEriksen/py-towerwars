@@ -101,7 +101,6 @@ class Tower(Sprite):
                 else:
                     t.hp -= self.dmg
                 self.setCD(self.spd)
-        return t
 
 
 class SplashTower(Tower):
@@ -243,8 +242,12 @@ class PoisonTower(Tower):
         else:
             if not self.cd:
                 t.hp -= self.dmg
-                t.setDebuff("slow", slow=self.slow, time=self.slow_time)
-                t.setDebuff("poison", tickdmg=self.dmg//4, time=5.0)
+                if t.hp <= 0:
+                    t.state = "dead"
+                else:
+                    t.setDebuff("slow", slow=self.slow, time=self.slow_time)
+                    t.setDebuff("poison", tickdmg=self.dmg//4, time=5.0)
+
                 self.setCD(self.spd)
 
                 # Spawns muzzle particle effect
@@ -263,5 +266,3 @@ class PoisonTower(Tower):
                         x, y, (0.45, 0.8, 0.35, 1)
                     )
                     i += 1
-
-        return t

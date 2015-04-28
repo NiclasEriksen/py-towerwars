@@ -25,11 +25,13 @@ NOBUILD = [
 
 
 class Game():
+
     """Game session."""
+
     def __init__(self, window):
         self.debug = window.debug
         self.window = window    # Need to keep track of the game window
-        ### Lists of game objects ###
+        # Lists of game objects
         self.mobs = []  # Enemy mob sprite objects
         self.mob_count = 0  # This serve as mob's id
         self.towers = []  # Tower sprite objects
@@ -40,11 +42,11 @@ class Game():
         self.loaded = False     # If game is loaded
         self.paused = True      # Game starts off in a paused state
 
-        ### Economy ###
+        # Economy
         self.gold = 0         # Players "wallet"
         self.total_value = 0    # To be used later for adaptive difficulty
 
-        ### Pathfinding stuff ###
+        # Pathfinding stuff
         self.pf_queue = []
         self.pf_clusters = []
 
@@ -53,10 +55,9 @@ class Game():
 
     def newGame(self, level="default"):
 
-        print "Starting a new game."
+        print("Starting a new game.")
 
-
-        ### Generates grid parameters for game instance ###
+        # Generates grid parameters for game instance
         self.tiles_no_build = NOBUILD
         self.tiles_no_walk = NOWALK
         self.generateGridSettings()
@@ -68,7 +69,7 @@ class Game():
         # Create particle emitters
         self.window.addParticleEmitters()
 
-        ### Lists of game objects ###
+        # Lists of game objects
         self.mobs = []  # Enemy mob sprite objects
         self.mob_count = 0  # This serve as mob's id
         self.towers = []  # Tower sprite objects
@@ -106,7 +107,6 @@ class Game():
         w, h, gm, ssize = self.window.width, self.window.height, 0, 32
         self.window.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
         self.window.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
-
 
     def pathFinding(self, dt, limit=1):
         if len(self.pf_queue) > 0:
@@ -149,7 +149,6 @@ class Game():
 
         if placed:
             self.gold -= t.price
-            print self.gold
             t.selected = False
             t.updatePos(new_rg[0], new_rg[1], new_g[0], new_g[1])
             if new:
@@ -196,7 +195,6 @@ class Game():
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
-            print "SPAWNING"
             choice = random.randint(0, 2)
             if choice:
                 mob = Mob(self, "YAY")
@@ -235,6 +233,13 @@ class Game():
         for m in self.mobs:
             m.updatePos()  # Update movement
             m.updateState()  # Update mob state, e.g. "dead", "alive"
+
+    def get_total_value(self):
+        value = 0
+        for t in self.towers:
+            value += t.price
+        return value
+
 
     # def generateGridIndicators(self):
     #     """ Generates the squares that indicates available blocks """

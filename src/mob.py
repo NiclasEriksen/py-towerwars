@@ -1,5 +1,4 @@
-import subprocess
-import pypf
+# import subprocess
 from pyglet.sprite import Sprite
 from functions import *
 import animation
@@ -7,9 +6,10 @@ import random
 from lepton import Particle
 
 n_particle = Particle(
-    velocity=(1,1,0), 
-    color=(0.55 ,0.50, 0.45, 0.5)
+    velocity=(1, 1, 0),
+    color=(0.55, 0.50, 0.45, 0.5)
 )
+
 
 class Mob(Sprite):
 
@@ -81,7 +81,7 @@ class Mob(Sprite):
         self.rx, self.ry = self.x, self.y
 
     def updatePos(self):
-        if not self.stall_timer and not self in self.g.pf_queue:
+        if not self.stall_timer and (self not in self.g.pf_queue):
 
             points = self.path
             tp = self.targetpoint
@@ -103,11 +103,14 @@ class Mob(Sprite):
                         except IndexError:
                             self.g.pf_queue.append(self)
                         if self.debug:
-                            print("Reached pos {0}, new target_pos is {1}".format(
-                                self.currentpoint, self.targetpoint))
+                            print(
+                                "Reached pos {0}, new target is {1}".format(
+                                    self.currentpoint, self.targetpoint
+                                )
+                            )
 
                 else:
-                    if not self in self.g.pf_queue:
+                    if (self not in self.g.pf_queue):
                         rads = get_angle(
                             self.rx, self.ry,
                             targetpos[0], targetpos[1]
@@ -118,7 +121,7 @@ class Mob(Sprite):
                         self.y = self.ry + self.y_offset
 
             else:
-                if not self in self.g.pf_queue:
+                if (self not in self.g.pf_queue):
                     if self.debug:
                         print("Need to recalculate mob route.")
                     self.g.pf_queue.append(self)
@@ -149,14 +152,22 @@ class Mob(Sprite):
                 genpath = True
                 share = True
                 for p in g.path:
-                    if abs(self.targetpoint[0] - p[0]) <= 1 and \
-                    abs(self.targetpoint[1] - p[1]) <= 1:
-                        if self.targetpoint in get_diagonal(g.w_grid, p[0], p[1]):
+                    if (
+                        abs(self.targetpoint[0] - p[0]) <= 1 and
+                        abs(self.targetpoint[1] - p[1]) <= 1
+                    ):
+                        if self.targetpoint in get_diagonal(
+                            g.w_grid, p[0], p[1]
+                        ):
                             genpath = False
                             share = True
                             self.targetpoint = p
                             break
-                        elif self.targetpoint in get_neighbors(g.w_grid, p[0], p[1]):
+                        elif (
+                            self.targetpoint in get_neighbors(
+                                g.w_grid, p[0], p[1]
+                            )
+                        ):
                             genpath = False
                             share = True
                             self.targetpoint = p
@@ -164,7 +175,9 @@ class Mob(Sprite):
 
                 if genpath:
                     if self.debug:
-                        print("Mob {0} had to generate a new path.".format(self.id))
+                        print(
+                            "Mob {0} had to generate new path.".format(self.id)
+                        )
                     newpath = g.getPath(self.currentpoint)
 
                     if newpath:
@@ -173,8 +186,6 @@ class Mob(Sprite):
                             self.targetpoint = newpath[1]
                         else:
                             self.targetpoint = newpath[0]
-
-                        ### Shares path if mobs nearby also is waiting for update ###
 
                     # if pathfinding is not successfull, stall for a second
                     else:
@@ -191,6 +202,7 @@ class Mob(Sprite):
                     self.path = g.path
                     self.point = g.path.index(self.targetpoint) - 1
 
+            # Shares path if mobs nearby is awaiting update
             if share and not self.state == "stalled":
                 for m in self.g.pf_queue:
                     if m.id != self.id:
@@ -205,9 +217,9 @@ class Mob(Sprite):
                             if self.debug:
                                 print("Shared path with nearby mob.")
 
-
     def updateState(self):
         self.debug = self.g.debug
+
         if self.state == "dead":
             anim = animation.Animation(
                 self.g.window, self.g.window.anim["mob1Qdeath"], self.x, self.y
@@ -216,6 +228,7 @@ class Mob(Sprite):
                 print("Mob {0} died at x:{1}, y:{2}".format(
                     self.id, self.x, self.y
                 ))
+            self.debuff_list = []
             if self in self.g.pf_queue:
                 self.g.pf_queue.remove(self)
             self.g.gold += self.bounty
@@ -232,15 +245,15 @@ class Mob(Sprite):
                 self.stall_timer = None
                 self.state = "alive"
                 self.updateTarget()
+        else:   # If none of the states apply
+            slowed = False
+            for d in self.debuff_list:
+                if d.d_type == "slow":
+                    slowed = True
+                d.update()
+            if not slowed:
+                self.spd = self.orig_spd
 
-        slowed = False
-        for d in self.debuff_list:
-            if d.d_type == "slow":
-                slowed = True
-            d.update()
-
-        if not slowed:
-            self.spd = self.orig_spd
 
 
 class Mob1W(Mob):
@@ -291,7 +304,6 @@ class Mob1W(Mob):
 
 class Debuff:
 
-
     def __init__(self, owner, d_type, time, **kwargs):
         self.owner = owner
         self.d_type = d_type
@@ -320,12 +332,12 @@ class Debuff:
                     self.owner.g.window.puff_fx.addParticle(
                         self.owner.x + random.randrange(-8, 9),
                         self.owner.y + random.randrange(-6, 7),
-                        (0.55 ,1, 0.45, 0.5)
+                        (0.55, 1, 0.45, 0.5)
                     )
                     self.owner.g.window.skull_fx.addParticle(
                         self.owner.x + random.randrange(0, 12),
                         self.owner.y + random.randrange(0, 12),
-                        (0.10 ,0.3, 0.10, 0.8),
+                        (0.10, 0.3, 0.10, 0.8),
                         velocity=(
                             random.randrange(-6, 6),
                             random.randrange(8, 24),
