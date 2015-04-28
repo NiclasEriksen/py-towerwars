@@ -193,9 +193,6 @@ class Game():
             self.towers.remove(t)
             grid.update(new=False)
 
-        if self.gold > 999:     # Maximum amount of gold
-            self.gold = 999
-
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
@@ -238,6 +235,9 @@ class Game():
         for m in self.mobs:
             m.updatePos()  # Update movement
             m.updateState()  # Update mob state, e.g. "dead", "alive"
+
+        if self.gold > 999:     # Maximum amount of gold
+            self.gold = 999
 
     def get_total_value(self):
         value = 0

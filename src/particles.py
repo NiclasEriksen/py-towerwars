@@ -10,12 +10,13 @@ class ParticleCategory:
 
     def __init__(self, game, t, e,
         x=None, y=None, dx=0, dy=0,
-        color=None, size=12
+        color=(1, 1, 1, 1), size=12
     ):
         self.system = game.particle_system
         self.tex = game.effects
         self.game = game
         self.group = None
+        self.color = color
         # print "Creating new particle category"
 
         if t == "emitter" and e == "smoke":
@@ -30,8 +31,15 @@ class ParticleCategory:
             self.createSimplePang()
         elif t == "simple" and e == "skull":
             self.createSimpleSkull()
+        elif t == "simple" and e == "crit":
+            self.color = (1.0, 0, 0, 1.0)
+            self.createSimpleCrit()
+        else:
+            print("No suitable effect found for {0} {1}".format(t, e))
 
     def draw(self):
+        # c = self.color
+        # glColor4f(c[0], c[1], c[2], c[3])
         self.group.draw()
 
     def update(self, dt):
@@ -116,6 +124,24 @@ class ParticleCategory:
                 12,
                 SpriteTexturizer(
                     self.tex["skull"].texture.id))
+        )
+
+    def createSimpleCrit(self):
+        self.group = ParticleGroup(
+            controllers=[
+                Lifetime(0.6),
+                Movement(damping=0.95),
+                Fader(
+                    fade_in_start=0, start_alpha=0,
+                    fade_in_end=0.10, max_alpha=1,
+                    fade_out_start=0.15, fade_out_end=0.6
+                )
+            ],
+            system=self.game.particle_system,
+            renderer=PointRenderer(
+                12,
+                SpriteTexturizer(
+                    self.tex["crit"].texture.id))
         )
 
     def createSmokeEmitter(self, color, size, x, y, lifetime=6, dx=-1.5, dy=0):

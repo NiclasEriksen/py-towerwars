@@ -99,6 +99,17 @@ class Tower(Sprite):
                 r = random.randint(1, 101)
                 if r <= self.crit:
                     t.hp -= self.dmg * 1.5
+                    self.window.crit_fx.addParticle(
+                        t.x + random.randrange(0, 12),
+                        t.y + random.randrange(0, 12),
+                        (0.10, 0.3, 0.10, 0.8),
+                        velocity=(
+                            random.randrange(-6, 6),
+                            random.randrange(8, 24),
+                            0
+                        )
+
+                    )
                 else:
                     t.hp -= self.dmg
                 self.setCD(self.spd)

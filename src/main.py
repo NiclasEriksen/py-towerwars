@@ -133,11 +133,20 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.smoke_fx = None
         self.muzzle_fx = None
         self.skull_fx = None
+        self.crit_fx = None
 
         self.puff_fx = ParticleCategory(self, "simple", "puff")
         self.smoke_fx = ParticleCategory(self, "simple", "smoke")
         self.muzzle_fx = ParticleCategory(self, "simple", "pang")
         self.skull_fx = ParticleCategory(self, "simple", "skull")
+        self.crit_fx = ParticleCategory(self, "simple", "crit")
+        self.particlestest = (
+            self.puff_fx,
+            self.smoke_fx,
+            self.muzzle_fx,
+            self.skull_fx,
+            self.crit_fx
+        )
         self.flame_emitter, self.gas_emitter = None, None
         self.bg = pyglet.sprite.Sprite(
             self.textures["bg"], batch=self.batches["bg"])
@@ -157,6 +166,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         p_smoke_texture = pyglet.image.load(RES_PATH + 'particle_smoke.png')
         p_pang_texture = pyglet.image.load(RES_PATH + 'particle_pang.png')
         p_skull_texture = pyglet.image.load(RES_PATH + 'particle_skull.png')
+        p_crit_texture = pyglet.image.load(RES_PATH + 'crit.png')
         tp_img = center_image(pyglet.image.load(
             RES_PATH + 'tower_poison.png')
         )
@@ -191,6 +201,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             smoke=p_smoke_texture,
             skull=p_skull_texture,
             pang=p_pang_texture,
+            crit=p_crit_texture,
         )
         ### Load sprite sheet ###
         ### All credits go to http://opengameart.org/users/hyptosis ###
@@ -619,6 +630,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.effects["smoke"].texture.id)
             )
         )
+        self.particlestest = (
+            self.puff_fx,
+            self.smoke_fx,
+            self.muzzle_fx,
+            self.skull_fx,
+            self.crit_fx,
+            self.flame_emitter_group,
+            self.gas_emitter_group
+        )
 
     def render(self, dt):
         """ Rendering method, need to remove game logic """
@@ -666,7 +686,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
             glShadeModel(GL_SMOOTH)
             glEnable(GL_BLEND)
             glDisable(GL_DEPTH_TEST)
-            self.particle_system.draw()
+
+            for c in self.particlestest:
+                c.draw()
+            # self.particle_system.draw()
 
             if self.debug:
                 glLineWidth(3)
