@@ -192,6 +192,9 @@ class Game():
             self.towers.remove(t)
             grid.update(new=False)
 
+        if self.gold > 999:     # Maximum amount of gold
+            self.gold = 999
+
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
@@ -239,7 +242,6 @@ class Game():
         for t in self.towers:
             value += t.price
         return value
-
 
     # def generateGridIndicators(self):
     #     """ Generates the squares that indicates available blocks """

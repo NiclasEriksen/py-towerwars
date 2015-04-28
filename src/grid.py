@@ -117,11 +117,17 @@ class Grid:
             else:
                 self.path = [self.goal]
 
-    def getPath(self, start):
-        path, success = pypf.get_path(
-                self.w_grid, self.w_grid,
-                start, self.goal
-        )
+    def getPath(self, start, flying=False):
+        if flying:
+            path, success = pypf.get_path(
+                    self.fullgrid, self.fullgrid,
+                    start, self.goal
+            )
+        else:
+            path, success = pypf.get_path(
+                    self.w_grid, self.w_grid,
+                    start, self.goal
+            )
 
         if success:
             return path

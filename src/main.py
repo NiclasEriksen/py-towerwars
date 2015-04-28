@@ -77,6 +77,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
+        self.batches["flying_mobs"] = pyglet.graphics.Batch()
         self.batches["bg"] = pyglet.graphics.Batch()
         self.batches["bg2"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
@@ -180,6 +181,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             tower_splash_turret=ts_t_img,
             mob1Q=mob_1q,
             mob1W=mob_1w,
+            mob1F=mob_1w,
             bg=bg01
         )
 
@@ -394,6 +396,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.mobs.append(mob)
             elif symbol == key.W:
                 mob = Mob1W(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.F:
+                mob = Mob1F(self.game, "YAY")
                 self.game.mobs.append(mob)
             elif symbol == key.F11:
                 self.set_fullscreen(not self.fullscreen)
@@ -620,8 +625,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             glEnable(GL_LINE_SMOOTH)
             glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE)
 
-            # glOrtho(50, self.width - 50, 50, self.height - 50, 1, -1)
-            glOrtho(0, self.width, 0, self.height, 1, -1)
+            # gluOrtho2D(50, self.width - 50, 50, self.height - 50)
+            gluOrtho2D(0, self.width, 0, self.height)
 
             glColor4f(0, 0, 0, 1)
 
@@ -637,8 +642,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
             #     self.batches["walls"].draw()
             self.batches["towers"].draw()
             self.batches["anim"].draw()
-            
+            self.batches["flying_mobs"].draw()
+
             ### Draw UI ###
+            # gluOrtho2D(0, self.width, 0, self.height)
             self.userinterface.render()
 
             self.setGL("off")

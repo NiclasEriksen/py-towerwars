@@ -302,6 +302,114 @@ class Mob1W(Mob):
             print("Spawning mob!")
 
 
+class Mob1F(Mob):
+
+    """Flying mob"""
+
+    def __init__(self, game, variant, debug=False):
+        super(Mob, self).__init__(
+            game.window.textures["mob1F"],
+            batch=game.window.batches["flying_mobs"]
+        )
+        # Adds this mob to the batch with towers
+        self.g = game
+        self.id = self.g.mob_count
+        self.g.mob_count += 1
+        self.debug = game.debug
+        # self.image = mob_img
+        s = game.grid.start
+        self.x_offset = random.randrange(  # Offset for drawing position
+            -self.g.squaresize // 8,
+            self.g.squaresize // 8
+        )
+        self.y_offset = random.randrange(
+            -self.g.squaresize // 8,
+            self.g.squaresize // 8
+        )
+        self.x = game.window.get_windowpos(s[0], s[1])[0]
+        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
+        self.rx = self.x
+        self.ry = self.y  # Real position, which is used in game logic
+        self.currentpoint = s
+        self.lastpoint = None
+        self.state = "alive"
+        self.variant = variant
+        self.hp = 180.0
+        self.hp_max = self.hp
+        self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
+        self.spd = 0.9
+        self.debuff_list = []
+        self.slow_cd = None
+        self.orig_spd = self.spd
+        self.stall_timer = None
+        self.point = 0
+        self.path = game.grid.getPath(self.currentpoint, flying=True)
+        self.targetpoint = self.path[1]
+        self.bounty = 5
+        self.debug = debug
+        if self.debug:
+            print("Spawning mob!")
+
+    def updatePos(self):
+        if not self.stall_timer and (self not in self.g.pf_queue):
+            points = self.path
+            tp = self.targetpoint
+
+            if tp in points and tp in self.g.grid.fullgrid:
+                targetpos = self.g.window.get_windowpos(tp[0], tp[1])
+
+                if get_dist(targetpos[0], targetpos[1], self.rx, self.ry) < 2:
+                    self.lastpoint = self.currentpoint
+                    self.currentpoint = self.targetpoint
+                    if self.currentpoint == self.g.grid.goal:
+                        if self.debug:
+                            print("Mob reached goal.")
+                        self.state = "reached_goal"
+                    else:
+                        self.point += 1
+                        self.targetpoint = points[self.point]
+                        if self.debug:
+                            print(
+                                "Reached pos {0}, new target is {1}".format(
+                                    self.currentpoint, self.targetpoint
+                                )
+                            )
+
+                else:
+                    if (self not in self.g.pf_queue):
+                        rads = get_angle(
+                            self.rx, self.ry,
+                            targetpos[0], targetpos[1]
+                        )
+                        self.rx = self.rx + self.spd * math.cos(rads)
+                        self.ry = self.ry - self.spd * math.sin(rads)
+                        self.x = self.rx + self.x_offset
+                        self.y = self.ry + self.y_offset
+
+        elif (self in self.g.pf_queue):
+            self.g.pf_queue.remove(self)    # Never calculate path for flying
+
+    def updateTarget(self):
+        if not self.state == "stalled":
+            if self.debug:
+                print("Updating target for mob.")
+                print("currentpoint: {0}".format(self.currentpoint))
+                print("target_pos: {0}".format(self.targetpoint))
+                print("point: {0}".format(self.point))
+
+            self.point = 0
+            if self.targetpoint in self.path:
+                self.point = self.path.index(self.targetpoint)
+                try:
+                    self.targetpoint = self.path[self.point + 1]
+                except IndexError:
+                    if self.debug:
+                        print("Target point out of range, panick!")
+                    self.targetpoint = g.goal
+
+            else:
+                pass
+
 class Debuff:
 
     def __init__(self, owner, d_type, time, **kwargs):
