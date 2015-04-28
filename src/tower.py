@@ -39,10 +39,11 @@ class Tower(Sprite):
         )
         self.dmg = 4.0
         self.crit = 15  # Percentage chance for a critical strike
-        self.spd = 0.4  # Time between attacks in seconds
-        self.price = 5   # Build price of tower
+        self.spd = 0.6  # Time between attacks in seconds
+        self.price = 10   # Build price of tower
         self.cd = False
         self.dmg_type = 0  # 0 Normal, 1 Magic, 2 Chaos
+        self.target_types = ["normal", "flying"]
         self.range = int(self.size * 3)
         self.target = None
         self.turret_size = 14   # Length of turret, in pixels
@@ -123,13 +124,14 @@ class SplashTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.window.cx
             self.y = self.window.cy
-        self.dmg = 20.0
+        self.dmg = 16.0
         self.crit = 0
-        self.spd = 1.5
+        self.spd = 2.0
         self.cd = False
         self.price = 40
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
-        self.range = int(game.squaresize * 4)
+        self.target_types = ["normal"]
+        self.range = int(game.squaresize * 2.5)
         self.splash_range = game.squaresize * 2
         self.turret = Sprite(
             self.window.textures["tower_splash_turret"],
@@ -211,12 +213,13 @@ class PoisonTower(Tower):
         self.window = game.window
         self.dmg = 8.0
         self.crit = 10
-        self.spd = 0.8
+        self.spd = 1.4
         self.slow = 30
         self.slow_time = self.spd
         self.cd = False
         self.price = 25
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
+        self.target_types = ["normal", "flying"]
         self.range = int(game.squaresize * 4.5)
         self.target = None
         self.turret_size = 14

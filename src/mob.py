@@ -42,8 +42,9 @@ class Mob(Sprite):
         self.targetpoint = s
         self.lastpoint = None
         self.state = "alive"
+        self.move_type = "normal"
         self.variant = variant
-        self.hp = 100.0
+        self.hp = 20.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.0
@@ -285,8 +286,9 @@ class Mob1W(Mob):
         self.targetpoint = s
         self.lastpoint = None
         self.state = "alive"
+        self.move_type = "normal"
         self.variant = variant
-        self.hp = 250.0
+        self.hp = 50.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9
@@ -315,6 +317,7 @@ class Mob1F(Mob):
         self.g = game
         self.id = self.g.mob_count
         self.g.mob_count += 1
+        self.move_type = "flying"
         self.debug = game.debug
         # self.image = mob_img
         s = game.grid.start
@@ -334,7 +337,7 @@ class Mob1F(Mob):
         self.lastpoint = None
         self.state = "alive"
         self.variant = variant
-        self.hp = 180.0
+        self.hp = 30.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9

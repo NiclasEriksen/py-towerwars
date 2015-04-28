@@ -1,5 +1,6 @@
 #!/bin/python2
 import pyglet   # Version 1.2.2
+from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse
 from pyglet.gl import *
@@ -449,7 +450,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         tower = PoisonTower(self.game)
                         self.game.selected_mouse = tower
                 else:
-                    if not self.game.selected_mouse:
+                    if not self.game.mouse_drag_tower:
                         for t in self.game.towers:
                             # Checks for towers under cursor
                             if x < t.x + t.size//2 and x > t.x - t.size//2:
@@ -457,13 +458,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
                                 if y < t.y + t.size//2 and y > t.y - t.size//2:
                                     # Binds tower to mouse and removes tower
                                     self.game.selected_mouse = t
-                                    self.game.gold += t.price
-                                    self.game.towers.remove(t)
-                                    g = self.game.grid
-                                    g.update()
-                                    if t.gx and t.gy:
-                                        g.t_grid.append((t.gx, t.gy))
-                                        g.w_grid.append((t.gx, t.gy))
                                     break
 
                         if self.debug:
@@ -475,24 +469,43 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
                     else:
                         self.game.place_tower(
-                            self.game.selected_mouse, x, y, new=True
+                            self.game.mouse_drag_tower, x, y, new=True
                         )
-                        self.game.selected_mouse = None
+                        self.game.mouse_drag_tower = None
             elif self.mainmenu:
                 pos = (x, y)
                 self.mainmenu.check_mouse(pos)
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            if self.game.selected_mouse:
+            if self.game.selected_mouse and self.game.dragging:
                 self.game.place_tower(self.game.selected_mouse, x, y, new=True)
                 self.game.selected_mouse = None
+                self.game.mouse_drag_tower = None
                 self.game.dragging = False
+            elif self.game.selected_mouse:
+                t = self.game.selected_mouse
+                self.game.active_tower = t
+                self.game.selected_mouse = None
+            else:
+                self.game.active_tower = None
+
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
             if self.game.selected_mouse:
+                if self.game.selected_mouse in self.game.towers:
+                    t = self.game.selected_mouse
+                    self.game.gold += t.price
+                    self.game.towers.remove(t)
+                    g = self.game.grid
+                    g.update()
+                    if t.gx and t.gy:
+                        g.t_grid.append((t.gx, t.gy))
+                        g.w_grid.append((t.gx, t.gy))
+
                 self.game.dragging = True
+                self.game.mouse_drag_tower = self.game.selected_mouse
                 self.game.selected_mouse.updatePos(x, y, None, None)
 
         elif buttons & mouse.RIGHT:
@@ -701,6 +714,16 @@ class GameWindow(pyglet.window.Window):  # Main game window
                             )
                         )
 
+            # Draw range circle on active tower
+            if self.game.active_tower:
+                glColor4f(0.4, 0.5, 0.9, 0.3)
+                t = self.game.active_tower
+                self.circle(
+                    t.x, t.y, t.range
+                )
+
+
+
             ### Update animations ###
             for a in self.animations:
                 a.update()
@@ -715,6 +738,20 @@ class GameWindow(pyglet.window.Window):  # Main game window
         else:
             if self.mainmenu:
                 self.mainmenu.render()
+
+    def circle(self, x, y, radius):
+        iterations = int(2*radius*pi)
+        s = sin(2*pi / iterations)
+        c = cos(2*pi / iterations)
+
+        dx, dy = radius, 0
+
+        glBegin(GL_TRIANGLE_FAN)
+        glVertex2f(x, y)
+        for i in range(iterations+1):
+            glVertex2f(x+dx, y+dy)
+            dx, dy = (dx*c - dy*s), (dy*c + dx*s)
+        glEnd()
 
 if __name__ == "__main__":
     window = GameWindow()

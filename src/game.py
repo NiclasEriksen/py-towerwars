@@ -37,7 +37,8 @@ class Game():
         self.towers = []  # Tower sprite objects
         self.selected_mouse = None  # Holds the object mouse is dragging
         self.dragging = False   # If an object is currently being dragged
-        self.highlighted = []   # List of highlighted items
+        self.mouse_drag_tower = None
+        self.active_tower = None   # List of highlighted items
         self.autospawn = False
         self.loaded = False     # If game is loaded
         self.paused = True      # Game starts off in a paused state
@@ -211,11 +212,12 @@ class Game():
             if not t.target:  # if tower has no target
                 i = random.randrange(0, 3)
                 for m in self.mobs:
-                    dist = get_dist(m.x, m.y, t.x, t.y)
-                    if dist <= t.range:
-                        if i == 0:
-                            t.target = m
-                            break
+                    if(m.move_type in t.target_types):
+                        dist = get_dist(m.x, m.y, t.x, t.y)
+                        if dist <= t.range:
+                            if i == 0:
+                                t.target = m
+                                break
             else:  # if tower has a target, do something
                 dist = get_dist(t.target.x, t.target.y, t.x, t.y)
                 if dist > t.range:
