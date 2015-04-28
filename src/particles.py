@@ -2,21 +2,23 @@ from lepton import Particle, ParticleGroup, default_system
 from lepton.emitter import StaticEmitter
 from lepton.renderer import PointRenderer
 from lepton.texturizer import SpriteTexturizer
-from lepton.controller import Gravity, Lifetime, Movement, Fader, Growth
+from lepton.controller import (
+    Gravity, Lifetime, Movement, Fader, Growth, ColorBlender
+)
 from pyglet.gl import *
+from functions import *
 
 
 class ParticleCategory:
 
     def __init__(self, game, t, e,
         x=None, y=None, dx=0, dy=0,
-        color=(1, 1, 1, 1), size=12
+        color=None, size=12
     ):
         self.system = game.particle_system
         self.tex = game.effects
         self.game = game
         self.group = None
-        self.color = color
         # print "Creating new particle category"
 
         if t == "emitter" and e == "smoke":
@@ -32,13 +34,11 @@ class ParticleCategory:
         elif t == "simple" and e == "skull":
             self.createSimpleSkull()
         elif t == "simple" and e == "crit":
-            self.color = (1.0, 0, 0, 1.0)
             self.createSimpleCrit()
         else:
             print("No suitable effect found for {0} {1}".format(t, e))
 
     def draw(self):
-        # c = self.color
         # glColor4f(c[0], c[1], c[2], c[3])
         self.group.draw()
 
@@ -129,17 +129,19 @@ class ParticleCategory:
     def createSimpleCrit(self):
         self.group = ParticleGroup(
             controllers=[
-                Lifetime(0.6),
+                Lifetime(1),
                 Movement(damping=0.95),
+                ColorBlender([(0, get_color(255, 255, 255,255)), 
+                              (0.3, get_color(255,0,0,255)), 
+                              (1, get_color(255,64,32,128))
+                ]),
                 Fader(
-                    fade_in_start=0, start_alpha=0,
-                    fade_in_end=0.10, max_alpha=1,
-                    fade_out_start=0.15, fade_out_end=0.6
+                    fade_out_start=0.25, fade_out_end=1
                 )
             ],
             system=self.game.particle_system,
             renderer=PointRenderer(
-                12,
+                14,
                 SpriteTexturizer(
                     self.tex["crit"].texture.id))
         )

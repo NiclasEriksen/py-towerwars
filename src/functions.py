@@ -8,6 +8,10 @@ def center_image(image):
     image.anchor_y = image.width//2
     return image
 
+def get_color(r, g, b, a):
+    """ converts rgba values of 0 - 255 to the equivalent in 0 - 1 """
+    return (r / 255.0, g / 255.0, b / 255.0, a / 255.0)
+
 
 def check_path(m, grid, new):
     update = False

@@ -100,12 +100,12 @@ class Tower(Sprite):
                 if r <= self.crit:
                     t.hp -= self.dmg * 1.5
                     self.window.crit_fx.addParticle(
-                        t.x + random.randrange(0, 12),
-                        t.y + random.randrange(0, 12),
-                        (0.10, 0.3, 0.10, 0.8),
+                        self.x,
+                        self.y,
+                        (0.9, 0.3, 0.10, 0.9),
                         velocity=(
-                            random.randrange(-6, 6),
-                            random.randrange(8, 24),
+                            0,
+                            24,
                             0
                         )
 
@@ -255,7 +255,23 @@ class PoisonTower(Tower):
             t.state = "dead"
         else:
             if not self.cd:
-                t.hp -= self.dmg
+                r = random.randint(1, 101)
+                if r <= self.crit:
+                    t.hp -= self.dmg * 1.5
+                    self.window.crit_fx.addParticle(
+                        self.x,
+                        self.y,
+                        (0.9, 0.3, 0.10, 0.9),
+                        velocity=(
+                            0,
+                            24,
+                            0
+                        )
+
+                    )
+                else:
+                    t.hp -= self.dmg
+
                 if t.hp <= 0:
                     t.state = "dead"
                 else:
