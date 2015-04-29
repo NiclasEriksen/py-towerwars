@@ -51,7 +51,8 @@ class Game():
         self.lives = 10
 
         # Economy
-        self.gold = 0         # Players "wallet"
+        self.gold = 0           # Players "wallet"
+        self.ai_gold = 0        # Gold used to spawn mobs by AI
         self.total_value = 0    # To be used later for adaptive difficulty
 
         # Pathfinding stuff
@@ -92,7 +93,24 @@ class Game():
         self.active_tower = None
         self.mouse_drag_tower = None
         self.pf_queue = []
-        self.gold = 100
+        self.gold = 25
+        self.ai_gold = 0
+        try:
+            pyglet.clock.unschedule(self.ai_income)
+        except:
+            pass
+        try:
+            pyglet.clock.unschedule(self.autospawn_balanced)
+        except:
+            pass
+        pyglet.clock.schedule_interval(
+                        self.ai_income,
+                        5.0
+                    )
+        pyglet.clock.schedule_interval(
+                        self.autospawn_balanced,
+                        0.2
+                    )
         self.lives = 10
         self.loaded = True
         pyglet.clock.unschedule(self.autospawn_random)
@@ -223,6 +241,25 @@ class Game():
                 mob = Mob1W(self, "YAY")
 
             self.mobs.append(mob)
+
+    def autospawn_balanced(self, dt):
+        if not self.paused and self.ai_gold > 0:
+            choice = random.randint(0, 2)
+            mob = None
+            if choice == 0:
+                mob = Mob(self, "YAY")
+            elif choice == 1:
+                mob = Mob1W(self, "YAY")
+            elif choice == 2:
+                mob = Mob1F(self, "YAY")
+            
+            if mob and mob.bounty <= self.ai_gold:
+                self.mobs.append(mob)
+                self.ai_gold -= mob.bounty
+
+    def ai_income(self, dt):
+        self.ai_gold += (self.get_total_value() + self.gold) // 10
+        print self.ai_gold
 
     def updateState(self):
         for t in self.towers:
