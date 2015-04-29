@@ -1,5 +1,7 @@
 #!/bin/python2
 import pyglet   # Version 1.2.2
+from audio import AudioFile  # Sound engine
+import wave
 from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse
@@ -13,6 +15,8 @@ from lepton.controller import Gravity, Lifetime, Movement, Fader, ColorBlender, 
 
 from functions import *
 
+# Sound engine
+pyglet.options['audio'] = ('openal', 'pulse', 'silent')
 
 ### Global variables ###
 DEBUG = False
@@ -90,6 +94,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.fg_group = pyglet.graphics.OrderedGroup(1)
 
         self.loadFonts()    # Loads fonts into memory
+        self.currently_playing = []
+        self.loadSFX()      # Load sound files into memory
         self.loadTextures()
 
         ### GL modes ###
@@ -229,6 +235,37 @@ class GameWindow(pyglet.window.Window):  # Main game window
             mob1Qdeath=death_anim,
             pang01=pang_anim
         )
+
+    def loadSFX(self):
+        # impact1 = AudioFile(RES_PATH + "impact1.wav")
+        impact1 = pyglet.media.load(RES_PATH + "impact1.ogg", streaming=False)
+        impact2 = pyglet.media.load(RES_PATH + "impact2.ogg", streaming=False)
+        # impact1.play()
+        # tkSnack.audio.play()
+        self.sfx = dict(
+            impact1=impact1,
+            impact2=impact2
+        )
+
+    def play_sfx(self, sound="default"):
+        # impact1 = AudioFile(RES_PATH + "impact1.wav")
+        # impact1.play()
+        # impact1.close()
+        # PLAYER.queue(self.sfx[sound])
+        for s in self.currently_playing:
+            print s.time
+            if s.time == 0.0:
+                self.currently_playing.remove(s)
+
+        if len(self.currently_playing) < 5:
+            playing = self.sfx[sound].play()
+            self.currently_playing.append(playing)
+
+        # try:
+        #     print self.sfx[sound].duration
+        #     print playing.time
+        # except:
+        #     print("Unable to play sound {0}".format(sound))
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
@@ -482,6 +519,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
+            # self.play_sfx("impact2")
             # First, check if mouse is released over a UI element
             t_type = self.userinterface.check_mouse((x, y))
             if t_type:  # check_mouse returns false if not on a button
@@ -492,11 +530,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
                 if t_type == "2":
-                    tower = SplashTower(self.game)
+                    tower = PoisonTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
                 if t_type == "3":
-                    tower = PoisonTower(self.game)
+                    tower = SplashTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
             elif self.game.mouse_drag_tower:
@@ -519,7 +557,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             else:
                 self.game.active_tower = None
-
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
@@ -547,10 +584,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         tower = Tower(self.game)
                         self.game.mouse_drag_tower = tower
                     if t_type == "2":
-                        tower = SplashTower(self.game)
+                        tower = PoisonTower(self.game)
                         self.game.mouse_drag_tower = tower
                     if t_type == "3":
-                        tower = PoisonTower(self.game)
+                        tower = SplashTower(self.game)
                         self.game.mouse_drag_tower = tower
                     self.game.selected_mouse = self.game.mouse_drag_tower
                 elif self.game.active_tower:

@@ -35,6 +35,11 @@ class Game():
         self.mobs = []  # Enemy mob sprite objects
         self.mob_count = 0  # This serve as mob's id
         self.towers = []  # Tower sprite objects
+        self.available_towers = {
+            "1": 10,
+            "2": 25,
+            "3": 40
+        }
         self.selected_mouse = None  # Holds the object mouse is dragging
         self.dragging = False   # If an object is currently being dragged
         self.mouse_drag_tower = None

@@ -86,6 +86,7 @@ class Tower(Sprite):
             t.state = "dead"
         else:
             if not self.cd:
+                self.window.play_sfx("impact1")
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
                 y = int(self.y + self.turret_size * math.sin(-self.angle))
                 self.window.muzzle_fx.addParticle(
@@ -255,6 +256,7 @@ class PoisonTower(Tower):
             t.state = "dead"
         else:
             if not self.cd:
+                self.window.play_sfx("impact2")
                 r = random.randint(1, 101)
                 if r <= self.crit:
                     t.hp -= self.dmg * 1.5

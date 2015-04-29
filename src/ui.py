@@ -77,16 +77,16 @@ class UI():
             x = 20
             y = 20
             texture = "tower_wood"
-        if b_type == "2":
+        elif b_type == "2":
             x = 20
             y = 20 + self.b_size
-            texture = "tower_splash"
-        if b_type == "3":
+            texture = "tower_poison"
+        elif b_type == "3":
             x = 20
             y = 20 + self.b_size * 2
-            texture = "tower_poison"
-
-        # "tower_splash_turret"
+            texture = "tower_splash"
+        else:
+            return False
 
         b_sprite = Sprite(
                         self.w.textures[texture],
@@ -95,20 +95,33 @@ class UI():
                         group=self.w.ui_group
                     )
 
+        b_sprite.active = True
+        b_sprite.b_price = self.w.game.available_towers[b_type]
         b_sprite.b_type = b_type
         self.sprites.append(b_sprite)
+
+    def update_buttons(self):
+        gold = self.w.game.gold
+        for b in self.sprites:
+            if not b.b_price <= gold:
+                b.opacity = 128
+                b.active = False
+            else:
+                b.opacity = 255
+                b.active = True
 
     def check_mouse(self, pos):
         # Checks if mouse position is on a button
         radius = self.b_size / 2
         for b in self.sprites:
-            if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
-                if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
-                    print "ON BUTTON"
-                    return b.b_type
+            if b.active:
+                if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
+                    if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
+                        return b.b_type
         return False
 
     def render(self):
+        self.update_buttons()
         self.w.batches["buttons"].draw()
         for t in self.texts:
             if t.t_type == "gold":  # Updates gold count
