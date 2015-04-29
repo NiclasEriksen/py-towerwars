@@ -240,20 +240,23 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # impact1 = AudioFile(RES_PATH + "impact1.wav")
         impact1 = pyglet.media.load(RES_PATH + "impact1.ogg", streaming=False)
         impact2 = pyglet.media.load(RES_PATH + "impact2.ogg", streaming=False)
+        dart = pyglet.media.load(RES_PATH + "dart.ogg", streaming=False)
+        bang1 = pyglet.media.load(RES_PATH + "bang1.ogg", streaming=False)
+        bang2 = pyglet.media.load(RES_PATH + "bang2.ogg", streaming=False)
+        pluck = pyglet.media.load(RES_PATH + "pluck.ogg", streaming=False)
         # impact1.play()
         # tkSnack.audio.play()
         self.sfx = dict(
             impact1=impact1,
-            impact2=impact2
+            impact2=impact2,
+            dart = dart,
+            bang1 = bang1,
+            bang2 = bang2,
+            pluck = pluck
         )
 
     def play_sfx(self, sound="default"):
-        # impact1 = AudioFile(RES_PATH + "impact1.wav")
-        # impact1.play()
-        # impact1.close()
-        # PLAYER.queue(self.sfx[sound])
         for s in self.currently_playing:
-            print s.time
             if s.time == 0.0:
                 self.currently_playing.remove(s)
 

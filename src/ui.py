@@ -172,6 +172,7 @@ class MainMenu():
         for e in self.entries:
             if x >= e.rectangle[0] and x <= e.rectangle[4]:
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
+                    self.w.play_sfx("pluck")
                     if e.action == "newgame":
                         self.w.game.newGame()
                         self.w.mainmenu = None
