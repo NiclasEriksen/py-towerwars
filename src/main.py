@@ -418,6 +418,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             elif symbol == key.F12:
                 self.game.debug = not self.game.debug
                 self.debug = self.game.debug
+            elif symbol == key.G and self.debug:
+                self.game.gold += 100
             elif symbol == key._1:
                 tower = Tower(self.game)
                 self.game.selected_mouse = tower
@@ -449,17 +451,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
         if button == mouse.LEFT:
             if not self.game.paused:
                 # First, check if mouse is on a UI element
-                t_type = self.userinterface.check_mouse((x, y))
-                if t_type:  # check_mouse returns false if not on a button
-                    if t_type == "1":
-                        tower = Tower(self.game)
-                        self.game.selected_mouse = tower
-                    if t_type == "2":
-                        tower = SplashTower(self.game)
-                        self.game.selected_mouse = tower
-                    if t_type == "3":
-                        tower = PoisonTower(self.game)
-                        self.game.selected_mouse = tower
+                if self.userinterface.check_mouse((x, y)):  # returns false if
+                    pass                                    # not on a button
                 else:
                     if not self.game.mouse_drag_tower:
                         for t in self.game.towers:
@@ -489,8 +482,28 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            if self.game.selected_mouse and self.game.dragging:
-                self.game.place_tower(self.game.selected_mouse, x, y, new=True)
+            # First, check if mouse is released over a UI element
+            t_type = self.userinterface.check_mouse((x, y))
+            if t_type:  # check_mouse returns false if not on a button
+                self.active_tower = None
+                self.selected_mouse = None
+                if t_type == "1":
+                    tower = Tower(self.game)
+                    self.game.mouse_drag_tower = tower
+                    self.game.active_tower = self.game.mouse_drag_tower
+                if t_type == "2":
+                    tower = SplashTower(self.game)
+                    self.game.mouse_drag_tower = tower
+                    self.game.active_tower = self.game.mouse_drag_tower
+                if t_type == "3":
+                    tower = PoisonTower(self.game)
+                    self.game.mouse_drag_tower = tower
+                    self.game.active_tower = self.game.mouse_drag_tower
+            elif self.game.mouse_drag_tower:
+                self.game.active_tower = self.game.mouse_drag_tower
+                self.game.place_tower(
+                    self.game.mouse_drag_tower, x, y, new=True
+                )
                 self.game.selected_mouse = None
                 self.game.mouse_drag_tower = None
                 self.game.dragging = False
@@ -498,13 +511,20 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 t = self.game.selected_mouse
                 self.game.active_tower = t
                 self.game.selected_mouse = None
+                self.game.dragging = False
+            elif not self.game.active_tower and self.game.dragging:
+                self.game.active_tower = None
+                self.game.dragging = None
+
+
             else:
                 self.game.active_tower = None
 
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
-            if self.game.selected_mouse:
+            self.game.dragging = True
+            if self.game.selected_mouse and self.debug:
                 if self.game.selected_mouse in self.game.towers:
                     t = self.game.selected_mouse
                     self.game.gold += t.price
@@ -515,16 +535,52 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         g.t_grid.append((t.gx, t.gy))
                         g.w_grid.append((t.gx, t.gy))
 
-                self.game.dragging = True
                 self.game.mouse_drag_tower = self.game.selected_mouse
                 self.game.selected_mouse.updatePos(x, y, None, None)
+            else:
+                t_type = self.userinterface.check_mouse((x, y))
+                if self.game.mouse_drag_tower:
+                    self.game.mouse_drag_tower.updatePos(x, y, None, None)
+                # First, check if mouse is released over a UI element
+                elif t_type:  # check_mouse returns false if not on a button
+                    if t_type == "1":
+                        tower = Tower(self.game)
+                        self.game.mouse_drag_tower = tower
+                    if t_type == "2":
+                        tower = SplashTower(self.game)
+                        self.game.mouse_drag_tower = tower
+                    if t_type == "3":
+                        tower = PoisonTower(self.game)
+                        self.game.mouse_drag_tower = tower
+                    self.game.selected_mouse = self.game.mouse_drag_tower
+                elif self.game.active_tower:
+                    t = self.game.active_tower
+                    if (
+                        (x <= t.x - t.size//2) or
+                        (x >= t.x + t.size//2) or
+                        (y <= t.y - t.size//2) or
+                        (y >= t.y + t.size//2)
+                    ):
+                        for t in self.game.towers:
+                            # Checks for towers under cursor
+                            if x < t.x + t.size//2 and x > t.x - t.size//2:
+
+                                if y < t.y + t.size//2 and y > t.y - t.size//2:
+                                    # Binds tower to mouse and removes tower
+                                    mdt = t
+                                    self.game.selected_mouse = mdt
+                                    self.game.active_tower = mdt
+                                    break
+
+            if not self.game.selected_mouse:
+                self.game.active_tower = None
 
         elif buttons & mouse.RIGHT:
             self.span(dx, dy)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        if self.game.selected_mouse:
-            self.game.selected_mouse.updatePos(x, y, None, None)
+        if self.game.mouse_drag_tower:
+            self.game.mouse_drag_tower.updatePos(x, y, None, None)
         self.cx, self.cy = x, y
 
     def on_resize(self, width, height):

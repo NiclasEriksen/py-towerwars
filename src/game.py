@@ -193,6 +193,11 @@ class Game():
             self.towers.remove(t)
             grid.update(new=False)
 
+        else:
+            self.active_tower = None
+            self.mouse_drag_tower = None
+            self.selected_mouse = None
+
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
