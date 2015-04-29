@@ -239,6 +239,7 @@ class Mob(Sprite):
             if self in self.g.pf_queue:
                 self.g.pf_queue.remove(self)
             self.g.mobs.remove(self)
+            self.g.leaking()
         elif self.state == "stalled":
             if self.stall_timer > 0:
                 self.stall_timer -= 1

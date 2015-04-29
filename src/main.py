@@ -95,6 +95,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
         self.loadFonts()    # Loads fonts into memory
         self.currently_playing = []
+        self.sound_enabled = True
         self.loadSFX()      # Load sound files into memory
         self.loadTextures()
 
@@ -256,13 +257,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
 
     def play_sfx(self, sound="default"):
-        for s in self.currently_playing:
-            if s.time == 0.0:
-                self.currently_playing.remove(s)
+        if self.sound_enabled:
+            for s in self.currently_playing:
+                if s.time == 0.0:
+                    self.currently_playing.remove(s)
 
-        if len(self.currently_playing) < 5:
-            playing = self.sfx[sound].play()
-            self.currently_playing.append(playing)
+            if len(self.currently_playing) < 5:
+                playing = self.sfx[sound].play()
+                self.currently_playing.append(playing)
 
         # try:
         #     print self.sfx[sound].duration
@@ -460,15 +462,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.debug = self.game.debug
             elif symbol == key.G and self.debug:
                 self.game.gold += 100
-            elif symbol == key._1:
-                tower = Tower(self.game)
-                self.game.selected_mouse = tower
-            elif symbol == key._2:
-                tower = SplashTower(self.game)
-                self.game.selected_mouse = tower
-            elif symbol == key._3:
-                tower = PoisonTower(self.game)
-                self.game.selected_mouse = tower
+            elif symbol == key.F5:
+                self.sound_enabled = not self.sound_enabled
             elif symbol == key.LEFT:
                 self.span(32, 0)
             elif symbol == key.RIGHT:

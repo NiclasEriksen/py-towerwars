@@ -48,6 +48,8 @@ class Game():
         self.loaded = False     # If game is loaded
         self.paused = True      # Game starts off in a paused state
 
+        self.lives = 10
+
         # Economy
         self.gold = 0         # Players "wallet"
         self.total_value = 0    # To be used later for adaptive difficulty
@@ -248,6 +250,10 @@ class Game():
 
         if self.gold > 999:     # Maximum amount of gold
             self.gold = 999
+
+    def leaking(self):
+        self.lives -= 1
+        self.window.play_sfx("pluck")
 
     def get_total_value(self):
         value = 0
