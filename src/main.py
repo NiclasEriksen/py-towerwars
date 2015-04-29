@@ -132,8 +132,21 @@ class GameWindow(pyglet.window.Window):  # Main game window
             pyglet.clock.unschedule(self.particle_system.update)
         except AttributeError:
             pass
+        self.particle_system = default_system
         self.particle_system.run_ahead(2.0, 30.0)
         pyglet.clock.schedule_interval(self.particle_system.update, 1.0/30.0)
+
+        self.batches = OrderedDict()
+        self.batches["mobs"] = pyglet.graphics.Batch()
+        self.batches["flying_mobs"] = pyglet.graphics.Batch()
+        self.batches["bg"] = pyglet.graphics.Batch()
+        self.batches["bg2"] = pyglet.graphics.Batch()
+        self.batches["towers"] = pyglet.graphics.Batch()
+        self.batches["buttons"] = pyglet.graphics.Batch()
+        self.batches["mm_buttons"] = pyglet.graphics.Batch()
+        self.batches["anim"] = pyglet.graphics.Batch()
+        self.ui_group = pyglet.graphics.OrderedGroup(2)
+        self.fg_group = pyglet.graphics.OrderedGroup(1)
 
         # Particles and stuff
         self.puff_fx = None

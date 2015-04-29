@@ -238,6 +238,7 @@ class Mob(Sprite):
             print("You are leaking!")
             if self in self.g.pf_queue:
                 self.g.pf_queue.remove(self)
+            self.debuff_list = []
             self.g.mobs.remove(self)
             self.g.leaking()
         elif self.state == "stalled":

@@ -78,14 +78,22 @@ class Game():
         self.window.addParticleEmitters()
 
         # Lists of game objects
+        for m in self.mobs:
+            m.debuff_list = []
         self.mobs = []  # Enemy mob sprite objects
         self.mob_count = 0  # This serve as mob's id
+        for t in self.towers:
+            t.target = None
         self.towers = []  # Tower sprite objects
         self.window.animations = []
         self.selected_mouse = None
         self.dragging = False
         self.highlighted = []
+        self.active_tower = None
+        self.mouse_drag_tower = None
+        self.pf_queue = []
         self.gold = 100
+        self.lives = 10
         self.loaded = True
         pyglet.clock.unschedule(self.autospawn_random)
         pyglet.clock.schedule_interval(self.pathFinding, 1.0/60.0)
@@ -250,6 +258,9 @@ class Game():
 
         if self.gold > 999:     # Maximum amount of gold
             self.gold = 999
+
+        if self.lives <= 0:
+            self.newGame()
 
     def leaking(self):
         self.lives -= 1

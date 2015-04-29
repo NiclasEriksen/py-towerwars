@@ -61,14 +61,14 @@ class UI():
         y = self.w.height - 65
 
         label = text.Label(
-            str(len(self.w.game.pf_queue)), font_name='UI font',
+            str(self.w.game.lives), font_name='UI font',
             font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center",
             color=(255, 155, 255, 255)
         )
 
-        label.t_type = "pf_count"
+        label.t_type = "lives"
 
         self.texts.append(label)
 
@@ -132,6 +132,8 @@ class UI():
                 t.text = str(len(self.w.animations))
             elif t.t_type == "pf_count":
                 t.text = str(len(self.w.game.pf_queue))
+            elif t.t_type == "lives":
+                t.text = str(self.w.game.lives)
             t.draw()
 
 
