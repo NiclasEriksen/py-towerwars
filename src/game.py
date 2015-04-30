@@ -95,6 +95,7 @@ class Game():
         self.pf_queue = []
         self.gold = 25
         self.ai_gold = 0
+        self.ai_flat_income = 0
         try:
             pyglet.clock.unschedule(self.ai_income)
         except:
@@ -105,7 +106,7 @@ class Game():
             pass
         pyglet.clock.schedule_interval(
                         self.ai_income,
-                        30.0
+                        10.0
                     )
         pyglet.clock.schedule_interval(
                         self.autospawn_balanced,
@@ -258,6 +259,8 @@ class Game():
                 self.ai_gold -= mob.bounty
 
     def ai_income(self, dt):
+        self.ai_gold += self.ai_flat_income
+        self.ai_flat_income += 1
         self.ai_gold += (self.get_total_value() + self.gold) // 10
         print self.ai_gold
 
