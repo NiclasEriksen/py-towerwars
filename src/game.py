@@ -105,7 +105,7 @@ class Game():
             pass
         pyglet.clock.schedule_interval(
                         self.ai_income,
-                        5.0
+                        30.0
                     )
         pyglet.clock.schedule_interval(
                         self.autospawn_balanced,
