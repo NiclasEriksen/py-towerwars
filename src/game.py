@@ -92,6 +92,7 @@ class Game():
         self.mob_count = 0  # This serve as mob's id
         for t in self.towers:
             t.target = None
+        self.goal, self.spawn = None, None
         self.towers = []  # Tower sprite objects
         self.window.animations = []
         self.selected_mouse = None

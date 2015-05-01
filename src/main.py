@@ -20,7 +20,7 @@ pyglet.options['audio'] = ('openal', 'pulse', 'silent')
 ### Global variables ###
 DEBUG = False
 RES_PATH = "../resources/"
-SCREENRES = (1280, 720)  # The resolution for the game window
+SCREENRES = (1440, 900)  # The resolution for the game window
 VSYNC = True
 PAUSED = False
 SCREEN_MARGIN = 15  # %

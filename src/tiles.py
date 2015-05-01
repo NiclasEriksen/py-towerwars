@@ -45,6 +45,7 @@ class TiledRenderer(object):
 
         for layer in self.tmx_data.visible_layers:
             nw, nb = False, False   # nowalk, nobuild
+            spawn, goal = False, False
             if layer.name == "Background":
                 batch = self.window.batches["bg1"]
             elif layer.name == "Background2":
@@ -52,6 +53,12 @@ class TiledRenderer(object):
             elif layer.name == "Obstacles":
                 batch = self.window.batches["obs"]
                 nw, nb = True, True
+            elif layer.name == "Spawn":
+                batch = self.window.batches["obs"]
+                spawn = True
+            elif layer.name == "Goal":
+                batch = self.window.batches["obs"]
+                goal = True
             elif layer.name == "Foreground":
                 batch = self.window.batches["fg"]
             else:
@@ -80,6 +87,10 @@ class TiledRenderer(object):
                     sprite = Sprite(image, batch=batch, x=x, y=y)
                     sprite.gx, sprite.gy = gx, gy
                     self.sprites.append(sprite)
+                    if spawn:
+                        self.window.game.spawn = (gx, gy)
+                    elif goal:
+                        self.window.game.goal = (gx, gy)
 
             # draw object layers
             elif isinstance(layer, TiledObjectGroup):

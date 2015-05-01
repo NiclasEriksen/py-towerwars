@@ -16,8 +16,8 @@ class Grid:
         self.path = []
         self.dim = self.g.grid_dim
         self.generate()
-        self.start = (0, self.dim[1]//2)
-        self.goal = (self.dim[0] - 1, self.dim[1]//2)
+        self.start = self.g.spawn
+        self.goal = self.g.goal
 
     def generate(self):
         self.fullgrid = []
