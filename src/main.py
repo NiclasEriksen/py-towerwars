@@ -164,6 +164,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.muzzle_fx = ParticleCategory(self, "simple", "pang")
         self.skull_fx = ParticleCategory(self, "simple", "skull")
         self.crit_fx = ParticleCategory(self, "simple", "crit")
+        self.blood_fx = ParticleCategory(self, "simple", "blood")
         self.particlestest = (
             self.puff_fx,
             self.smoke_fx,
@@ -192,6 +193,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         p_pang_texture = pyglet.image.load(RES_PATH + 'particle_pang.png')
         p_skull_texture = pyglet.image.load(RES_PATH + 'particle_skull.png')
         p_crit_texture = pyglet.image.load(RES_PATH + 'crit.png')
+        p_blood_texture = pyglet.image.load(RES_PATH + 'blood.png')
         tp_img = center_image(pyglet.image.load(
             RES_PATH + 'tower_poison.png')
         )
@@ -227,6 +229,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             skull=p_skull_texture,
             pang=p_pang_texture,
             crit=p_crit_texture,
+            blood=p_blood_texture,
         )
         # ### Load sprite sheet ###
         # ### All credits go to http://opengameart.org/users/hyptosis ###
@@ -274,7 +277,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             pluck = pluck
         )
 
-    def play_sfx(self, sound="default"):
+    def play_sfx(self, sound="default", volume=1.0):
         if self.sound_enabled:
             for s in self.currently_playing:
                 if s.time == 0.0:
@@ -282,6 +285,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             if len(self.currently_playing) < 5:
                 playing = self.sfx[sound].play()
+                playing.volume = volume
                 self.currently_playing.append(playing)
 
         # try:
@@ -754,6 +758,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.muzzle_fx,
             self.skull_fx,
             self.crit_fx,
+            self.blood_fx,
             self.flame_emitter_group,
             self.gas_emitter_group
         )

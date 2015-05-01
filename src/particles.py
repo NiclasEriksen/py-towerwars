@@ -35,6 +35,8 @@ class ParticleCategory:
             self.createSimpleSkull()
         elif t == "simple" and e == "crit":
             self.createSimpleCrit()
+        elif t == "simple" and e == "blood":
+            self.createSimpleBlood()
         else:
             print("No suitable effect found for {0} {1}".format(t, e))
 
@@ -105,6 +107,24 @@ class ParticleCategory:
                 10,
                 SpriteTexturizer(
                     self.tex["pang"].texture.id))
+        )
+
+    def createSimpleBlood(self):
+        self.group = ParticleGroup(
+            controllers=[
+                Lifetime(0.5),
+                Growth(5, damping=0.7),
+                Fader(
+                    fade_in_start=0, start_alpha=0,
+                    fade_in_end=0.1, max_alpha=0.9,
+                    fade_out_start=0.1, fade_out_end=0.5
+                )
+            ],
+            system=self.game.particle_system,
+            renderer=PointRenderer(
+                16,
+                SpriteTexturizer(
+                    self.tex["blood"].texture.id))
         )
 
     def createSimpleSkull(self):

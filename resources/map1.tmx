@@ -16,19 +16,25 @@
  <tileset firstgid="1025" name="build_atlas" tilewidth="32" tileheight="32">
   <image source="build_atlas.png" width="1024" height="1024"/>
  </tileset>
- <layer name="Background" width="40" height="22">
+ <tileset firstgid="2049" name="obj_misk_atlas" tilewidth="32" tileheight="32">
+  <image source="obj_misk_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <layer name="Background" width="40" height="22" visible="0">
   <data encoding="base64" compression="zlib">
-   eJy1l81RwzAQhWUztABnLkAFMRUAlQAVJCUwaYajnCo45q8IruTIaqxv9OKRwkXSzE48tmx/fm93pXjn3MZitBi66Xgl4S3urqbfJ7s+H7/x/l3v3N7iYPFzXS82LjFtIgvHPp4fMlxhrLvpWpiz7RNjbb57e+aDxWM/8Y2iXYjPAt/Spblod2zA92zPfLF47ZOWQRc8L/EtunPdAt+2Ml94v/LhF16P8Xg+bmzeKernG+afn+kXmKgTNFwVvOU7BtFx14DvzZ75bvHRJ09XUZsQ2wzfKeqLzseG+YdG6IWnMOb6infnc1v5C4PWA+foezlvmUsPalm/5Jz2ZHTJ9b5Fl/ojurXqfz4yBEZ6M16X+vLSJT6tixb+woWXvBfuEh/5oFzcV5NPawL9dM3NDfwN9xzEW55Ruz4GyadR+HJ9Gf3QnJqo7av66915TcCX63vKF77r0KguVL/5/gUNS4P80/popR89hPddWnNhO4nerGdfMWrz4a3u9ULcFvjWsU/ib+1+nPOXXNd1rjTYk5K35N13jNp82l90nbvEp/tsdK/d90r18Z92mqPcQ7Tg03ddGvpfQ/dVg+jZgu8PGOBYzA==
+   eJy9l01SwjAYhtM6XEHXXoJ6AvQk4gngCA6HkWXaU7gE4QK60a0szTfNM31hmrowsTPvhIGkefp+PyneOdcFtUH3tXMPQWs3yActq368C+Pl9R3X78O6t6BD0NfMuc9ZP/5VxqSCr4ts9rkZ4bJrU/W/2ZxdPTDm5PuoBrb38Pmp7r3EO9Nzgm/lhrl4d8zMt7jwrhPP2jim+ObVuW/Gt8vM91gPHhof8TLO26uesRthuw7zTtE/XzD/7N4L8c+YjLETD9eJ2PIcjfi4L8BnHi7rIffwsI3ajfCdor/4fCyUf/QWzTliCuNYX/HufG6p+MKg9cB35otPxJa59KBS9Ut84KKv4MtY75tXQ3/Et1L9z0cGYzTB2FTpvrxyA5/WRYn4wkUs2RfuFB/5oFysy8mnNYF/fiL3NL625iCx5R6566ORfGqFb6wv4x+eUxPE9SVom4mN+Hp3XhPwjfU95bPnOhSqC/WPXqdnWiq2mn9aH7nrAtFD2G/qzIXtJH5znm0zxxURW33XM90k+DaxTxJf+nEpsRe+Tb2Pwke/tGci716jcvNpf9FzboqPPKUXMf5HffzmneYoa1AJPt1r6tL/Gvpe1YifJfh+AE1fWKM=
   </data>
  </layer>
- <layer name="Background2" width="40" height="22">
+ <layer name="Background2" width="40" height="22" visible="0">
   <data encoding="base64" compression="zlib">
-   eJxjYKAciDFTwRAagoF0nxkBu02YCauhJQCFzU0mBoZrQHwdiG8wQfi3oPyBBuYEwkYCKP9tELhzKAOLQZ5/Byv4Dkx3P5gg9GAEg71cFqeD+/7B7GChvV30BoTKxoEGgz39jQLKAKzc+zLIyz+RQZoOYfnXZJC6DwRAYSgxiN030gEABVwPrg==
+   eJxjYKAciDFTwRAagoF0nxkBu02YCauhJQCFzU0mBoZrQHwdiG8wQfi3oPyBBuYEwkYCKP9tELiTELBgHGgX4AYWzIPbfSAwGN33HZjufjBB6IhB6L7BXi6LA90nQeNw+wcLAxby9A/GdAcDhMrGgQb40t8nVvq5Ax8YzPELAoPZfbBy7wtS/TtY4hUEYOlPZJDmE3NovWuC5L5Lgyj8QAAUhhKDNPxGAQMDAJayFM0=
   </data>
  </layer>
+ <imagelayer name="Background">
+  <image source="map1bg.png"/>
+ </imagelayer>
  <layer name="Obstacles" width="40" height="22">
   <data encoding="base64" compression="zlib">
-   eJzNlzEOgkAQRYeF29gapVVba6Ol2uEp1MaAtafwGOpK5QH0Dh5BZ8NOHBEBE9ndSX6gIOTlz84fAKiuyANYoIaorgA44FWiUtTWe392GgDMgxov/WPFyBCKjOmE2mi2FmrvAF8b2UY+wA41QY31/cX7fNYG3y9lg+/uZZ5xD13yL9bnjXQumAvbfDQbiu3oEF+kc4W8S/T8usKnvON5p/KvKFds8OW9+5bJtvhoLlQ/O+LVX9N8D/87n2Tnrsy/HjL1UTML/qV6do8lfFPNtkKtDfLxnbup4GvatyuesZvI7mk2eF9Ty3y88jujim9psK/EJ3X28Wwuyz5TRb0NRT3vTBd5l7DvAVf4ivYtZbMs4VP5N2jw/PF/DMoU2h3EanPvxjnP8plSNRdN8T0B5mh28A==
+   eJzNl79OwzAQhy8ufRBATKwIurZdmRGMaTd4BCZgqRJm9pYN9SX4U9JMPAC8AztCgp8Vn2oZ1wlVbfekT82QSp9+5zu34xbRRHEPvtpElwbf4CIhOgZHgugFnwUowS3QK90iGoJtfGfH4AHkYNqmxvUIpyfFc8v+TgaHjqicXsFIue2D6RK/Lhx6Bqv4NakDuJ3A/Q6cgVP1/Jb8fZf9UjgMDHz5/afYz6y51vPdNft9JlVmeoZ1+dmKe95fs1+mzhszt8xFEz/Z8z0w9ODHsyHdZiv6+ahztVc4u1zN76b4yez0fSf3n22vxPAzs1u2k2P58VzIfh6KRX9D+/047o1CO3eu/Lpw6oFBhPxKNbszh1+q3K7BTUA//c4d1fj5zu0dZ+xDVM88G3pfy8h+epl3Rp3fVcC+sl+hdp++m127L1RxbzuiWXahi7PLtd8Dm+Jnu295NxcOP7n/+h7Pn/Ti/xi8U/juYNeY925mZGbulLq58OX3C6v2jTE=
   </data>
  </layer>
  <layer name="Goal" width="40" height="22">
@@ -43,7 +49,7 @@
  </layer>
  <layer name="Foreground" width="40" height="22">
   <data encoding="base64" compression="zlib">
-   eJzt0MENQEAUhOHBHukElVCeK/ogqAQ9UIBxX+GwYSPzJXN5h82fBdyKDZAYx4/e2AL7vbLcU7ZlXP5y41MFu0pP2vaLfxX5izoCGq6Nvi6xG9g1cpOnfTO7Fm71tE/c6UKgD7+uEBGR0wH46Awi
+   eJxjYKAu4GFhYOBlgbA1WRH0K6CYOiuVLYOCz4zYxadiEdcBukMXiPWA2BPqHhjtTiP3kQJ8gO7yZcEUXwEVO41FjlbgC45wxQW4oOH3io5uJAVMYmNgUBkEcYwPuAxy9w03MI+ZgWE+EC9gHmiXYAf7gO7aD8QHBqn77gHddR+IHwxS9w03wMk0cHbvBtq9B4/9XEA5zQF0HyGgBXSbzyB230tgffuaxDp3FIyCUUB7oMHNwJAJxFlAnM090K5BAACV5RYm
   </data>
  </layer>
 </map>

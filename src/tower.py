@@ -86,7 +86,6 @@ class Tower(Sprite):
             t.state = "dead"
         else:
             if not self.cd:
-                self.window.play_sfx("bang1")
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
                 y = int(self.y + self.turret_size * math.sin(-self.angle))
                 self.window.muzzle_fx.addParticle(
@@ -100,6 +99,7 @@ class Tower(Sprite):
                 r = random.randint(1, 101)
                 if r <= self.crit:
                     t.hp -= self.dmg * 1.5
+                    volume = 1.0
                     self.window.crit_fx.addParticle(
                         self.x,
                         self.y,
@@ -112,8 +112,12 @@ class Tower(Sprite):
 
                     )
                 else:
+                    volume = 0.5
                     t.hp -= self.dmg
+
                 self.setCD(self.spd)
+
+                self.window.play_sfx("bang1", volume)   # play sound
 
 
 class SplashTower(Tower):
@@ -257,10 +261,10 @@ class PoisonTower(Tower):
             t.state = "dead"
         else:
             if not self.cd:
-                self.window.play_sfx("dart")
                 r = random.randint(1, 101)
                 if r <= self.crit:
                     t.hp -= self.dmg * 1.5
+                    volume = 1.0
                     self.window.crit_fx.addParticle(
                         self.x,
                         self.y,
@@ -273,7 +277,10 @@ class PoisonTower(Tower):
 
                     )
                 else:
+                    volume = 0.6
                     t.hp -= self.dmg
+
+                self.setCD(self.spd)
 
                 if t.hp <= 0:
                     t.state = "dead"
@@ -299,3 +306,5 @@ class PoisonTower(Tower):
                         x, y, (0.45, 0.8, 0.35, 1)
                     )
                     i += 1
+
+                self.window.play_sfx("dart", volume)

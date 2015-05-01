@@ -26,7 +26,12 @@ class TiledRenderer(object):
 
     def update_offset(self):
         for s in self.sprites:
-            s.x, s.y = self.window.get_windowpos(s.gx, s.gy)
+            if s.imagelayer:
+                s.x = self.window.offset_x
+                s.y = self.window.offset_y
+                print("Adjusting image layer: {0}, {1}".format(s.x, s.y))
+            else:
+                s.x, s.y = self.window.get_windowpos(s.gx, s.gy)
 
     def loadmap(self):
 
@@ -85,6 +90,7 @@ class TiledRenderer(object):
                     # image.blit(x * tw, y * th)
                     image = center_image(image)
                     sprite = Sprite(image, batch=batch, x=x, y=y)
+                    sprite.imagelayer = False
                     sprite.gx, sprite.gy = gx, gy
                     self.sprites.append(sprite)
                     if spawn:
@@ -117,9 +123,13 @@ class TiledRenderer(object):
             elif isinstance(layer, TiledImageLayer):
                 if layer.image:
                     print "LOOOL"
-                    sprite = Sprite(image, batch=batch, x=0, y=0)
-                    self.sprites.append(sprite)
+                    # image = center_image(image)
+                    x = self.window.width // 2
+                    y = self.window.height // 2
+                    sprite = Sprite(layer.image, batch=batch, x=x, y=y)
+                    sprite.imagelayer = True
                     sprite.gx, sprite.gy = None, None
+                    self.sprites.append(sprite)
 
     def draw(self):
         # not going for efficiency here

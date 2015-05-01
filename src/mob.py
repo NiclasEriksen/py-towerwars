@@ -218,22 +218,35 @@ class Mob(Sprite):
                             if self.debug:
                                 print("Shared path with nearby mob.")
 
+    def kill(self):
+        anim = animation.Animation(
+            self.g.window, self.g.window.anim["mob1Qdeath"], self.x, self.y
+        )
+        if self.debug:
+            print("Mob {0} died at x:{1}, y:{2}".format(
+                self.id, self.x, self.y
+            ))
+        i = 0
+        while i < 3:    # Spawn three blood splats
+                    x = self.x + random.randrange(-4, 5)
+                    y = self.y + random.randrange(-4, 5)
+                    self.g.window.blood_fx.addParticle(
+                        x, y, (1, 0.1, 0.1, 1)
+                    )
+                    i += 1
+        self.debuff_list = []
+        if self in self.g.pf_queue:
+            self.g.pf_queue.remove(self)
+        self.g.gold += self.bounty
+        self.g.mobs.remove(self)
+        
+
+
     def updateState(self):
         self.debug = self.g.debug
 
         if self.state == "dead":
-            anim = animation.Animation(
-                self.g.window, self.g.window.anim["mob1Qdeath"], self.x, self.y
-            )
-            if self.debug:
-                print("Mob {0} died at x:{1}, y:{2}".format(
-                    self.id, self.x, self.y
-                ))
-            self.debuff_list = []
-            if self in self.g.pf_queue:
-                self.g.pf_queue.remove(self)
-            self.g.gold += self.bounty
-            self.g.mobs.remove(self)
+            self.kill()
         elif self.state == "reached_goal":
             print("You are leaking!")
             if self in self.g.pf_queue:
