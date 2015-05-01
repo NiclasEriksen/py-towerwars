@@ -206,9 +206,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
         ts_t_img = center_image(pyglet.image.load(
             RES_PATH + 'tower_splash_turret.png')
         )
-        mob_1w = center_image(pyglet.image.load(RES_PATH + 'mob_1w.png'))
         mob_1q = center_image(pyglet.image.load(RES_PATH + 'mob.png'))
-        bg01 = pyglet.image.load(RES_PATH + 'bg01.png')
+        mob_1w = center_image(pyglet.image.load(RES_PATH + 'mob_1w.png'))
+        mob_1e = center_image(pyglet.image.load(RES_PATH + 'mob_1e.png'))
+        mob_1r = center_image(pyglet.image.load(RES_PATH + 'mob_1r.png'))
+        mob_1a = center_image(pyglet.image.load(RES_PATH + 'mob_1a.png'))
+        mob_1s = center_image(pyglet.image.load(RES_PATH + 'mob_1s.png'))
+        mob_1d = center_image(pyglet.image.load(RES_PATH + 'mob_1d.png'))
+        mob_1f = center_image(pyglet.image.load(RES_PATH + 'mob_1f.png'))
+        # bg01 = pyglet.image.load(RES_PATH + 'bg01.png')
 
         self.textures = dict(
             wall_stone=ws_img,
@@ -219,8 +225,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
             tower_splash_turret=ts_t_img,
             mob1Q=mob_1q,
             mob1W=mob_1w,
-            mob1F=mob_1w,
-            bg=bg01
+            mob1E=mob_1e,
+            mob1R=mob_1r,
+            mob1A=mob_1a,
+            mob1S=mob_1s,
+            mob1D=mob_1d,
+            mob1F=mob_1f,
         )
 
         self.effects = dict(
@@ -476,6 +486,21 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.mobs.append(mob)
             elif symbol == key.W:
                 mob = Mob1W(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.E:
+                mob = Mob1E(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.R:
+                mob = Mob1R(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.A:
+                mob = Mob1A(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.S:
+                mob = Mob1S(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.D:
+                mob = Mob1D(self.game, "YAY")
                 self.game.mobs.append(mob)
             elif symbol == key.F:
                 mob = Mob1F(self.game, "YAY")
@@ -795,10 +820,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.batches["bg1"].draw()
             self.batches["bg2"].draw()
             self.batches["obs"].draw()
+            self.batches["towers"].draw()
             self.batches["mobs"].draw()
             # if self.debug:
             #     self.batches["walls"].draw()
-            self.batches["towers"].draw()
             self.batches["anim"].draw()
             self.batches["fg"].draw()
             self.batches["flying_mobs"].draw()
@@ -845,7 +870,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             #         ('v2f', (x, y))
             #         )
             ### Draw mob health bars ###
-            glColor4f(0.6, 0.3, 0.3, 1.0)
+            glColor4f(0.9, 0.2, 0.2, 1.0)
             glLineWidth(3)
             for m in self.game.mobs:
                 # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)

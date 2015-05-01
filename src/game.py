@@ -118,7 +118,7 @@ class Game():
                     )
         pyglet.clock.schedule_interval(
                         self.autospawn_balanced,
-                        0.2
+                        0.25
                     )
         self.lives = 10
         self.loaded = True
@@ -259,18 +259,28 @@ class Game():
 
     def autospawn_balanced(self, dt):
         if not self.paused and self.ai_gold > 0:
-            choice = random.randint(0, 2)
+            choice = random.randint(0, 7)
             mob = None
             if choice == 0:
                 mob = Mob(self, "YAY")
             elif choice == 1:
                 mob = Mob1W(self, "YAY")
             elif choice == 2:
+                mob = Mob1E(self, "YAY")
+            elif choice == 3:
+                mob = Mob1R(self, "YAY")
+            elif choice == 4:
+                mob = Mob1A(self, "YAY")
+            elif choice == 5:
+                mob = Mob1S(self, "YAY")
+            elif choice == 6:
+                mob = Mob1D(self, "YAY")
+            elif choice == 7:
                 mob = Mob1F(self, "YAY")
-            
-            if mob and mob.bounty <= self.ai_gold:
+
+            if mob and mob.bounty * 2 <= self.ai_gold:
                 self.mobs.append(mob)
-                self.ai_gold -= mob.bounty
+                self.ai_gold -= mob.bounty * 2
 
     def ai_income(self, dt):
         self.ai_gold += self.ai_flat_income
