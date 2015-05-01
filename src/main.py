@@ -1,7 +1,6 @@
 #!/bin/python2
 import pyglet   # Version 1.2.2
 from audio import AudioFile  # Sound engine
-import wave
 from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse
@@ -71,7 +70,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
             resizable=True,
             vsync=VSYNC
             )
-        self.game = Game(self)
         ### GL and graphics variables ###
         self.width = SCREENRES[0]
         self.height = SCREENRES[1]
@@ -79,11 +77,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.cx, self.cy = 0, 0  # Cursor position
         glClearColor(0.1, 0.1, 0.1, 1)  # Background color
         self.particle_system = default_system
+        self.tile_renderer = None
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
         self.batches["flying_mobs"] = pyglet.graphics.Batch()
-        self.batches["bg"] = pyglet.graphics.Batch()
+        self.batches["bg1"] = pyglet.graphics.Batch()
+        self.batches["obs"] = pyglet.graphics.Batch()
+        self.batches["fg"] = pyglet.graphics.Batch()
         self.batches["bg2"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
@@ -108,6 +109,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.animations = []
 
         # self.generateGridSettings()
+        self.game = Game(self)
 
         print "Creating UI"
         self.userinterface = UI(self)
@@ -139,8 +141,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
         self.batches["flying_mobs"] = pyglet.graphics.Batch()
-        self.batches["bg"] = pyglet.graphics.Batch()
+        self.batches["bg1"] = pyglet.graphics.Batch()
         self.batches["bg2"] = pyglet.graphics.Batch()
+        self.batches["obs"] = pyglet.graphics.Batch()
+        self.batches["fg"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
         self.batches["mm_buttons"] = pyglet.graphics.Batch()
@@ -168,10 +172,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.crit_fx
         )
         self.flame_emitter, self.gas_emitter = None, None
-        self.bg = pyglet.sprite.Sprite(
-            self.textures["bg"], batch=self.batches["bg"])
-        self.bg.x = self.offset_x
-        self.bg.y = self.offset_y
+        # self.bg = pyglet.sprite.Sprite(
+        #     self.textures["bg"], batch=self.batches["bg"])
+        # self.bg.x = self.offset_x
+        # self.bg.y = self.offset_y
+        # self.tile_renderer = TiledRenderer(self, RES_PATH + "map1.tmx")
 
     def loadFonts(self):
         pyglet.font.add_file(RES_PATH + 'soft_elegance.ttf')
@@ -223,16 +228,16 @@ class GameWindow(pyglet.window.Window):  # Main game window
             pang=p_pang_texture,
             crit=p_crit_texture,
         )
-        ### Load sprite sheet ###
-        ### All credits go to http://opengameart.org/users/hyptosis ###
-        sprite_sheet_img = pyglet.image.load(
-            RES_PATH + 'hyptosis_tile-art-batch-1.png')
-        sprite_sheet = pyglet.image.ImageGrid(
-            sprite_sheet_img,
-            sprite_sheet_img.width / 32, sprite_sheet_img.height / 32)
-        for i in sprite_sheet:
-            i = center_image(i)
-        self.spritesheet = sprite_sheet
+        # ### Load sprite sheet ###
+        # ### All credits go to http://opengameart.org/users/hyptosis ###
+        # sprite_sheet_img = pyglet.image.load(
+        #     RES_PATH + 'hyptosis_tile-art-batch-1.png')
+        # sprite_sheet = pyglet.image.ImageGrid(
+        #     sprite_sheet_img,
+        #     sprite_sheet_img.width / 32, sprite_sheet_img.height / 32)
+        # for i in sprite_sheet:
+        #     i = center_image(i)
+        # self.spritesheet = sprite_sheet
 
         ### Load images and create image grids for animations ###
         ### and centers their frame anchor point              ###
@@ -377,8 +382,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.offset_x += dx
         self.offset_y -= dy
         # self.updateGridSettings()
-        self.bg.x += dx
-        self.bg.y += dy
+        # self.bg.x += dx
+        # self.bg.y += dy
 
         # for w in self.walls:
         #     w.updatePos()
@@ -391,6 +396,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
             m.y += dy
             m.rx += dx
             m.ry += dy
+
+        for t in self.tile_renderer.sprites:
+            t.x += dx
+            t.y += dy
 
         grid = self.game.grid
 
@@ -643,8 +652,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
         if not self.mainmenu:
             self.game.updateGridSettings()
-            self.bg.x = self.offset_x
-            self.bg.y = self.offset_y
+            # self.bg.x = self.offset_x
+            # self.bg.y = self.offset_y
 
         # for w in self.walls:
         #     w.updatePos()
@@ -654,6 +663,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             for m in self.game.mobs:
                 m.updateOffset()
+
+            self.userinterface.update_offset()
+
+            self.tile_renderer.update_offset()
+
             grid = self.game.grid
             sx, sy = self.get_windowpos(grid.start[0], grid.start[1])
             for p in self.gas_emitter_group:
@@ -773,12 +787,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
             glPointSize(3)
             self.setGL("on")
             glColor4f(1, 1, 1, 1)
-            self.batches["bg"].draw()
+            self.batches["bg1"].draw()
+            self.batches["bg2"].draw()
+            self.batches["obs"].draw()
             self.batches["mobs"].draw()
             # if self.debug:
             #     self.batches["walls"].draw()
             self.batches["towers"].draw()
             self.batches["anim"].draw()
+            self.batches["fg"].draw()
             self.batches["flying_mobs"].draw()
 
             ### Draw UI ###
@@ -849,7 +866,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     t.x, t.y, t.range
                 )
 
-
+        # for t in self.tile_renderer.sprites:
+        #     t.
 
             ### Update animations ###
             for a in self.animations:

@@ -300,7 +300,7 @@ class Mob1W(Mob):
         self.stall_timer = None
         self.point = 0
         self.path = game.grid.path
-        self.bounty = 3
+        self.bounty = 2
         self.debug = debug
         if self.debug:
             print("Spawning mob!")
@@ -350,7 +350,7 @@ class Mob1F(Mob):
         self.point = 0
         self.path = game.grid.getPath(self.currentpoint, flying=True)
         self.targetpoint = self.path[1]
-        self.bounty = 5
+        self.bounty = 3
         self.debug = debug
         if self.debug:
             print("Spawning mob!")

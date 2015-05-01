@@ -16,7 +16,7 @@ class UI():
     def add_text(self, t_type):
         if t_type == "gold":
             x = 20
-            y = self.w.height - 15
+            y = self.w.height - 25
 
             label = text.Label(
                 str(self.w.game.gold), font_name='UI font',
@@ -26,11 +26,11 @@ class UI():
                 color=(255, 255, 155, 255)
             )
             label.t_type = t_type
-
+            label.align = "left"
             self.texts.append(label)
 
         x = self.w.width - 20
-        y = self.w.height - 15
+        y = self.w.height - 25
 
         label = text.Label(
             str(len(self.w.game.mobs)), font_name='UI font',
@@ -41,10 +41,11 @@ class UI():
         )
 
         label.t_type = "mob_count"
+        label.align = "right"
 
         self.texts.append(label)
 
-        y = self.w.height - 40
+        y = self.w.height - 50
 
         label = text.Label(
             str(len(self.w.animations)), font_name='UI font',
@@ -55,10 +56,11 @@ class UI():
         )
 
         label.t_type = "anim_count"
+        label.align = "right"
 
         self.texts.append(label)
 
-        y = self.w.height - 65
+        y = self.w.height - 75
 
         label = text.Label(
             str(self.w.game.lives), font_name='UI font',
@@ -69,6 +71,7 @@ class UI():
         )
 
         label.t_type = "lives"
+        label.align = "right"
 
         self.texts.append(label)
 
@@ -136,6 +139,18 @@ class UI():
                 t.text = str(self.w.game.lives)
             t.draw()
 
+    def update_offset(self):
+        ri = 0      # right counter
+        li = 0      # left counter
+        for t in self.texts:
+            if t.align == "right":
+                ri += 1
+                t.x = self.w.width - 20
+                t.y = self.w.height - 25 * ri
+            elif t.align == "left":
+                li += 1
+                t.x = 20
+                t.y = self.w.height - 25 * li
 
 class MainMenu():
 

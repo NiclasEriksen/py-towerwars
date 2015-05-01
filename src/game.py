@@ -1,27 +1,32 @@
 from functions import *
 from grid import *
 from mob import *
+from tiles import *
 import pyglet
 
+RES_PATH = "../resources/"
+
 # Crappy map until TMX import is done -.-
-NOWALK = [
-    (17, 0), (17, 1), (17, 2), (17, 3), (17, 4), (17, 8), (17, 9), (17, 10), (17, 11),
-    (17, 12), (17, 13), (17, 14), (17, 15), (17, 16), (18, 16), (19, 16), (20, 16),
-    (21, 16), (21, 17),
-    (21, 18), (21, 19), (21, 20), (22, 20), (23, 20), (24, 20), (25, 20), (26, 20),
-    (27, 20), (28, 20), (29, 20), (30, 20), (31, 20), (32, 20), (33, 20), (34, 20),
-    (35, 20), (23, 3), (23, 4), (23, 5), (23, 6), (23, 7), (23, 8), (23, 9), (23, 10),
-    (23, 11), (23, 12), (24, 12), (25, 12), (26, 12), (27, 12), (27, 13), (27, 14),
-    (27, 15),  (27, 16), (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
-    (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
-    (4, 18), (5, 18), (4, 19), (5, 19),
-    (11, 6), (11, 5), (12, 5)
-]
-NOBUILD = [
-    (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
-    (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
-    (4, 18), (5, 18), (4, 19), (5, 19)
-]
+# NOWALK = [
+#     (17, 0), (17, 1), (17, 2), (17, 3), (17, 4), (17, 8), (17, 9), (17, 10), (17, 11),
+#     (17, 12), (17, 13), (17, 14), (17, 15), (17, 16), (18, 16), (19, 16), (20, 16),
+#     (21, 16), (21, 17),
+#     (21, 18), (21, 19), (21, 20), (22, 20), (23, 20), (24, 20), (25, 20), (26, 20),
+#     (27, 20), (28, 20), (29, 20), (30, 20), (31, 20), (32, 20), (33, 20), (34, 20),
+#     (35, 20), (23, 3), (23, 4), (23, 5), (23, 6), (23, 7), (23, 8), (23, 9), (23, 10),
+#     (23, 11), (23, 12), (24, 12), (25, 12), (26, 12), (27, 12), (27, 13), (27, 14),
+#     (27, 15),  (27, 16), (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
+#     (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
+#     (4, 18), (5, 18), (4, 19), (5, 19),
+#     (11, 6), (11, 5), (12, 5)
+# ]
+# NOBUILD = [
+#     (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
+#     (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
+#     (4, 18), (5, 18), (4, 19), (5, 19)
+# ]
+NOBUILD = []
+NOWALK = []
 
 
 class Game():
@@ -60,11 +65,14 @@ class Game():
         self.pf_clusters = []
 
         # Specifies how the game grid will be, and calculates the offset
-        self.generateGridSettings()
+        # self.generateGridSettings()
 
     def newGame(self, level="default"):
 
         print("Starting a new game.")
+
+        # Remove old stuff from game window
+        self.window.flushWindow()
 
         # Generates grid parameters for game instance
         self.tiles_no_build = NOBUILD
@@ -72,8 +80,7 @@ class Game():
         self.generateGridSettings()
         self.grid = Grid(self)
 
-        # Remove old stuff from game window
-        self.window.flushWindow()
+        self.window.tile_renderer.update_offset()
 
         # Create particle emitters
         self.window.addParticleEmitters()
@@ -131,15 +138,21 @@ class Game():
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
-        w, h, gm, ssize = self.window.width, self.window.height, 0, 32
-        self.squaresize = ssize
+        tiles = TiledRenderer(self.window, RES_PATH + "map1.tmx")
+        mw = tiles.tmx_data.width
+        mh = tiles.tmx_data.height
+        self.grid_dim = (mw, mh)
+        w, h, gm = self.window.width, self.window.height, 0
         self.grid_margin = gm
-        self.grid_dim = (36, 21)
+        ssize = tiles.tmx_data.tilewidth
+        self.squaresize = ssize
         self.window.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
         self.window.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
+        self.window.tile_renderer = tiles
 
     def updateGridSettings(self):
-        w, h, gm, ssize = self.window.width, self.window.height, 0, 32
+        w, h, gm, ssize = self.window.width, self.window.height, \
+            self.grid_margin, self.squaresize
         self.window.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
         self.window.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
 
