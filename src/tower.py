@@ -51,23 +51,26 @@ class Tower(Sprite):
         self.setAngle()
 
     def setAngle(self, angle=None):
-        if not angle:
-            self.angle = random.randrange(-10, 10)
-        else:
-            self.angle = angle
-        self.turret.rotation = math.degrees(self.angle) + 90
+        if self.turret:
+            if not angle:
+                self.angle = random.randrange(-10, 10)
+            else:
+                self.angle = angle
+            self.turret.rotation = math.degrees(self.angle) + 90
 
     def updatePos(self, x, y, gx, gy):
         self.x = x
         self.y = y
         self.gx = gx
         self.gy = gy
-        self.turret.x = self.x
-        self.turret.y = self.y
+        if self.turret:
+            self.turret.x = self.x
+            self.turret.y = self.y
 
     def updateOffset(self):
         self.x, self.y = self.window.get_windowpos(self.gx, self.gy)
-        self.turret.x, self.turret.y = self.x, self.y
+        if self.turret:
+            self.turret.x, self.turret.y = self.x, self.y
 
     def setCD(self, n):
         self.cd = True
@@ -140,7 +143,7 @@ class SplashTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.window.cx
             self.y = self.window.cy
-        self.dmg = 16.0
+        self.dmg = 14.0
         self.crit = 0
         self.spd = 2.0
         self.cd = False
@@ -228,7 +231,7 @@ class PoisonTower(Tower):
         self.game = game
         self.size = game.squaresize
         self.window = game.window
-        self.dmg = 8.0
+        self.dmg = 7.0
         self.crit = 10
         self.spd = 1.4
         self.slow = 30
@@ -308,3 +311,66 @@ class PoisonTower(Tower):
                     i += 1
 
                 self.window.play_sfx("dart", volume)
+
+
+class ChainTower(Tower):
+
+    def __init__(self, game, name="Chain Tower", x=0, y=0):
+        super(Tower, self).__init__(
+            game.window.textures["tower_chain"],
+            batch=game.window.batches["towers"],
+            group=game.window.fg_group
+        )
+        self.name = name
+        self.game = game
+        self.size = game.squaresize
+        self.window = game.window
+        self.dmg = 32.0
+        self.crit = 0
+        self.spd = 3.5
+        self.stun_time = 1.5
+        self.cd = False
+        self.price = 90
+        self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
+        self.target_types = ["normal", "flying"]
+        self.range = int(game.squaresize * 3.5)
+        self.target = None
+        self.turret_size = 14
+        self.gx = x
+        self.gy = y
+        if x and y:  # If position is supplied, set it
+            self.x = x
+            self.y = y
+        else:  # Sets the tower position to cursor position
+            self.x = self.window.cx
+            self.y = self.window.cy
+        self.turret = None
+        self.selected = False
+
+    def doDamage(self, t):
+        if t.hp <= 0:
+            t.state = "dead"
+        else:
+            if not self.cd:
+                volume = 0.6
+                t.hp -= self.dmg
+
+                self.setCD(self.spd)
+
+                if t.hp <= 0:
+                    t.state = "dead"
+                else:
+                    t.setDebuff("stun", time=self.stun_time)
+
+                self.setCD(self.spd)
+
+                i = 0
+                while i < 5:
+                    x = t.x + random.randrange(-4, 5)
+                    y = t.y + random.randrange(-4, 5)
+                    self.window.puff_fx.addParticle(
+                        x, y, (0.6, 0.6, 0.9, 1)
+                    )
+                    i += 1
+
+                self.window.play_sfx("pluck", volume)

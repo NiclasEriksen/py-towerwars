@@ -78,6 +78,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         glClearColor(0.1, 0.1, 0.1, 1)  # Background color
         self.particle_system = default_system
         self.tile_renderer = None
+        self.loading = False
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
@@ -206,6 +207,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
         ts_t_img = center_image(pyglet.image.load(
             RES_PATH + 'tower_splash_turret.png')
         )
+        tc_img = center_image(pyglet.image.load(
+            RES_PATH + 'tower_chain.png')
+        )
         mob_1q = center_image(pyglet.image.load(RES_PATH + 'mob.png'))
         mob_1w = center_image(pyglet.image.load(RES_PATH + 'mob_1w.png'))
         mob_1e = center_image(pyglet.image.load(RES_PATH + 'mob_1e.png'))
@@ -224,6 +228,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             tower_poison_turret=tp_t_img,
             tower_splash=ts_img,
             tower_splash_turret=ts_t_img,
+            tower_chain=tc_img,
             mob1Q=mob_1q,
             mob1W=mob_1w,
             mob1E=mob_1e,
@@ -466,6 +471,23 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 1.0/30.0
             )
 
+    def load_screen(self):
+        print("Loadscreen")
+        label = pyglet.text.Label(
+                "Loading...", font_name='UI font',
+                font_size=18,
+                x=self.width // 2, y=self.height // 2,
+                anchor_x="center", anchor_y="center",
+                color=(255, 255, 255, 255)
+            )
+
+        glColor4f(0.4, 0.4, 0.3, 0.7)
+        self.circle(
+            self.width // 2, self.height // 2, 70
+        )
+
+        label.draw()
+
     def quit_game(self):
         print("Exiting...")
         pyglet.app.exit()
@@ -591,6 +613,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     tower = SplashTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
+                if t_type == "4":
+                    tower = ChainTower(self.game)
+                    self.game.mouse_drag_tower = tower
+                    self.game.active_tower = self.game.mouse_drag_tower
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
                 self.game.place_tower(
@@ -642,6 +668,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         self.game.mouse_drag_tower = tower
                     if t_type == "3":
                         tower = SplashTower(self.game)
+                        self.game.mouse_drag_tower = tower
+                    if t_type == "4":
+                        tower = ChainTower(self.game)
                         self.game.mouse_drag_tower = tower
                     self.game.selected_mouse = self.game.mouse_drag_tower
                 elif self.game.active_tower:
@@ -795,7 +824,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def render(self, dt):
         """ Rendering method, need to remove game logic """
-        if not self.game.paused and not self.mainmenu:
+        if self.loading:
+            self.load_screen()
+        elif self.mainmenu:
+            self.mainmenu.render()
+        elif not self.game.paused and not self.mainmenu:
             # Initialize Projection matrix
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
@@ -836,6 +869,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             ### Draw UI ###
             # gluOrtho2D(0, self.width, 0, self.height)
             self.userinterface.render()
+
 
             self.setGL("off")
 
@@ -915,9 +949,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             self.game.updateState()
 
-        else:
-            if self.mainmenu:
-                self.mainmenu.render()
 
     def circle(self, x, y, radius):
         iterations = int(2*radius*pi)

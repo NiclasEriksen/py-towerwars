@@ -44,7 +44,7 @@ class Mob(Sprite):
         self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
-        self.hp = 18.0
+        self.hp = 14.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.0
@@ -69,6 +69,9 @@ class Mob(Sprite):
             dmg = kwargs.items()[0][1]
             time = kwargs.items()[1][1]
             debuff = Debuff(self, d_type, time, dmg=dmg)
+        elif d_type == "stun":
+            time = kwargs.items()[0][1]
+            debuff = Debuff(self, d_type, time)
 
         if debuff:
             debuff.update()
@@ -82,7 +85,8 @@ class Mob(Sprite):
         self.rx, self.ry = self.x, self.y
 
     def updatePos(self):
-        if not self.stall_timer and (self not in self.g.pf_queue):
+        if not self.stall_timer and (self not in self.g.pf_queue) \
+        and self.spd > 0.0:
 
             points = self.path
             tp = self.targetpoint
@@ -262,12 +266,16 @@ class Mob(Sprite):
                 self.state = "alive"
                 self.updateTarget()
         else:   # If none of the states apply
-            slowed = False
+            slowed, stunned = False, False
             for d in self.debuff_list:
                 if d.d_type == "slow":
                     slowed = True
+                elif d.d_type == "stun":
+                    stunned = True
                 d.update()
-            if not slowed:
+            if stunned:
+                self.speed = 0.0
+            elif not slowed:
                 self.spd = self.orig_spd
 
 
@@ -303,7 +311,7 @@ class Mob1W(Mob):
         self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
-        self.hp = 50.0
+        self.hp = 35.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9
@@ -350,7 +358,7 @@ class Mob1E(Mob):
         self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
-        self.hp = 190.0
+        self.hp = 180.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.6
@@ -721,12 +729,15 @@ class Debuff:
             self.slow = kwargs.items()[0][1]
         elif self.d_type == "poison":
             self.dmg = kwargs.items()[0][1]
+        elif self.d_type == "stun":
+            pass
 
     def update(self):
         if self.time > 0:
             self.doEffect()
             self.time -= 1
         else:
+            self.owner.spd = self.owner.orig_spd
             self.owner.debuff_list.remove(self)
 
     def doEffect(self):
@@ -757,5 +768,5 @@ class Debuff:
                 else:
                     self.owner.state = "dead"
 
-
-
+        elif self.d_type == "stun":
+            self.owner.spd = 0.0

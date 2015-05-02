@@ -88,6 +88,10 @@ class UI():
             x = 20
             y = 20 + self.b_size * 2
             texture = "tower_splash"
+        elif b_type == "4":
+            x = 20
+            y = 20 + self.b_size * 3
+            texture = "tower_chain"
         else:
             return False
 
@@ -192,7 +196,6 @@ class MainMenu():
                     self.w.play_sfx("pluck")
                     if e.action == "newgame":
                         self.w.game.newGame()
-                        self.w.mainmenu = None
                     elif e.action == "resume":
                         self.w.game.paused = False
                         self.w.mainmenu = None

@@ -43,7 +43,8 @@ class Game():
         self.available_towers = {
             "1": 10,
             "2": 25,
-            "3": 40
+            "3": 40,
+            "4": 90,
         }
         self.selected_mouse = None  # Holds the object mouse is dragging
         self.dragging = False   # If an object is currently being dragged
@@ -70,7 +71,12 @@ class Game():
     def newGame(self, level="default"):
 
         print("Starting a new game.")
-
+        # Display load screen
+        self.window.mainmenu = None   # Kills the menu
+        self.window.loading = True
+        pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT)
+        self.window.render(0)
+        self.window.flip()
         # Remove old stuff from game window
         self.window.flushWindow()
 
@@ -121,7 +127,6 @@ class Game():
                         0.25
                     )
         self.lives = 10
-        self.loaded = True
         pyglet.clock.unschedule(self.autospawn_random)
         pyglet.clock.schedule_interval(self.pathFinding, 1.0/60.0)
 
@@ -131,11 +136,12 @@ class Game():
         self.grid.update()
 
         # Adding buttons to UI
-        for b in ("1", "2", "3"):
+        for b in ("1", "2", "3", "4"):
             self.window.userinterface.add_button(b)
         self.window.userinterface.add_text("gold")
+        self.window.loading = False
+        self.loaded = True
         self.paused = False
-        self.window.mainmenu = None   # Kills the menu
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
