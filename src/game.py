@@ -259,7 +259,10 @@ class Game():
 
     def autospawn_balanced(self, dt):
         if not self.paused and self.ai_gold > 0:
-            choice = random.randint(0, 7)
+            mob_choices = 9
+            choice = random.randint(0, mob_choices - 1)
+            if choice < mob_choices - 1 and len(self.mobs) >= 100:
+                choice += 2
             mob = None
             if choice == 0:
                 mob = Mob(self, "YAY")
@@ -277,6 +280,8 @@ class Game():
                 mob = Mob1D(self, "YAY")
             elif choice == 7:
                 mob = Mob1F(self, "YAY")
+            elif choice == 8:
+                mob = Mob1Z(self, "YAY")
 
             if mob and mob.bounty * 2 <= self.ai_gold:
                 self.mobs.append(mob)

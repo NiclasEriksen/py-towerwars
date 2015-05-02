@@ -214,6 +214,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         mob_1s = center_image(pyglet.image.load(RES_PATH + 'mob_1s.png'))
         mob_1d = center_image(pyglet.image.load(RES_PATH + 'mob_1d.png'))
         mob_1f = center_image(pyglet.image.load(RES_PATH + 'mob_1f.png'))
+        mob_1z = center_image(pyglet.image.load(RES_PATH + 'mob_1z.png'))
         # bg01 = pyglet.image.load(RES_PATH + 'bg01.png')
 
         self.textures = dict(
@@ -231,6 +232,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             mob1S=mob_1s,
             mob1D=mob_1d,
             mob1F=mob_1f,
+            mob1Z=mob_1z,
         )
 
         self.effects = dict(
@@ -504,6 +506,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.mobs.append(mob)
             elif symbol == key.F:
                 mob = Mob1F(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.Z:
+                mob = Mob1Z(self.game, "YAY")
                 self.game.mobs.append(mob)
             elif symbol == key.F11:
                 self.set_fullscreen(not self.fullscreen)
