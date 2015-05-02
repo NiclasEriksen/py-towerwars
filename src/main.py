@@ -1,6 +1,6 @@
 #!/bin/python2
 import pyglet   # Version 1.2.2
-from audio import AudioFile  # Sound engine
+# from audio import AudioFile  # Sound engine
 from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse

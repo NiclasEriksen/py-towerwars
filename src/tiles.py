@@ -1,6 +1,7 @@
 from pytmx import *
 from pytmx.util_pyglet import load_pyglet
 from pyglet.sprite import Sprite
+from pyglet.image import ImageDataRegion
 from functions import *
 
 class TiledRenderer(object):
@@ -15,8 +16,6 @@ class TiledRenderer(object):
         self.window = window
         self.sprites = []
         self.loadmap()
-        for layer in self.tmx_data.visible_layers:
-            print layer.name
 
     def draw_rect(self, color, rect, width):
         pass
@@ -49,6 +48,7 @@ class TiledRenderer(object):
         poly_color = (0, 255, 0)
 
         for layer in self.tmx_data.visible_layers:
+            print layer.name
             nw, nb = False, False   # nowalk, nobuild
             spawn, goal = False, False
             if layer.name == "Background":
@@ -71,7 +71,6 @@ class TiledRenderer(object):
                         layer.name
                     )
                 )
-                break
             # draw map tile layers
             if isinstance(layer, TiledTileLayer):
 
@@ -122,16 +121,22 @@ class TiledRenderer(object):
             # draw image layers
             elif isinstance(layer, TiledImageLayer):
                 if layer.image:
-                    print "LOOOL"
+                    # if isinstance(layer.image, ImageDataRegion):
+                    #     print "heidu"
+                    #     image = layer.image.get_texture()
+                    # else:
+                    image = layer.image
+                    print layer.name, layer.image, image
                     # image = center_image(image)
                     x = self.window.width // 2
                     y = self.window.height // 2
-                    sprite = Sprite(layer.image, batch=batch, x=x, y=y)
+                    sprite = Sprite(image, batch=batch, x=x, y=y)
                     sprite.imagelayer = True
                     sprite.gx, sprite.gy = None, None
                     self.sprites.append(sprite)
 
     def draw(self):
+        print "BAD"
         # not going for efficiency here
         # for demonstration purposes only
 
