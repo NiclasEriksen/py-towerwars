@@ -186,7 +186,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def loadFonts(self):
         pyglet.font.add_file(RES_PATH + 'soft_elegance.ttf')
-        self.ui_font = pyglet.font.load('UI font')
+        pyglet.font.add_file(RES_PATH + 'ui/' + 'visitor1.ttf')
+        self.ui_font = pyglet.font.load('Soft Elegance')
+        self.small_font = pyglet.font.load('Visitor TT1 BRK')
 
     def loadTextures(self):
 
@@ -478,7 +480,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def load_screen(self):
         print("Loadscreen")
         label = pyglet.text.Label(
-                "Loading...", font_name='UI font',
+                "Loading...", font_name='Soft Elegance',
                 font_size=18,
                 x=self.width // 2, y=self.height // 2,
                 anchor_x="center", anchor_y="center",

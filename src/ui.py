@@ -23,7 +23,7 @@ class UI():
             y = self.w.height - 25
 
             label = text.Label(
-                str(self.w.game.gold), font_name='UI font',
+                str(self.w.game.gold), font_name='Soft Elegance',
                 font_size=14,
                 x=x, y=y,
                 anchor_x="center", anchor_y="center",
@@ -37,7 +37,7 @@ class UI():
         y = self.w.height - 25
 
         label = text.Label(
-            str(len(self.w.game.mobs)), font_name='UI font',
+            str(len(self.w.game.mobs)), font_name='Soft Elegance',
             font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center",
@@ -52,7 +52,7 @@ class UI():
         y = self.w.height - 50
 
         label = text.Label(
-            str(len(self.w.animations)), font_name='UI font',
+            str(len(self.w.animations)), font_name='Soft Elegance',
             font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center",
@@ -67,7 +67,7 @@ class UI():
         y = self.w.height - 75
 
         label = text.Label(
-            str(self.w.game.lives), font_name='UI font',
+            str(self.w.game.lives), font_name='Visitor TT1 BRK',
             font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center",
@@ -117,6 +117,8 @@ class UI():
             if b.b_type == "sell":
                 b.active = True
             elif b.b_type == "upgrade":
+                if isinstance(b, text.Label):
+                    b.text = str(b.owner.price // 2)
                 if not b.owner.price // 2 <= gold:
                     b.opacity = 80
                     # b.active = False
@@ -137,6 +139,8 @@ class UI():
             else:
                 for s in self.sprites:
                     if s.b_type == "upgrade":
+                        if isinstance(s, text.Label):
+                            s.delete()
                         self.sprites.remove(s)
                     elif s.b_type == "sell":
                         self.sprites.remove(s)
@@ -145,6 +149,8 @@ class UI():
         else:
             for s in self.sprites:
                 if s.b_type == "upgrade":
+                    if isinstance(s, text.Label):
+                        s.delete()
                     self.sprites.remove(s)
                 elif s.b_type == "sell":
                     self.sprites.remove(s)
@@ -154,11 +160,12 @@ class UI():
         # Checks if mouse position is on a button
         # radius = self.b_size / 2
         for b in self.sprites:
-            radius = b.width // 2
-            if b.active:
-                if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
-                    if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
-                        return b.b_type
+            if not isinstance(b, text.Label):
+                radius = b.width // 2
+                if b.active:
+                    if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
+                        if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
+                            return b.b_type
         return False
 
     def render(self):
@@ -193,6 +200,8 @@ class UI():
     def context_menu(self, obj, action="show"):
         for s in self.sprites:
             if s.b_type == "upgrade":
+                if isinstance(s, text.Label):
+                    s.delete()
                 self.sprites.remove(s)
             elif s.b_type == "sell":
                 self.sprites.remove(s)
@@ -215,6 +224,20 @@ class UI():
         b_sprite.b_type = "upgrade"
         b_sprite.owner = obj
         self.sprites.append(b_sprite)
+
+        size = 10
+        label = text.Label(
+            str(obj.price // 2), font_name='Visitor TT1 BRK',
+            font_size=size,
+            x=obj.x - texture.width // 2,
+            y=obj.y + obj.height // 2 + texture.height + size // 2,
+            batch=self.w.batches["buttons"],
+            anchor_x="center", anchor_y="center",
+            color=(255, 255, 255, 255)
+        )
+        label.owner = obj
+        label.b_type = "upgrade"
+        self.sprites.append(label)
 
         texture = image.load(RES_PATH + 'ui/sell.png')
         texture = center_image(texture)
@@ -257,7 +280,7 @@ class MainMenu():
                 )
         b_sprite.action = action
         b_sprite.label = text.Label(
-            title, font_name='UI font',
+            title, font_name='Soft Elegance',
             font_size=14,
             x=x, y=y,
             anchor_x="center", anchor_y="center"
