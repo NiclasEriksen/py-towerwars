@@ -60,9 +60,11 @@ class TiledRenderer(object):
                 nw, nb = True, True
             elif layer.name == "Spawn":
                 batch = self.window.batches["obs"]
+                nb = True
                 spawn = True
             elif layer.name == "Goal":
                 batch = self.window.batches["obs"]
+                nb = True
                 goal = True
             elif layer.name == "Foreground":
                 batch = self.window.batches["fg"]

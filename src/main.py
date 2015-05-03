@@ -24,6 +24,7 @@ SCREENRES = (1440, 900)  # The resolution for the game window
 VSYNC = True
 PAUSED = False
 SCREEN_MARGIN = 15  # %
+FPS = 30.0
 
 ### Get information about the OS and display ###11
 platform = pyglet.window.get_platform()
@@ -31,7 +32,7 @@ display = platform.get_default_display()
 screen = display.get_default_screen()
 
 ### Limit the frames per second to 60 ###
-pyglet.clock.set_fps_limit(60)
+pyglet.clock.set_fps_limit(FPS)
 fps_display = pyglet.clock.ClockDisplay()
 
 ############################
@@ -74,6 +75,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.width = SCREENRES[0]
         self.height = SCREENRES[1]
         self.offset = (0, 0)
+        self.fps = FPS
         self.cx, self.cy = 0, 0  # Cursor position
         glClearColor(0.1, 0.1, 0.1, 1)  # Background color
         self.particle_system = default_system
@@ -86,6 +88,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.batches["bg1"] = pyglet.graphics.Batch()
         self.batches["obs"] = pyglet.graphics.Batch()
         self.batches["fg"] = pyglet.graphics.Batch()
+        self.batches["fg2"] = pyglet.graphics.Batch()
         self.batches["bg2"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
@@ -146,6 +149,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.batches["bg2"] = pyglet.graphics.Batch()
         self.batches["obs"] = pyglet.graphics.Batch()
         self.batches["fg"] = pyglet.graphics.Batch()
+        self.batches["fg2"] = pyglet.graphics.Batch()
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
         self.batches["mm_buttons"] = pyglet.graphics.Batch()
@@ -599,24 +603,37 @@ class GameWindow(pyglet.window.Window):  # Main game window
             # First, check if mouse is released over a UI element
             t_type = self.userinterface.check_mouse((x, y))
             if t_type:  # check_mouse returns false if not on a button
-                self.active_tower = None
-                self.selected_mouse = None
+                # self.active_tower = None
                 if t_type == "1":
                     tower = Tower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
-                if t_type == "2":
+                elif t_type == "2":
                     tower = PoisonTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
-                if t_type == "3":
+                elif t_type == "3":
                     tower = SplashTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
-                if t_type == "4":
+                elif t_type == "4":
                     tower = ChainTower(self.game)
                     self.game.mouse_drag_tower = tower
                     self.game.active_tower = self.game.mouse_drag_tower
+                elif t_type == "sell":
+                    # Sell active tower!
+                    print self.game.active_tower
+                    self.game.gold += int(self.game.active_tower.price * 0.75)
+                    self.game.towers.remove(self.game.active_tower)
+                    self.game.active_tower = None
+                    self.game.grid.update()
+                elif t_type == "upgrade":
+                    print("yay!")
+                    if self.game.active_tower:
+                        self.game.active_tower.upgrade()
+
+                # self.selected_mouse = None
+
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
                 self.game.place_tower(
@@ -633,7 +650,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
             elif not self.game.active_tower and self.game.dragging:
                 self.game.active_tower = None
                 self.game.dragging = None
-
 
             else:
                 self.game.active_tower = None
@@ -913,7 +929,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             glLineWidth(3)
             for m in self.game.mobs:
                 # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
-                if m.hp < m.hp_max:
+                if m.hp < m.hp_max and not m.state == "dead" and m.hp > 0.0:
                     pyglet.graphics.draw(
                         2,
                         GL_LINES,
@@ -929,11 +945,83 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             # Draw range circle on active tower
             if self.game.active_tower:
-                glColor4f(0.4, 0.5, 0.9, 0.3)
+                glColor4f(0.4, 0.5, 0.9, 0.2)
                 t = self.game.active_tower
                 self.circle(
                     t.x, t.y, t.range
                 )
+            if self.game.mouse_drag_tower:
+                if not self.rectangles:
+                    self._rectangles = pyglet.graphics.vertex_list(
+                        4,
+                        'v2i')
+                    self._rectangles_path = pyglet.graphics.vertex_list(
+                        4,
+                        'v2i')
+                    self.rectangles = []
+                    self.rectangles_path = []
+                    grid = []
+                    path = []
+                    for p in self.game.grid.t_grid:
+                        grid.append(p)
+                    for p in self.game.grid.path:
+                        try:
+                            grid.remove(p)
+                            path.append(p)
+                        except ValueError:
+                            pass
+                    for p in grid:
+                        pos = self.get_windowpos(p[0], p[1])
+                        x, y = pos
+                        ss = self.game.squaresize - 2
+                        rectangle = [
+                            x - ss // 2, y - ss // 2,
+                            x - ss // 2, y + ss // 2,
+                            x + ss // 2, y + ss // 2,
+                            x + ss // 2, y - ss // 2,
+                        ]
+                        self.rectangles.append(rectangle)
+
+                    for p in path:
+                        pos = self.get_windowpos(p[0], p[1])
+                        x, y = pos
+                        ss = self.game.squaresize - 6
+                        rectangle = [
+                            x - ss // 2, y - ss // 2,
+                            x - ss // 2, y + ss // 2,
+                            x + ss // 2, y + ss // 2,
+                            x + ss // 2, y - ss // 2,
+                        ]
+                        self.rectangles_path.append(rectangle)
+
+                    batch = self.batches["fg2"]
+                    for r in self.rectangles:
+                        # vertex_list = pyglet.graphics.vertex_list(4,
+                        #     ('v2i', r),
+                        #     ('c3B', [128, 128, 255, 80] * 4)
+                        # )
+                        self._rectangles = batch.add(4, GL_QUADS, None,
+                            ('v2i', r),
+                        )
+                    batch = self.batches["fg3"]
+                    for r in self.rectangles_path:
+                        # vertex_list = pyglet.graphics.vertex_list(4,
+                        #     ('v2i', r),
+                        #     ('c3B', [128, 128, 255, 80] * 4)
+                        # )
+                        self._rectangles_path = batch.add(4, GL_QUADS, None,
+                            ('v2i', r),
+                        )
+                glColor4f(0.7, 0.7, 0.9, 0.2)
+                self.batches["fg2"].draw()
+                glColor4f(0.7, 0.7, 0.3, 0.2)
+                self.batches["fg3"].draw()
+
+            else:
+                self.batches["fg2"] = pyglet.graphics.Batch()
+                self.batches["fg3"] = pyglet.graphics.Batch()
+                self.rectangles = None
+                self._rectangles = None
 
         # for t in self.tile_renderer.sprites:
         #     t.
@@ -966,5 +1054,5 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
 if __name__ == "__main__":
     window = GameWindow()
-    pyglet.clock.schedule_interval(window.render, 1.0/60.0)
+    pyglet.clock.schedule_interval(window.render, 1.0 / window.fps)
     pyglet.app.run()

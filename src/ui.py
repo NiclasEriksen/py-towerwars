@@ -1,6 +1,9 @@
 # UI module
 from pyglet.sprite import Sprite
-from pyglet import gl, graphics, text
+from pyglet import gl, graphics, text, image
+import copy # to edit images without impacting the original
+from functions import *
+RES_PATH = "../resources/"
 
 
 class UI():
@@ -10,6 +13,7 @@ class UI():
         self.buttons = []
         self.texts = []
         self.sprites = []
+        self.active_tower = None
         # self.b_size = self.game.squaresize
         self.b_size = 32
 
@@ -110,17 +114,47 @@ class UI():
     def update_buttons(self):
         gold = self.w.game.gold
         for b in self.sprites:
-            if not b.b_price <= gold:
-                b.opacity = 128
+            if b.b_type == "sell":
+                b.active = True
+            elif b.b_type == "upgrade":
+                if not b.owner.price // 2 <= gold:
+                    b.opacity = 80
+                    # b.active = False
+                else:
+                    b.opacity = 255
+                    # b.active = True
+            elif not b.b_price <= gold:
+                b.opacity = 80
                 b.active = False
             else:
                 b.opacity = 255
                 b.active = True
 
+
+        if self.w.game.active_tower:
+            if self.active_tower == self.w.game.active_tower:
+                pass
+            else:
+                for s in self.sprites:
+                    if s.b_type == "upgrade":
+                        self.sprites.remove(s)
+                    elif s.b_type == "sell":
+                        self.sprites.remove(s)
+                self.active_tower = self.w.game.active_tower
+                self.context_menu(self.active_tower)
+        else:
+            for s in self.sprites:
+                if s.b_type == "upgrade":
+                    self.sprites.remove(s)
+                elif s.b_type == "sell":
+                    self.sprites.remove(s)
+            self.active_tower = None
+
     def check_mouse(self, pos):
         # Checks if mouse position is on a button
-        radius = self.b_size / 2
+        # radius = self.b_size / 2
         for b in self.sprites:
+            radius = b.width // 2
             if b.active:
                 if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
                     if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
@@ -155,6 +189,48 @@ class UI():
                 li += 1
                 t.x = 20
                 t.y = self.w.height - 25 * li
+
+    def context_menu(self, obj, action="show"):
+        for s in self.sprites:
+            if s.b_type == "upgrade":
+                self.sprites.remove(s)
+            elif s.b_type == "sell":
+                self.sprites.remove(s)
+
+
+        texture = image.load(RES_PATH + 'ui/upgrade.png')
+        texture = center_image(texture)
+        b_sprite = Sprite(
+                texture,
+                x=obj.x - texture.width // 2,
+                y=obj.y + obj.height // 2 + texture.height // 2,
+                batch=self.w.batches["buttons"],
+                group=self.w.ui_group
+        )
+
+        b_sprite.active = True
+        b_sprite.b_price = obj.price // 2
+        if b_sprite.b_price > self.w.game.gold:
+            b_sprite.opacity = 80
+        b_sprite.b_type = "upgrade"
+        b_sprite.owner = obj
+        self.sprites.append(b_sprite)
+
+        texture = image.load(RES_PATH + 'ui/sell.png')
+        texture = center_image(texture)
+        b_sprite = Sprite(
+                texture,
+                x=obj.x + texture.width // 2,
+                y=obj.y + obj.height // 2 + texture.height // 2,
+                batch=self.w.batches["buttons"],
+                group=self.w.ui_group
+        )
+
+        b_sprite.active = True
+        b_sprite.b_price = obj.price
+        b_sprite.b_type = "sell"
+        b_sprite.owner = obj
+        self.sprites.append(b_sprite)
 
 class MainMenu():
 

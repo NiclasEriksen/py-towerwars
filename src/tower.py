@@ -122,6 +122,13 @@ class Tower(Sprite):
 
                 self.window.play_sfx("bang1", volume)   # play sound
 
+    def upgrade(self):
+        if self.game.gold >= self.price // 2:
+            self.spd *= 0.80
+            self.dmg = int(self.dmg * 1.25)
+            self.game.gold -= self.price // 2
+            self.price = int(self.price * 1.5)
+
 
 class SplashTower(Tower):
 
@@ -143,7 +150,7 @@ class SplashTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.window.cx
             self.y = self.window.cy
-        self.dmg = 14.0
+        self.dmg = 15.0
         self.crit = 0
         self.spd = 2.0
         self.cd = False
@@ -151,7 +158,7 @@ class SplashTower(Tower):
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
         self.target_types = ["normal"]
         self.range = int(game.squaresize * 2.5)
-        self.splash_range = game.squaresize * 2
+        self.splash_range = game.squaresize
         self.turret = Sprite(
             self.window.textures["tower_splash_turret"],
             x=self.x, y=self.y,
@@ -162,6 +169,14 @@ class SplashTower(Tower):
         self.turret_size = 18
         self.selected = False
         self.setAngle()
+
+    def upgrade(self):
+        if self.game.gold >= self.price // 2:
+            self.dmg = int(self.dmg * 1.30)
+            self.range = int(self.range * 1.05)
+            self.splash_range = int(self.splash_range * 1.1)
+            self.game.gold -= self.price // 2
+            self.price += self.price // 2
 
     def doDamage(self, t):
         if t.hp <= 0:
@@ -235,7 +250,7 @@ class PoisonTower(Tower):
         self.crit = 10
         self.spd = 1.4
         self.slow = 30
-        self.slow_time = self.spd
+        self.slow_time = 1.5
         self.cd = False
         self.price = 25
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
@@ -313,6 +328,16 @@ class PoisonTower(Tower):
                 self.window.play_sfx("dart", volume)
 
 
+    def upgrade(self):
+        if self.game.gold >= self.price // 2:
+            self.dmg = int(self.dmg * 1.25)
+            self.slow = int(self.slow * 1.1)
+            self.slow_time = int(self.slow * 1.1)
+            self.spd *= 0.90
+            self.game.gold -= self.price // 2
+            self.price += self.price // 2
+
+
 class ChainTower(Tower):
 
     def __init__(self, game, name="Chain Tower", x=0, y=0):
@@ -365,11 +390,21 @@ class ChainTower(Tower):
                 self.setCD(self.spd)
 
                 i = 0
-                while i < 5:
-                    x = t.x + random.randrange(-4, 5)
-                    y = t.y + random.randrange(-4, 5)
+                while i < 4:
+                    x = t.x + random.randrange(-6, 6)
+                    y = t.y + random.randrange(-6, 6)
+                    self.window.smoke_fx.addParticle(
+                        x, y, (0.7, 0.8, 1.0, 0.7)
+                    )
+                    i += 1
+                self.window.smoke_fx.addParticle(
+                    t.x, t.y, (0.5, 0.5, 1.0, 0.9)
+                )
+                while i < 3:
+                    x = t.x + random.randrange(-6, 6)
+                    y = t.y
                     self.window.puff_fx.addParticle(
-                        x, y, (0.6, 0.6, 0.9, 1)
+                        x, y, (0.4, 0.6, 1.0, 1.0)
                     )
                     i += 1
 

@@ -68,6 +68,15 @@ class Game():
         # Specifies how the game grid will be, and calculates the offset
         # self.generateGridSettings()
 
+        # player = pyglet.media.Player()
+        # sound = pyglet.media.load('../resources/mus1.ogg')
+        # player.queue(sound) 
+
+        # # keep playing for as long as the app is running (or you tell it to stop):
+        # player.eos_action = pyglet.media.Player.EOS_LOOP 
+
+        # player.play()
+
     def newGame(self, level="default"):
 
         print("Starting a new game.")
@@ -302,7 +311,7 @@ class Game():
     def updateState(self):
         for t in self.towers:
             if not t.target:  # if tower has no target
-                i = random.randrange(0, 3)
+                i = random.randrange(0, 1)
                 for m in self.mobs:
                     if(m.move_type in t.target_types):
                         dist = get_dist(m.x, m.y, t.x, t.y)

@@ -196,7 +196,7 @@ class Mob(Sprite):
                     else:
                         print("Mob is stalling!")
                         self.state = "stalled"
-                        self.stall_timer = 60
+                        self.stall_timer = self.g.window.fps * 2
 
                 else:
                     if self.debug:
@@ -405,17 +405,17 @@ class Mob1R(Mob):
         self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
-        self.hp = 250.0
+        self.hp = 80.0
         self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
-        self.spd = 0.8
+        self.spd = 1.8
         self.debuff_list = []
         self.slow_cd = None
         self.orig_spd = self.spd
         self.stall_timer = None
         self.point = 0
         self.path = game.grid.path
-        self.bounty = 15
+        self.bounty = 10
         self.debug = debug
         if self.debug:
             print("Spawning mob!")
@@ -724,7 +724,7 @@ class Debuff:
     def __init__(self, owner, d_type, time, **kwargs):
         self.owner = owner
         self.d_type = d_type
-        self.time = time * 60
+        self.time = time * self.owner.g.window.fps
         if self.d_type == "slow":
             self.slow = kwargs.items()[0][1]
         elif self.d_type == "poison":
@@ -746,7 +746,7 @@ class Debuff:
             if newspeed <= self.owner.spd:
                 self.owner.spd = newspeed
         elif self.d_type == "poison":
-            if self.time % 60 == 0:
+            if self.time % self.owner.g.window.fps == 0:
                 if self.owner.hp > 0:
                     self.owner.hp -= self.dmg
                     self.owner.g.window.puff_fx.addParticle(
