@@ -3,12 +3,6 @@ from pyglet.sprite import Sprite
 from functions import *
 import animation
 import random
-from lepton import Particle
-
-n_particle = Particle(
-    velocity=(1, 1, 0),
-    color=(0.55, 0.50, 0.45, 0.5)
-)
 
 
 class Mob(Sprite):
@@ -24,7 +18,6 @@ class Mob(Sprite):
         self.id = self.g.mob_count
         self.g.mob_count += 1
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -85,8 +78,10 @@ class Mob(Sprite):
         self.rx, self.ry = self.x, self.y
 
     def updatePos(self):
-        if not self.stall_timer and (self not in self.g.pf_queue) \
-        and self.spd > 0.0:
+        if (
+            not self.stall_timer and (self not in self.g.pf_queue)
+            and self.spd > 0.0
+        ):
 
             points = self.path
             tp = self.targetpoint
@@ -215,17 +210,11 @@ class Mob(Sprite):
                             m.point = self.point
                             m.targetpoint = self.targetpoint
                             m.path = self.path
-                            # m.x, m.y, m.rx, m.ry = self.x, \
-                            #     self.y, self.rx, self.ry
-                            # m.state = "alive"
                             self.g.pf_queue.remove(m)
                             if self.debug:
                                 print("Shared path with nearby mob.")
 
     def kill(self):
-        anim = animation.Animation(
-            self.g.window, self.g.window.anim["mob1Qdeath"], self.x, self.y
-        )
         if self.debug:
             print("Mob {0} died at x:{1}, y:{2}".format(
                 self.id, self.x, self.y
@@ -243,8 +232,6 @@ class Mob(Sprite):
             self.g.pf_queue.remove(self)
         self.g.gold += self.bounty
         self.g.mobs.remove(self)
-        
-
 
     def updateState(self):
         self.debug = self.g.debug
@@ -277,7 +264,6 @@ class Mob(Sprite):
                 self.speed = 0.0
             elif not slowed:
                 self.spd = self.orig_spd
-
 
 
 class Mob1W(Mob):
@@ -432,7 +418,6 @@ class Mob1A(Mob):
         self.id = self.g.mob_count
         self.g.mob_count += 1
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -479,7 +464,6 @@ class Mob1S(Mob):
         self.id = self.g.mob_count
         self.g.mob_count += 1
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -526,7 +510,6 @@ class Mob1D(Mob):
         self.id = self.g.mob_count
         self.g.mob_count += 1
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -577,7 +560,6 @@ class Mob1F(Mob):
         self.g.mob_count += 1
         self.move_type = "flying"
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -683,7 +665,6 @@ class Mob1Z(Mob):
         self.id = self.g.mob_count
         self.g.mob_count += 1
         self.debug = game.debug
-        # self.image = mob_img
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,

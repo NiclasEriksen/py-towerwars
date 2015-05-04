@@ -8,9 +8,9 @@ from pyglet.gl import *
 from lepton import Particle, ParticleGroup, default_system
 from lepton.emitter import StaticEmitter
 from lepton.renderer import PointRenderer
-from lepton.texturizer import SpriteTexturizer, create_point_texture
+from lepton.texturizer import SpriteTexturizer
 from lepton.controller import (
-    Gravity, Lifetime, Movement, Fader, ColorBlender, Growth
+    Gravity, Lifetime, Movement, Fader
 )
 ############################
 # Import classes #

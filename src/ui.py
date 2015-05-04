@@ -13,8 +13,8 @@ class UI():
         self.buttons = []
         self.texts = []
         self.sprites = []
+        self.context_sprites = []
         self.active_tower = None
-        # self.b_size = self.game.squaresize
         self.b_size = 32
 
     def add_text(self, t_type):
@@ -83,24 +83,28 @@ class UI():
         if b_type == "1":
             x = 20
             y = 20
+            category = "tower"
             texture = self.w.textures["tower_wood"]
             active = True
             b_price = self.w.game.available_towers[b_type]
         elif b_type == "2":
             x = 20
             y = 20 + self.b_size
+            category = "tower"
             texture = self.w.textures["tower_poison"]
             active = True
             b_price = self.w.game.available_towers[b_type]
         elif b_type == "3":
             x = 20
             y = 20 + self.b_size * 2
+            category = "tower"
             texture = self.w.textures["tower_splash"]
             active = True
             b_price = self.w.game.available_towers[b_type]
         elif b_type == "4":
             x = 20
             y = 20 + self.b_size * 3
+            category = "tower"
             texture = self.w.textures["tower_chain"]
             active = True
             b_price = self.w.game.available_towers[b_type]
@@ -109,7 +113,7 @@ class UI():
             texture = center_image(texture)
             x = texture.width + 2
             y = self.w.height - (texture.height + 2)
-
+            category = "ui"
             active = False
             b_price = False
             b_type = "icon"
@@ -123,6 +127,7 @@ class UI():
                         group=self.w.ui_group
                     )
 
+        b_sprite.category = category
         b_sprite.b_type = b_type
         b_sprite.active = active
         b_sprite.b_price = b_price
@@ -131,6 +136,14 @@ class UI():
     def update_buttons(self):
         gold = self.w.game.gold
         for b in self.sprites:
+            if b.category == "tower":
+                if not b.b_price <= gold:
+                    b.opacity = 80
+                    b.active = False
+                else:
+                    b.opacity = 255
+                    b.active = True
+        for b in self.context_sprites:
             if b.b_type == "sell":
                 b.active = True
             elif b.b_type == "upgrade":
@@ -141,48 +154,39 @@ class UI():
                             b.color = (255, 140, 140, 225)
                         else:
                             b.color = (130, 255, 130, 255)
-                else:                
+                else:
                     if not b.owner.price // 2 <= gold:
                         b.opacity = 80
                         # b.active = False
                     else:
                         b.opacity = 255
                         # b.active = True
-            elif not b.b_price <= gold:
-                b.opacity = 80
-                b.active = False
-            else:
-                b.opacity = 255
-                b.active = True
 
 
         if self.w.game.active_tower:
-            if self.active_tower == self.w.game.active_tower:
-                pass
+            if self.active_tower:
+                if self.active_tower == self.w.game.active_tower:
+                    pass
+                else:
+                    self.active_tower = self.w.game.active_tower
+                    self.context_menu(self.active_tower)
             else:
-                for s in self.sprites:
-                    if s.b_type == "upgrade":
-                        if isinstance(s, text.Label):
-                            s.delete()
-                        self.sprites.remove(s)
-                    elif s.b_type == "sell":
-                        self.sprites.remove(s)
                 self.active_tower = self.w.game.active_tower
                 self.context_menu(self.active_tower)
         else:
-            for s in self.sprites:
-                if s.b_type == "upgrade":
-                    if isinstance(s, text.Label):
-                        s.delete()
-                    self.sprites.remove(s)
-                elif s.b_type == "sell":
-                    self.sprites.remove(s)
+            self.wipe_context_menu()
             self.active_tower = None
 
     def check_mouse(self, pos):
         # Checks if mouse position is on a button
-        # radius = self.b_size / 2
         for b in self.sprites:
+            if not isinstance(b, text.Label):
+                radius = b.width // 2
+                if b.active:
+                    if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
+                        if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
+                            return b.b_type
+        for b in self.context_sprites:
             if not isinstance(b, text.Label):
                 radius = b.width // 2
                 if b.active:
@@ -209,62 +213,82 @@ class UI():
 
     def update_offset(self):
         ri = 0      # right counter
-        li = 0      # left counter
         for t in self.texts:
             if t.align == "right":
                 ri += 1
                 t.x = self.w.width - 20
                 t.y = self.w.height - 25 * ri
             elif t.align == "left":
-                li += 1
-                t.x = 20
-                t.y = self.w.height - 25 * li
+                t.y = self.w.height - 16
+        for s in self.sprites:
+            if s.b_type == "icon":
+                s.y = self.w.height - (s.height + 2)
+        for s in self.context_sprites:
+            s.x = s.owner.x + s.offset[0]
+            s.y = s.owner.y + s.offset[1]
+
+    def wipe_context_menu(self):
+        for s in self.context_sprites:
+            if isinstance(s, text.Label):
+                s.delete()
+        self.context_sprites = []
 
     def context_menu(self, obj, action="show"):
-        for s in self.sprites:
-            if s.b_type == "upgrade":
-                if isinstance(s, text.Label):
-                    s.delete()
-                self.sprites.remove(s)
-            elif s.b_type == "sell":
-                self.sprites.remove(s)
-
-
+        self.wipe_context_menu()
+        category = "context"
         texture = image.load(RES_PATH + 'ui/upgrade.png')
         texture = center_image(texture)
+        offset =  (
+            0.0 - texture.width // 2,
+            obj.height // 2 + texture.height // 2
+        )
         b_sprite = Sprite(
                 texture,
-                x=obj.x - texture.width // 2,
-                y=obj.y + obj.height // 2 + texture.height // 2,
+                x=obj.x + offset[0],
+                y=obj.y + offset[1],
                 batch=self.w.batches["buttons"],
                 group=self.w.ui_group
         )
 
+        b_sprite.offset = offset
         b_sprite.active = True
         b_sprite.b_price = obj.price // 2
         if b_sprite.b_price > self.w.game.gold:
             b_sprite.opacity = 80
         b_sprite.b_type = "upgrade"
+        b_sprite.category = category
         b_sprite.owner = obj
-        self.sprites.append(b_sprite)
+        self.context_sprites.append(b_sprite)
 
         size = 10
-        x = obj.x - texture.width // 2
-        y = obj.y + obj.height // 2 + texture.height + size // 2
+        offset = (
+            0.0 - texture.width // 2 + 1,
+            obj.height // 2 + texture.height // 2 + (size * 1.5) - 1
+        )
+        x = obj.x + offset[0]
+        y = obj.y + offset[1]
         label = text.Label(
             str(obj.price // 2), font_name='Visitor TT1 BRK',
             font_size=size,
-            x=x+1,
-            y=y-1,
+            x=x,
+            y=y,
             batch=self.w.batches["buttons"],
             anchor_x="center", anchor_y="center",
             color=(32, 32, 32, 196)
         )
+        label.offset = offset
         label.owner = obj
         label.b_type = "upgrade"
+        label.category = category
         label.shadow = True
-        self.sprites.append(label)
+        self.context_sprites.append(label)
 
+        offset = (
+            0.0 - texture.width // 2,
+            obj.height // 2 + texture.height // 2 + (size * 1.5)
+        )
+        x = obj.x + offset[0]
+        y = obj.y + offset[1]
         label = text.Label(
             str(obj.price // 2), font_name='Visitor TT1 BRK',
             font_size=size,
@@ -274,28 +298,36 @@ class UI():
             anchor_x="center", anchor_y="center",
             color=(130, 255, 130, 255)
         )
+        label.offset = offset
         label.owner = obj
         label.b_type = "upgrade"
+        label.category = category
         label.shadow = False
         if obj.price // 2 > self.w.game.gold:
             label.color = (255, 140, 140, 225)
-        self.sprites.append(label)
+        self.context_sprites.append(label)
 
         texture = image.load(RES_PATH + 'ui/sell.png')
         texture = center_image(texture)
+        offset =  (
+            texture.width // 2,
+            obj.height // 2 + texture.height // 2
+        )
         b_sprite = Sprite(
                 texture,
-                x=obj.x + texture.width // 2,
-                y=obj.y + obj.height // 2 + texture.height // 2,
+                x=obj.x + offset[0],
+                y=obj.y + offset[1],
                 batch=self.w.batches["buttons"],
                 group=self.w.ui_group
         )
-
+        b_sprite.offset = offset
         b_sprite.active = True
         b_sprite.b_price = obj.price
         b_sprite.b_type = "sell"
+        b_sprite.category = category
         b_sprite.owner = obj
-        self.sprites.append(b_sprite)
+        self.context_sprites.append(b_sprite)
+
 
 class MainMenu():
 

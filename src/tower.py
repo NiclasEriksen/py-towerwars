@@ -250,7 +250,7 @@ class PoisonTower(Tower):
         self.crit = 10
         self.spd = 1.4
         self.slow = 30
-        self.slow_time = 1.5
+        self.slow_time = 1.0
         self.cd = False
         self.price = 25
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
@@ -304,6 +304,7 @@ class PoisonTower(Tower):
                     t.state = "dead"
                 else:
                     t.setDebuff("slow", slow=self.slow, time=self.slow_time)
+                    print("Slowing for {0} seconds".format(self.slow_time))
                     t.setDebuff("poison", tickdmg=self.dmg//4, time=5.0)
 
                 self.setCD(self.spd)
@@ -332,7 +333,7 @@ class PoisonTower(Tower):
         if self.game.gold >= self.price // 2:
             self.dmg = int(self.dmg * 1.25)
             self.slow = int(self.slow * 1.1)
-            self.slow_time = int(self.slow * 1.1)
+            self.slow_time = self.slow_time * 1.1
             self.spd *= 0.90
             self.game.gold -= self.price // 2
             self.price += self.price // 2

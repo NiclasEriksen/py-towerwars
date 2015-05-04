@@ -4,11 +4,12 @@ from pyglet.sprite import Sprite
 from pyglet.image import ImageDataRegion
 from functions import *
 
+
 class TiledRenderer(object):
-    """
-    Super simple way to render a tiled map with pyglet
-    no shape drawing yet
-    """
+
+    """Super simple way to render a tiled map with pyglet
+    no shape drawing yet"""
+
     def __init__(self, window, filename):
         tm = load_pyglet(filename)
         self.size = tm.width * tm.tilewidth, tm.height * tm.tileheight
@@ -36,19 +37,15 @@ class TiledRenderer(object):
 
         tw = self.tmx_data.tilewidth
         th = self.tmx_data.tileheight
-        mw = self.tmx_data.width
         mh = self.tmx_data.height - 1
-        pixel_height = (mh + 1) * th
         draw_rect = self.draw_rect
         draw_lines = self.draw_lines
-        # offset_x, offset_y = self.window.offset_x, self.window.offset_y
         offset_x, offset_y = 0, 0
 
         rect_color = (255, 0, 0)
         poly_color = (0, 255, 0)
 
         for layer in self.tmx_data.visible_layers:
-            print layer.name
             nw, nb = False, False   # nowalk, nobuild
             spawn, goal = False, False
             if layer.name == "Background":
@@ -128,7 +125,6 @@ class TiledRenderer(object):
                     #     image = layer.image.get_texture()
                     # else:
                     image = layer.image
-                    print layer.name, layer.image, image
                     # image = center_image(image)
                     x = self.window.width // 2
                     y = self.window.height // 2
@@ -136,62 +132,3 @@ class TiledRenderer(object):
                     sprite.imagelayer = True
                     sprite.gx, sprite.gy = None, None
                     self.sprites.append(sprite)
-
-    def draw(self):
-        print "BAD"
-        # not going for efficiency here
-        # for demonstration purposes only
-
-        # deref these heavily used references for speed
-        tw = self.tmx_data.tilewidth
-        th = self.tmx_data.tileheight
-        mw = self.tmx_data.width
-        mh = self.tmx_data.height - 1
-        pixel_height = (mh + 1) * th
-        draw_rect = self.draw_rect
-        draw_lines = self.draw_lines
-
-        rect_color = (255, 0, 0)
-        poly_color = (0, 255, 0)
-
-        # fill the background color
-        # if self.tmx_data.background_color:
-        #     surface.fill(pygame.Color(self.tmx_data.background_color))
-
-        # iterate over all the visible layers, then draw them
-        # according to the type of layer they are.
-        for layer in self.tmx_data.visible_layers:
-
-            # draw map tile layers
-            if isinstance(layer, TiledTileLayer):
-
-                # iterate over the tiles in the layer
-                for x, y, image in layer.tiles():
-                    y = mh - y
-                    image.blit(x * tw, y * th)
-
-            # draw object layers
-            elif isinstance(layer, TiledObjectGroup):
-
-                # iterate over all the objects in the layer
-                for obj in layer:
-                    logger.info(obj)
-
-                    # objects with points are polygons or lines
-                    if hasattr(obj, 'points'):
-                        draw_lines(poly_color, obj.closed, obj.points, 3)
-
-                    # some object have an image
-                    elif obj.image:
-                        obj.image.blit(obj.x, pixel_height - obj.y)
-
-                    # draw a rect for everything else
-                    else:
-                        draw_rect(rect_color,
-                                  (obj.x, obj.y, obj.width, obj.height), 3)
-
-            # draw image layers
-            elif isinstance(layer, TiledImageLayer):
-                if layer.image:
-                    layer.image.blit(0, 0)
-
