@@ -6,28 +6,6 @@ import pyglet
 
 RES_PATH = "../resources/"
 
-# Crappy map until TMX import is done -.-
-# NOWALK = [
-#     (17, 0), (17, 1), (17, 2), (17, 3), (17, 4), (17, 8), (17, 9), (17, 10), (17, 11),
-#     (17, 12), (17, 13), (17, 14), (17, 15), (17, 16), (18, 16), (19, 16), (20, 16),
-#     (21, 16), (21, 17),
-#     (21, 18), (21, 19), (21, 20), (22, 20), (23, 20), (24, 20), (25, 20), (26, 20),
-#     (27, 20), (28, 20), (29, 20), (30, 20), (31, 20), (32, 20), (33, 20), (34, 20),
-#     (35, 20), (23, 3), (23, 4), (23, 5), (23, 6), (23, 7), (23, 8), (23, 9), (23, 10),
-#     (23, 11), (23, 12), (24, 12), (25, 12), (26, 12), (27, 12), (27, 13), (27, 14),
-#     (27, 15),  (27, 16), (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
-#     (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
-#     (4, 18), (5, 18), (4, 19), (5, 19),
-#     (11, 6), (11, 5), (12, 5)
-# ]
-# NOBUILD = [
-#     (6, 7), (7, 7), (6, 8), (7, 8), (6, 9), (7, 9), (6, 10), (7, 10),
-#     (6, 11), (7, 11), (6, 12), (7, 12), (6, 13), (7, 13), (6, 14), (7, 14),
-#     (4, 18), (5, 18), (4, 19), (5, 19)
-# ]
-NOBUILD = []
-NOWALK = []
-
 
 class Game():
 
@@ -90,8 +68,8 @@ class Game():
         self.window.flushWindow()
 
         # Generates grid parameters for game instance
-        self.tiles_no_build = NOBUILD
-        self.tiles_no_walk = NOWALK
+        self.tiles_no_build = []
+        self.tiles_no_walk = []
         self.generateGridSettings()
         self.grid = Grid(self)
 
@@ -145,7 +123,7 @@ class Game():
         self.grid.update()
 
         # Adding buttons to UI
-        for b in ("1", "2", "3", "4"):
+        for b in ("1", "2", "3", "4", "gold_icon"):
             self.window.userinterface.add_button(b)
         self.window.userinterface.add_text("gold")
         self.window.loading = False
@@ -171,6 +149,58 @@ class Game():
             self.grid_margin, self.squaresize
         self.window.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
         self.window.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
+
+    def createGridIndicators(self):
+        self.window._rectangles = pyglet.graphics.vertex_list(
+            4,
+            'v2i'
+        )
+        self.window._rectangles_path = pyglet.graphics.vertex_list(
+            4,
+            'v2i'
+        )
+        self.window.rectangles = []
+        self.window.rectangles_path = []
+        grid = []
+        path = []
+        for p in self.grid.t_grid:
+            grid.append(p)
+        for p in self.grid.path:
+            try:
+                grid.remove(p)
+                path.append(p)
+            except ValueError:
+                pass
+        for p in grid:
+            pos = self.window.get_windowpos(p[0], p[1])
+            x, y = pos
+            ss = self.squaresize - 2
+            rectangle = create_rectangle(x, y, ss, ss)
+            self.window.rectangles.append(rectangle)
+
+        for p in path:
+            pos = self.window.get_windowpos(p[0], p[1])
+            x, y = pos
+            ss = self.squaresize - 6
+            rectangle = create_rectangle(x, y, ss, ss)
+            self.window.rectangles_path.append(rectangle)
+
+        batch = self.window.batches["fg2"]
+        for r in self.window.rectangles:
+            # vertex_list = pyglet.graphics.vertex_list(4,
+            #     ('v2i', r),
+            #     ('c3B', [128, 128, 255, 80] * 4)
+            # )
+            self.window._rectangles = batch.add(
+                4, pyglet.graphics.gl.GL_QUADS, None,
+                ('v2i', r),
+            )
+        batch = self.window.batches["fg3"]
+        for r in self.window.rectangles_path:
+            self.window._rectangles_path = batch.add(
+                4, pyglet.graphics.gl.GL_QUADS, None,
+                ('v2i', r),
+            )
 
     def pathFinding(self, dt, limit=1):
         if len(self.pf_queue) > 0:

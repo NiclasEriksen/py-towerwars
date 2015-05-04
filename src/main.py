@@ -9,15 +9,24 @@ from lepton import Particle, ParticleGroup, default_system
 from lepton.emitter import StaticEmitter
 from lepton.renderer import PointRenderer
 from lepton.texturizer import SpriteTexturizer, create_point_texture
-from lepton.controller import Gravity, Lifetime, Movement, Fader, ColorBlender, Growth
-# import pytmx    # Tiled map loader
-
+from lepton.controller import (
+    Gravity, Lifetime, Movement, Fader, ColorBlender, Growth
+)
+############################
+# Import classes #
+from game import *
+from tower import *
+from mob import *
+from ui import *
+import pypf
+from animation import *
+from particles import *
 from functions import *
 
 # Sound engine
 pyglet.options['audio'] = ('openal', 'pulse', 'silent')
 
-### Global variables ###
+# Global variables #
 DEBUG = False
 RES_PATH = "../resources/"
 SCREENRES = (1440, 900)  # The resolution for the game window
@@ -26,31 +35,20 @@ PAUSED = False
 SCREEN_MARGIN = 15  # %
 FPS = 30.0
 
-### Get information about the OS and display ###11
+# Get information about the OS and display #
 platform = pyglet.window.get_platform()
 display = platform.get_default_display()
 screen = display.get_default_screen()
 
-### Limit the frames per second to 60 ###
+# Limit the frames per second to 60 #
 pyglet.clock.set_fps_limit(FPS)
 fps_display = pyglet.clock.ClockDisplay()
-
-############################
-### Import classes ###
-from game import *
-from tower import *
-from mob import *
-from ui import *
-import pypf
-# from wall import *
-from animation import *
-from particles import *
 
 
 class GameWindow(pyglet.window.Window):  # Main game window
 
     def __init__(self):
-        ### Template for multisampling
+        # Template for multisampling
         gl_template = pyglet.gl.Config(
             sample_buffers=1,
             samples=2,
@@ -63,7 +61,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             gl_template = pyglet.gl.Config(alpha_size=8)
             gl_config = screen.get_best_config(gl_template)
             print("No multisampling.")
-        ### Create OpenGL context ###
+        # Create OpenGL context #
         gl_context = gl_config.create_context(None)
         super(GameWindow, self).__init__(
             context=gl_context,
@@ -71,7 +69,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             resizable=True,
             vsync=VSYNC
             )
-        ### GL and graphics variables ###
+        # GL and graphics variables #
         self.width = SCREENRES[0]
         self.height = SCREENRES[1]
         self.offset = (0, 0)
@@ -104,18 +102,18 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.loadSFX()      # Load sound files into memory
         self.loadTextures()
 
-        ### GL modes ###
+        # GL modes #
         glShadeModel(GL_SMOOTH)
         glEnable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
 
-        ### Lists of game objects ###
+        # Lists of game objects #
         self.animations = []
 
         # self.generateGridSettings()
         self.game = Game(self)
 
-        print "Creating UI"
+        print("Creating UI")
         self.userinterface = UI(self)
 
         # Spawn main menu
@@ -129,7 +127,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def flushWindow(self):
         try:
             if self.debug:
-                print "Removing old particle system."
+                print("Removing old particle system.")
             self.particle_system.remove_group(self.flame_emitter_group)
             self.particle_system.remove_group(self.gas_emitter_group)
         except AttributeError:
@@ -178,11 +176,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.crit_fx
         )
         self.flame_emitter, self.gas_emitter = None, None
-        # self.bg = pyglet.sprite.Sprite(
-        #     self.textures["bg"], batch=self.batches["bg"])
-        # self.bg.x = self.offset_x
-        # self.bg.y = self.offset_y
-        # self.tile_renderer = TiledRenderer(self, RES_PATH + "map1.tmx")
 
     def loadFonts(self):
         pyglet.font.add_file(RES_PATH + 'soft_elegance.ttf')
@@ -191,8 +184,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.small_font = pyglet.font.load('Visitor TT1 BRK')
 
     def loadTextures(self):
-
-        ### Get images from resource cache and centers their anchor points ###
         ws_img = center_image(pyglet.image.load(RES_PATH + 'wall_stone.png'))
         tw_img = center_image(pyglet.image.load(RES_PATH + 'tower_wood.png'))
         p_texture = pyglet.image.load(RES_PATH + 'particle.png')
@@ -254,19 +245,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             crit=p_crit_texture,
             blood=p_blood_texture,
         )
-        # ### Load sprite sheet ###
-        # ### All credits go to http://opengameart.org/users/hyptosis ###
-        # sprite_sheet_img = pyglet.image.load(
-        #     RES_PATH + 'hyptosis_tile-art-batch-1.png')
-        # sprite_sheet = pyglet.image.ImageGrid(
-        #     sprite_sheet_img,
-        #     sprite_sheet_img.width / 32, sprite_sheet_img.height / 32)
-        # for i in sprite_sheet:
-        #     i = center_image(i)
-        # self.spritesheet = sprite_sheet
 
-        ### Load images and create image grids for animations ###
-        ### and centers their frame anchor point              ###
+        # Load images and create image grids for animations #
+        # and centers their frame anchor point              #
         death_img = pyglet.image.load(RES_PATH + 'mob_death.png')
         pang_img = pyglet.image.load(RES_PATH + 'pang_01_32.png')
         death_anim = pyglet.image.ImageGrid(death_img, 1, 7)
@@ -294,10 +275,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.sfx = dict(
             impact1=impact1,
             impact2=impact2,
-            dart = dart,
-            bang1 = bang1,
-            bang2 = bang2,
-            pluck = pluck
+            dart=dart,
+            bang1=bang1,
+            bang2=bang2,
+            pluck=pluck
         )
 
     def play_sfx(self, sound="default", volume=1.0):
@@ -344,21 +325,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             points.append(wp[1])
             r_points = [x, y, x + w, y, x + w, y + w, x, y + w]
             rects = rects + r_points
-        # rect = self.batches["bg"].add(
-        #     len(rects) / 2,
-        #     GL_QUADS,
-        #     self.bg_group,
-        #     ('v2f', rects)
-        #     )
-        # dots = self.batches["bg2"].add(
-        #     len(points) / 2,
-        #     GL_POINTS,
-        #     self.fg_group,
-        #     ('v2f', (points))
-        #     )
 
-    ### Makes a list of points that represent lines of the grid path ###
     def generateGridPathIndicators(self):
+        # Makes a list of points that represent lines of the grid path #
         points = []
         i = 0
         g = self.game.grid
@@ -408,12 +377,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def span(self, dx, dy):
         self.offset_x += dx
         self.offset_y -= dy
-        # self.updateGridSettings()
-        # self.bg.x += dx
-        # self.bg.y += dy
-
-        # for w in self.walls:
-        #     w.updatePos()
 
         for t in self.game.towers:
             t.updateOffset()
@@ -488,7 +451,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             )
 
         glColor4f(0.4, 0.4, 0.3, 0.7)
-        self.circle(
+        self.draw_circle(
             self.width // 2, self.height // 2, 70
         )
 
@@ -498,19 +461,18 @@ class GameWindow(pyglet.window.Window):  # Main game window
         print("Exiting...")
         pyglet.app.exit()
 
-    ### EVENT HANDLERS ###
+    # EVENT HANDLERS #
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ESCAPE:
             if self.game.loaded:
                 self.pause_game(not self.game.paused)
             else:
                 self.quit_game()
-            # self.quit_game()
             # return True  # Disable ESC to exit
         elif symbol == key.SPACE:
             if self.game.loaded:
                 self.pause_game(not self.game.paused)
-        if not self.game.paused: # Only listen for these keys when game is running
+        if not self.game.paused:  # Only listen for keys if game is running
             if symbol == key.Q:
                 mob = Mob(self.game, "YAY")
                 self.game.mobs.append(mob)
@@ -601,11 +563,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
-            # self.play_sfx("impact2")
             # First, check if mouse is released over a UI element
             t_type = self.userinterface.check_mouse((x, y))
             if t_type:  # check_mouse returns false if not on a button
-                # self.active_tower = None
                 if t_type == "1":
                     tower = Tower(self.game)
                     self.game.mouse_drag_tower = tower
@@ -624,17 +584,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.active_tower = self.game.mouse_drag_tower
                 elif t_type == "sell":
                     # Sell active tower!
-                    print self.game.active_tower
                     self.game.gold += int(self.game.active_tower.price * 0.75)
                     self.game.towers.remove(self.game.active_tower)
                     self.game.active_tower = None
                     self.game.grid.update()
                 elif t_type == "upgrade":
-                    print("yay!")
                     if self.game.active_tower:
                         self.game.active_tower.upgrade()
-
-                # self.selected_mouse = None
 
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
@@ -729,15 +685,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
         glMatrixMode(gl.GL_MODELVIEW)
         self.activate()
 
-        # self.generateGridIndicators()
-
         if not self.mainmenu:
             self.game.updateGridSettings()
-            # self.bg.x = self.offset_x
-            # self.bg.y = self.offset_y
-
-        # for w in self.walls:
-        #     w.updatePos()
 
             for t in self.game.towers:
                 t.updateOffset()
@@ -777,22 +726,22 @@ class GameWindow(pyglet.window.Window):  # Main game window
         sy = self.get_windowpos(grid.start[0], grid.start[1])[1]
         gx = self.get_windowpos(grid.goal[0], grid.goal[1])[0]
         gy = self.get_windowpos(grid.goal[0], grid.goal[1])[1]
-        w = self.game.squaresize
-        
-        color2 = (0.7,0.2,0.1,0.6)
+
+        color2 = (0.7, 0.2, 0.1, 0.6)
         self.flame_emitter = StaticEmitter(
             rate=5,
             template=Particle(
-                position=(gx, gy, 0), 
-                color=color2), 
+                position=(gx, gy, 0),
+                color=color2),
             deviation=Particle(
                 position=(1, 1, 0),
                 velocity=(0.6, 0.2, 0),
-                color=(0,0.02,0,0),
+                color=(0, 0.02, 0, 0),
                 age=1))
         self.flame_emitter_group = ParticleGroup(
             controllers=[self.flame_emitter, Lifetime(6),
-                Gravity((-1.5,0,0)), Movement(),
+                Gravity((-1.5, 0, 0)),
+                Movement(),
                 Fader(
                     fade_in_start=0, start_alpha=0,
                     fade_in_end=0.20, max_alpha=0.5,
@@ -805,22 +754,24 @@ class GameWindow(pyglet.window.Window):  # Main game window
             )
         )
 
-        color = (0,0.5,0.7,0.6)
+        color = (0, 0.5, 0.7, 0.6)
         self.gas_emitter = StaticEmitter(
             rate=5,
             template=Particle(
-                position=(sx, sy, 0), 
-                color=color), 
+                position=(sx, sy, 0),
+                color=color),
             deviation=Particle(
                 position=(1, 1, 0),
                 velocity=(0.6, 0.2, 0),
-                color=(0,0.03,0,0),
+                color=(0, 0.03, 0, 0),
                 age=1))
         self.gas_emitter_group = ParticleGroup(
             controllers=[self.gas_emitter, Lifetime(6),
-                Gravity((1.5,0,0)), Movement(),
+                Gravity((1.5, 0, 0)),
+                Movement(),
                 Fader(
-                    fade_in_start=0, start_alpha=0, fade_in_end=0.20, max_alpha=0.5, 
+                    fade_in_start=0, start_alpha=0,
+                    fade_in_end=0.20, max_alpha=0.5,
                     fade_out_start=2.0, fade_out_end=5.0
                 )
             ],
@@ -839,6 +790,20 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.flame_emitter_group,
             self.gas_emitter_group
         )
+
+    def draw_circle(self, x, y, radius):
+        iterations = int(2*radius*pi)
+        s = sin(2*pi / iterations)
+        c = cos(2*pi / iterations)
+
+        dx, dy = radius, 0
+
+        glBegin(GL_TRIANGLE_FAN)
+        glVertex2f(x, y)
+        for i in range(iterations+1):
+            glVertex2f(x+dx, y+dy)
+            dx, dy = (dx*c - dy*s), (dy*c + dx*s)
+        glEnd()
 
     def render(self, dt):
         """ Rendering method, need to remove game logic """
@@ -867,8 +832,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             glColor4f(0, 0, 0, 1)
 
-            # glColor4f(1, 1, 1, 0.2)
-
             glColor4f(0.3, 0.3, 0.3, 1.0)
             glPointSize(3)
             self.setGL("on")
@@ -884,10 +847,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.batches["fg"].draw()
             self.batches["flying_mobs"].draw()
 
-            ### Draw UI ###
+            # Draw UI #
             # gluOrtho2D(0, self.width, 0, self.height)
             self.userinterface.render()
-
 
             self.setGL("off")
 
@@ -917,16 +879,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     ('v2f', points)
                 )
 
-            # for p in self.grid.w_grid:
-
-            #     glColor4f(1, 0, 1, 1)
-            #     x, y = self.get_windowpos(p[0], p[1])
-            #     pyglet.graphics.draw(
-            #         1,
-            #         GL_POINTS,
-            #         ('v2f', (x, y))
-            #         )
-            ### Draw mob health bars ###
+            # Draw mob health bars #
             glColor4f(0.9, 0.2, 0.2, 1.0)
             glLineWidth(3)
             for m in self.game.mobs:
@@ -949,71 +902,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
             if self.game.active_tower:
                 glColor4f(0.4, 0.5, 0.9, 0.2)
                 t = self.game.active_tower
-                self.circle(
+                self.draw_circle(
                     t.x, t.y, t.range
                 )
             if self.game.mouse_drag_tower:
                 if not self.rectangles:
-                    self._rectangles = pyglet.graphics.vertex_list(
-                        4,
-                        'v2i')
-                    self._rectangles_path = pyglet.graphics.vertex_list(
-                        4,
-                        'v2i')
-                    self.rectangles = []
-                    self.rectangles_path = []
-                    grid = []
-                    path = []
-                    for p in self.game.grid.t_grid:
-                        grid.append(p)
-                    for p in self.game.grid.path:
-                        try:
-                            grid.remove(p)
-                            path.append(p)
-                        except ValueError:
-                            pass
-                    for p in grid:
-                        pos = self.get_windowpos(p[0], p[1])
-                        x, y = pos
-                        ss = self.game.squaresize - 2
-                        rectangle = [
-                            x - ss // 2, y - ss // 2,
-                            x - ss // 2, y + ss // 2,
-                            x + ss // 2, y + ss // 2,
-                            x + ss // 2, y - ss // 2,
-                        ]
-                        self.rectangles.append(rectangle)
-
-                    for p in path:
-                        pos = self.get_windowpos(p[0], p[1])
-                        x, y = pos
-                        ss = self.game.squaresize - 6
-                        rectangle = [
-                            x - ss // 2, y - ss // 2,
-                            x - ss // 2, y + ss // 2,
-                            x + ss // 2, y + ss // 2,
-                            x + ss // 2, y - ss // 2,
-                        ]
-                        self.rectangles_path.append(rectangle)
-
-                    batch = self.batches["fg2"]
-                    for r in self.rectangles:
-                        # vertex_list = pyglet.graphics.vertex_list(4,
-                        #     ('v2i', r),
-                        #     ('c3B', [128, 128, 255, 80] * 4)
-                        # )
-                        self._rectangles = batch.add(4, GL_QUADS, None,
-                            ('v2i', r),
-                        )
-                    batch = self.batches["fg3"]
-                    for r in self.rectangles_path:
-                        # vertex_list = pyglet.graphics.vertex_list(4,
-                        #     ('v2i', r),
-                        #     ('c3B', [128, 128, 255, 80] * 4)
-                        # )
-                        self._rectangles_path = batch.add(4, GL_QUADS, None,
-                            ('v2i', r),
-                        )
+                    self.game.createGridIndicators()
                 glColor4f(0.7, 0.7, 0.9, 0.2)
                 self.batches["fg2"].draw()
                 glColor4f(0.7, 0.7, 0.3, 0.2)
@@ -1025,10 +919,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.rectangles = None
                 self._rectangles = None
 
-        # for t in self.tile_renderer.sprites:
-        #     t.
-
-            ### Update animations ###
+            # Update animations #
             for a in self.animations:
                 a.update()
                 if not a.playing:
@@ -1039,20 +930,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             self.game.updateState()
 
-
-    def circle(self, x, y, radius):
-        iterations = int(2*radius*pi)
-        s = sin(2*pi / iterations)
-        c = cos(2*pi / iterations)
-
-        dx, dy = radius, 0
-
-        glBegin(GL_TRIANGLE_FAN)
-        glVertex2f(x, y)
-        for i in range(iterations+1):
-            glVertex2f(x+dx, y+dy)
-            dx, dy = (dx*c - dy*s), (dy*c + dx*s)
-        glEnd()
 
 if __name__ == "__main__":
     window = GameWindow()

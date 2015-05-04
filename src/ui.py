@@ -19,14 +19,14 @@ class UI():
 
     def add_text(self, t_type):
         if t_type == "gold":
-            x = 20
-            y = self.w.height - 25
+            x = 32
+            y = self.w.height - 16
 
             label = text.Label(
                 str(self.w.game.gold), font_name='Soft Elegance',
                 font_size=14,
                 x=x, y=y,
-                anchor_x="center", anchor_y="center",
+                anchor_x="left", anchor_y="center",
                 color=(255, 255, 155, 255)
             )
             label.t_type = t_type
@@ -83,32 +83,49 @@ class UI():
         if b_type == "1":
             x = 20
             y = 20
-            texture = "tower_wood"
+            texture = self.w.textures["tower_wood"]
+            active = True
+            b_price = self.w.game.available_towers[b_type]
         elif b_type == "2":
             x = 20
             y = 20 + self.b_size
-            texture = "tower_poison"
+            texture = self.w.textures["tower_poison"]
+            active = True
+            b_price = self.w.game.available_towers[b_type]
         elif b_type == "3":
             x = 20
             y = 20 + self.b_size * 2
-            texture = "tower_splash"
+            texture = self.w.textures["tower_splash"]
+            active = True
+            b_price = self.w.game.available_towers[b_type]
         elif b_type == "4":
             x = 20
             y = 20 + self.b_size * 3
-            texture = "tower_chain"
+            texture = self.w.textures["tower_chain"]
+            active = True
+            b_price = self.w.game.available_towers[b_type]
+        elif b_type == "gold_icon":
+            texture = image.load(RES_PATH + 'ui/gold.png')
+            texture = center_image(texture)
+            x = texture.width + 2
+            y = self.w.height - (texture.height + 2)
+
+            active = False
+            b_price = False
+            b_type = "icon"
         else:
             return False
 
         b_sprite = Sprite(
-                        self.w.textures[texture],
+                        texture,
                         x=x, y=y,
                         batch=self.w.batches["buttons"],
                         group=self.w.ui_group
                     )
 
-        b_sprite.active = True
-        b_sprite.b_price = self.w.game.available_towers[b_type]
         b_sprite.b_type = b_type
+        b_sprite.active = active
+        b_sprite.b_price = b_price
         self.sprites.append(b_sprite)
 
     def update_buttons(self):
@@ -119,12 +136,18 @@ class UI():
             elif b.b_type == "upgrade":
                 if isinstance(b, text.Label):
                     b.text = str(b.owner.price // 2)
-                if not b.owner.price // 2 <= gold:
-                    b.opacity = 80
-                    # b.active = False
-                else:
-                    b.opacity = 255
-                    # b.active = True
+                    if not b.shadow:
+                        if not b.owner.price // 2 <= gold:
+                            b.color = (255, 140, 140, 225)
+                        else:
+                            b.color = (130, 255, 130, 255)
+                else:                
+                    if not b.owner.price // 2 <= gold:
+                        b.opacity = 80
+                        # b.active = False
+                    else:
+                        b.opacity = 255
+                        # b.active = True
             elif not b.b_price <= gold:
                 b.opacity = 80
                 b.active = False
@@ -226,17 +249,36 @@ class UI():
         self.sprites.append(b_sprite)
 
         size = 10
+        x = obj.x - texture.width // 2
+        y = obj.y + obj.height // 2 + texture.height + size // 2
         label = text.Label(
             str(obj.price // 2), font_name='Visitor TT1 BRK',
             font_size=size,
-            x=obj.x - texture.width // 2,
-            y=obj.y + obj.height // 2 + texture.height + size // 2,
+            x=x+1,
+            y=y-1,
             batch=self.w.batches["buttons"],
             anchor_x="center", anchor_y="center",
-            color=(255, 255, 255, 255)
+            color=(32, 32, 32, 196)
         )
         label.owner = obj
         label.b_type = "upgrade"
+        label.shadow = True
+        self.sprites.append(label)
+
+        label = text.Label(
+            str(obj.price // 2), font_name='Visitor TT1 BRK',
+            font_size=size,
+            x=x,
+            y=y,
+            batch=self.w.batches["buttons"],
+            anchor_x="center", anchor_y="center",
+            color=(130, 255, 130, 255)
+        )
+        label.owner = obj
+        label.b_type = "upgrade"
+        label.shadow = False
+        if obj.price // 2 > self.w.game.gold:
+            label.color = (255, 140, 140, 225)
         self.sprites.append(label)
 
         texture = image.load(RES_PATH + 'ui/sell.png')
@@ -272,12 +314,7 @@ class MainMenu():
                     )
         # b_sprite.width, b_sprite.height = 3, 1
         x, y = b_sprite.x, b_sprite.y
-        b_sprite.rectangle = (
-                x - 64, y - 16,
-                x - 64, y + 16,
-                x + 64, y + 16,
-                x + 64, y - 16,
-                )
+        b_sprite.rectangle = create_rectangle(x, y, 128, 32)
         b_sprite.action = action
         b_sprite.label = text.Label(
             title, font_name='Soft Elegance',
