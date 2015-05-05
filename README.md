@@ -5,14 +5,12 @@ It's built on [Pyglet](http://www.pyglet.org/), [py-lepton](https://code.google.
 
 Here's a list of keyboard shortcuts:
 
-F11: Fullscreen
-
-F12: Debug (G: give gold)
-
-F2: Autospawn random mobs
-
-Q, W, E, R,
-A, S, D, F,
-Z, X, C, V: Mobs
-
-Space: Pause
+Key | Function
+--------------- | ----------------
+F11             | Fullscreen
+F12             | Debug (G for gold)
+F2              | Autospawn random mobs
+Space           | Pause
+Q, W, E, R      | Mobs tier 1
+A, S, D, F      | Mobs tier 2
+Z, X, C, V      | Mobs tier 3
