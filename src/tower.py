@@ -160,9 +160,9 @@ class SplashTower(Tower):
         else:  # Sets the tower position to cursor position
             self.x = self.window.cx
             self.y = self.window.cy
-        self.dmg = 15.0
+        self.dmg = 16.0
         self.crit = 0
-        self.spd = 2.0
+        self.spd = 1.8
         self.cd = False
         self.price = 40
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
@@ -174,7 +174,7 @@ class SplashTower(Tower):
             x=self.x, y=self.y,
             batch=self.window.batches["anim"]
         )
-        self.splash_limit = 6
+        self.splash_limit = 3
         self.target = None
         self.turret_size = 18
         self.selected = False
@@ -182,8 +182,8 @@ class SplashTower(Tower):
 
     def upgrade(self):
         if self.game.gold >= self.price // 2:
-            self.dmg = int(self.dmg * 1.30)
-            self.range = int(self.range * 1.05)
+            self.dmg = int(self.dmg * 1.40)
+            self.splash_limit += 1
             self.splash_range = int(self.splash_range * 1.1)
             self.game.gold -= self.price // 2
             self.price += self.price // 2

@@ -45,6 +45,13 @@ class TiledRenderer(object):
         rect_color = (255, 0, 0)
         poly_color = (0, 255, 0)
 
+        for l in self.tmx_data.layers:
+            if isinstance(l, TiledTileLayer) and l.name == "Obstacles":
+                print("YEAH")
+                for x, y, image in l.tiles():
+                    self.window.game.tiles_no_walk.append((x, y))
+                    self.window.game.tiles_no_build.append((x, y))
+
         for layer in self.tmx_data.visible_layers:
             nw, nb = False, False   # nowalk, nobuild
             spawn, goal = False, False
@@ -54,7 +61,7 @@ class TiledRenderer(object):
                 batch = self.window.batches["bg2"]
             elif layer.name == "Obstacles":
                 batch = self.window.batches["obs"]
-                nw, nb = True, True
+                # nw, nb = True, True
             elif layer.name == "Spawn":
                 batch = self.window.batches["obs"]
                 nb = True
@@ -72,29 +79,29 @@ class TiledRenderer(object):
                 )
             # draw map tile layers
             if isinstance(layer, TiledTileLayer):
-
-                # iterate over the tiles in the layer
-                for x, y, image in layer.tiles():
-                    if nw:
-                        self.window.game.tiles_no_walk.append((x, y))
-                    if nb:
-                        self.window.game.tiles_no_build.append((x, y))
-                    gx, gy = x, y
-                    y = mh - y
-                    x = x * tw
-                    y = y * th
-                    x += offset_x
-                    y += offset_y
-                    # image.blit(x * tw, y * th)
-                    image = center_image(image)
-                    sprite = Sprite(image, batch=batch, x=x, y=y)
-                    sprite.imagelayer = False
-                    sprite.gx, sprite.gy = gx, gy
-                    self.sprites.append(sprite)
-                    if spawn:
-                        self.window.game.spawn = (gx, gy)
-                    elif goal:
-                        self.window.game.goal = (gx, gy)
+                if not layer.name == "Obstacles":
+                    # iterate over the tiles in the layer
+                    for x, y, image in layer.tiles():
+                        if nw:
+                            self.window.game.tiles_no_walk.append((x, y))
+                        if nb:
+                            self.window.game.tiles_no_build.append((x, y))
+                        gx, gy = x, y
+                        y = mh - y
+                        x = x * tw
+                        y = y * th
+                        x += offset_x
+                        y += offset_y
+                        # image.blit(x * tw, y * th)
+                        image = center_image(image)
+                        sprite = Sprite(image, batch=batch, x=x, y=y)
+                        sprite.imagelayer = False
+                        sprite.gx, sprite.gy = gx, gy
+                        self.sprites.append(sprite)
+                        if spawn:
+                            self.window.game.spawn = (gx, gy)
+                        elif goal:
+                            self.window.game.goal = (gx, gy)
 
             # draw object layers
             elif isinstance(layer, TiledObjectGroup):
@@ -126,6 +133,7 @@ class TiledRenderer(object):
                     # else:
                     image = layer.image
                     # image = center_image(image)
+                    print image
                     x = self.window.width // 2
                     y = self.window.height // 2
                     sprite = Sprite(image, batch=batch, x=x, y=y)
