@@ -16,3 +16,7 @@ Space           | Pause
 Q, W, E, R      | Mobs tier 1
 A, S, D, F      | Mobs tier 2
 Z, X, C, V      | Mobs tier 3
+
+Screenshot of early version:
+
+![Screenshot](https://raw.githubusercontent.com/NiclasEriksen/py-towerwars/master/scr.png)
