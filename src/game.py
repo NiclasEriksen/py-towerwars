@@ -5,9 +5,6 @@ from tiles import *
 import pyglet
 import os
 
-ROOT = os.path.dirname(__file__)
-RES_PATH = os.path.join(ROOT, "resources")
-
 
 class Game():
 
@@ -58,9 +55,10 @@ class Game():
 
         # player.play()
 
-    def newGame(self, level="default"):
+    def newGame(self, level="map1"):
 
         print("Starting a new game.")
+        self.map = os.path.join(self.window.resourcepath, level + ".tmx")
         # Display load screen
         self.window.mainmenu = None   # Kills the menu
         self.window.loading = True
@@ -135,7 +133,7 @@ class Game():
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
-        tiles = TiledRenderer(self.window, os.path.join(RES_PATH, "map1.tmx"))
+        tiles = TiledRenderer(self.window, self.map)
         mw = tiles.tmx_data.width
         mh = tiles.tmx_data.height
         self.grid_dim = (mw, mh)
@@ -309,7 +307,7 @@ class Game():
 
     def autospawn_balanced(self, dt):
         if not self.paused and self.ai_gold > 0:
-            mob_choices = 9
+            mob_choices = 12
             choice = random.randint(0, mob_choices - 1)
             if choice < mob_choices - 1 and len(self.mobs) >= 100:
                 choice += 2
@@ -332,6 +330,12 @@ class Game():
                 mob = Mob1F(self, "YAY")
             elif choice == 8:
                 mob = Mob1Z(self, "YAY")
+            elif choice == 9:
+                mob = Mob1X(self, "YAY")
+            elif choice == 10:
+                mob = Mob1C(self, "YAY")
+            elif choice == 11:
+                mob = Mob1V(self, "YAY")
 
             if mob and mob.bounty * 2 <= self.ai_gold:
                 self.mobs.append(mob)

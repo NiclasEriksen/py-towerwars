@@ -72,6 +72,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             vsync=VSYNC
             )
         # GL and graphics variables #
+        self.resourcepath = RES_PATH
         self.width = SCREENRES[0]
         self.height = SCREENRES[1]
         self.offset = (0, 0)
@@ -189,6 +190,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
         ws_img = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'wall_stone.png'))
         )
+        sell_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'sell.png'))
+        )
+        gold_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'gold.png'))
+        )
+        upgr_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'upgrade.png'))
+        )
         tw_img = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'tower_wood.png'))
         )
@@ -252,10 +262,22 @@ class GameWindow(pyglet.window.Window):  # Main game window
         mob_1z = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'mob_1z.png'))
         )
+        mob_1x = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1x.png'))
+        )
+        mob_1c = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1c.png'))
+        )
+        mob_1v = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1v.png'))
+        )
         # bg01 = pyglet.image.load(RES_PATH + 'bg01.png')
 
         self.textures = dict(
             wall_stone=ws_img,
+            sell=sell_img,
+            gold=gold_img,
+            upgrade=upgr_img,
             tower_wood=tw_img,
             tower_poison=tp_img,
             tower_poison_turret=tp_t_img,
@@ -271,6 +293,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             mob1D=mob_1d,
             mob1F=mob_1f,
             mob1Z=mob_1z,
+            mob1X=mob_1x,
+            mob1C=mob_1c,
+            mob1V=mob_1v,
         )
 
         self.effects = dict(
@@ -547,6 +572,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.mobs.append(mob)
             elif symbol == key.Z:
                 mob = Mob1Z(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.X:
+                mob = Mob1X(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.C:
+                mob = Mob1C(self.game, "YAY")
+                self.game.mobs.append(mob)
+            elif symbol == key.V:
+                mob = Mob1V(self.game, "YAY")
                 self.game.mobs.append(mob)
             elif symbol == key.F11:
                 self.set_fullscreen(not self.fullscreen)
@@ -936,16 +970,18 @@ class GameWindow(pyglet.window.Window):  # Main game window
             for m in self.game.mobs:
                 # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
                 if m.hp < m.hp_max and not m.state == "dead" and m.hp > 0.0:
+                    height = m.image.height // 2
+                    width = m.image.width // 2
                     pyglet.graphics.draw(
                         2,
                         GL_LINES,
                         (
                             'v2f',
                             (
-                                m.x - 1 - int((m.hp / m.hp_max) * 8),
-                                m.y + 10,
-                                m.x - 1 + int((m.hp / m.hp_max) * 8),
-                                m.y + 10)
+                                m.x - 1 - int((m.hp / m.hp_max) * width),
+                                m.y + height,
+                                m.x - 1 + int((m.hp / m.hp_max) * width),
+                                m.y + height)
                             )
                         )
 

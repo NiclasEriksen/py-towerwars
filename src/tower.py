@@ -132,8 +132,10 @@ class Tower(Sprite):
 
     def upgrade(self):
         if self.game.gold >= self.price // 2:
-            self.spd *= 0.80
-            self.dmg = int(self.dmg * 1.25)
+            self.spd *= 0.90
+            self.crit *= 1.1
+            self.dmg = int(self.dmg * 1.30)
+            self.range = int(self.range * 1.05)
             self.game.gold -= self.price // 2
             self.price = int(self.price * 1.5)
 
