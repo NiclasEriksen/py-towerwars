@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="32" tileheight="32" nextobjectid="11">
+ <tileset firstgid="1" name="LostGardenMountain" tilewidth="32" tileheight="32">
+  <image source="mountain_landscape_23.png" width="512" height="512"/>
+ </tileset>
+ <layer name="Background" width="32" height="18">
+  <data encoding="base64" compression="zlib">
+   eJyllktSAkEMhrMHYfYyNbP3xd4HB9Cp4gB6BtwqC9nCnAC8Ad5AL2e6zF/8HRtqGhZfNUwx/aWTdIqpiEyPYKSUylJplZ7xpFTKUKkTK2hszXH2lYGtswN+7wCVref2bq7/Unkk95uyVb6UuXKn3JALPsSBHDzQb3PPPzPvu7lXRuvOjhogBs7/2NxVpp9rviJ+lE/zB0/hzs11KNzn3Px/kD94N+YuZdd72L+R/z3AtRhm+pGDtfJtOQ91vDe49r7mHBf3xan3DjnHnkXCs68P60w399/W/M/KizGRuOY8B3wdiiPOPyJ3qD/uXSm7+vt881l9HgJnxKDD2VF7vnfBfWG5mDhHI3EfcjwFxR54dbH06futciV//R9i2FgcqRz4XuB+5Oe17Yl9MdPmFgvm3EK5lrj/SsoFx8AzCG7ugUbiWqRq25KD3TwDfAx4x88gwOfnHvH3GvNkYXlhN8fAeVtLPIM4x6kZyDGk9tznPTQPuAdxF723kXhW1B0dXWZy8Pck7kM42Fe756f6+b8A+/ku4ux+JoRnv3Dzk7I=
+  </data>
+ </layer>
+ <layer name="Obstacle" width="32" height="18">
+  <data encoding="base64" compression="zlib">
+   eJzt0UsOQFAMRuGuyWMBEm6YI8y5YVmWYHGYibOKNuhJvvHfpImIpMiQI4heG2o0KFEp7+8YMKJFh15xv8CCFRNmRMX9L3VbH+CZ5v/33tiBE5f1IT/tATD3DJY=
+  </data>
+ </layer>
+ <layer name="FG" width="32" height="18">
+  <data encoding="base64" compression="zlib">
+   eJzN1UkKwkAQheHc1wN4hVzA4QJOB1CXunDYuFFwAsEJk7gRHBa6EPwbItRGRNvq9sEH3SFUNSlIB4GbDDFCBy20HfV9Zo0NtlhihYHD/keccMYlfbZw2F87hx/VyaGAmlhr5NXs68ggjywqSv3l7GeYi30JZYRoKvWXSbAXe/MNGh/2tpn/Fbd0XbWoo5Wi7wMopose+p76jzHB9M17WjPYIUKsVP/fc/d9gC9j7gbzj7a9Hx5LUC1T
+  </data>
+ </layer>
+ <objectgroup name="Obstacles"/>
+</map>

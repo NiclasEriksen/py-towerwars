@@ -584,10 +584,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.active_tower = self.game.mouse_drag_tower
                 elif t_type == "sell":
                     # Sell active tower!
-                    self.game.gold += int(self.game.active_tower.price * 0.75)
-                    self.game.towers.remove(self.game.active_tower)
+                    print("Selling tower")
+                    self.game.active_tower.sell()
+                    print len(self.game.towers)
                     self.game.active_tower = None
-                    self.game.grid.update()
+                    self.game.selected_mouse = None
+                    self.game.mouse_drag_tower = None
+                    self.game.dragging = False
                 elif t_type == "upgrade":
                     if self.game.active_tower:
                         self.game.active_tower.upgrade()

@@ -17,6 +17,7 @@ class Game():
         # Lists of game objects
         self.mobs = []  # Enemy mob sprite objects
         self.mob_count = 0  # This serve as mob's id
+        self.tower_count = 0  # This serve as towers's id
         self.towers = []  # Tower sprite objects
         self.available_towers = {
             "1": 10,
@@ -245,6 +246,8 @@ class Game():
             self.gold -= t.price
             t.selected = False
             t.updatePos(new_rg[0], new_rg[1], new_g[0], new_g[1])
+            t.id = self.tower_count
+            self.tower_count += 1
             if new:
                 self.towers.append(t)
             print("Towers: {0}".format(len(self.towers)))

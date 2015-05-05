@@ -84,6 +84,14 @@ class Tower(Sprite):
                 self.cd_count = 0
                 self.cd = False
 
+    def sell(self):
+        self.game.gold += int(self.price * 0.75)
+        self.batch = None
+        self.turret = None
+        self.window.userinterface.wipe_context_menu()
+        self.game.towers.remove(self)
+        self.game.grid.update(new=True)
+
     def doDamage(self, t):
         if t.hp <= 0:
             t.state = "dead"
