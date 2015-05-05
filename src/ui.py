@@ -3,7 +3,10 @@ from pyglet.sprite import Sprite
 from pyglet import gl, graphics, text, image
 import copy # to edit images without impacting the original
 from functions import *
-RES_PATH = "../resources/"
+import os
+ROOT = os.path.dirname(__file__)
+RES_PATH = os.path.join(ROOT, "resources")
+RES_PATH_UI = os.path.join(RES_PATH, "ui")
 
 
 class UI():
@@ -109,7 +112,7 @@ class UI():
             active = True
             b_price = self.w.game.available_towers[b_type]
         elif b_type == "gold_icon":
-            texture = image.load(RES_PATH + 'ui/gold.png')
+            texture = image.load(os.path.join(RES_PATH_UI, 'gold.png'))
             texture = center_image(texture)
             x = texture.width + 2
             y = self.w.height - (texture.height + 2)
@@ -236,7 +239,7 @@ class UI():
     def context_menu(self, obj, action="show"):
         self.wipe_context_menu()
         category = "context"
-        texture = image.load(RES_PATH + 'ui/upgrade.png')
+        texture = image.load(os.path.join(RES_PATH_UI, 'upgrade.png'))
         texture = center_image(texture)
         offset =  (
             0.0 - texture.width // 2,
@@ -307,7 +310,7 @@ class UI():
             label.color = (255, 140, 140, 225)
         self.context_sprites.append(label)
 
-        texture = image.load(RES_PATH + 'ui/sell.png')
+        texture = image.load(os.path.join(RES_PATH_UI, 'sell.png'))
         texture = center_image(texture)
         offset =  (
             texture.width // 2,

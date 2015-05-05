@@ -3,8 +3,10 @@ from grid import *
 from mob import *
 from tiles import *
 import pyglet
+import os
 
-RES_PATH = "../resources/"
+ROOT = os.path.dirname(__file__)
+RES_PATH = os.path.join(ROOT, "resources")
 
 
 class Game():
@@ -133,7 +135,7 @@ class Game():
 
     def generateGridSettings(self):
         """ These control the grid that is the game window """
-        tiles = TiledRenderer(self.window, RES_PATH + "map1.tmx")
+        tiles = TiledRenderer(self.window, os.path.join(RES_PATH, "map1.tmx"))
         mw = tiles.tmx_data.width
         mh = tiles.tmx_data.height
         self.grid_dim = (mw, mh)

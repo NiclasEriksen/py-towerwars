@@ -1,6 +1,7 @@
 #!/bin/python2
 import pyglet   # Version 1.2.2
 # from audio import AudioFile  # Sound engine
+import os
 from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse
@@ -28,7 +29,8 @@ pyglet.options['audio'] = ('openal', 'pulse', 'silent')
 
 # Global variables #
 DEBUG = False
-RES_PATH = "../resources/"
+ROOT = os.path.dirname(__file__)
+RES_PATH = os.path.join(ROOT, "resources")
 SCREENRES = (1440, 900)  # The resolution for the game window
 VSYNC = True
 PAUSED = False
@@ -178,44 +180,78 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.flame_emitter, self.gas_emitter = None, None
 
     def loadFonts(self):
-        pyglet.font.add_file(RES_PATH + 'soft_elegance.ttf')
-        pyglet.font.add_file(RES_PATH + 'ui/' + 'visitor1.ttf')
+        pyglet.font.add_file(os.path.join(RES_PATH, 'soft_elegance.ttf'))
+        pyglet.font.add_file(os.path.join(RES_PATH, 'visitor1.ttf'))
         self.ui_font = pyglet.font.load('Soft Elegance')
         self.small_font = pyglet.font.load('Visitor TT1 BRK')
 
     def loadTextures(self):
-        ws_img = center_image(pyglet.image.load(RES_PATH + 'wall_stone.png'))
-        tw_img = center_image(pyglet.image.load(RES_PATH + 'tower_wood.png'))
-        p_texture = pyglet.image.load(RES_PATH + 'particle.png')
-        p_smoke_texture = pyglet.image.load(RES_PATH + 'particle_smoke.png')
-        p_pang_texture = pyglet.image.load(RES_PATH + 'particle_pang.png')
-        p_skull_texture = pyglet.image.load(RES_PATH + 'particle_skull.png')
-        p_crit_texture = pyglet.image.load(RES_PATH + 'crit.png')
-        p_blood_texture = pyglet.image.load(RES_PATH + 'blood.png')
+        ws_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'wall_stone.png'))
+        )
+        tw_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'tower_wood.png'))
+        )
+        p_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'particle.png')
+        )
+        p_smoke_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'particle_smoke.png')
+        )
+        p_pang_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'particle_pang.png')
+        )
+        p_skull_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'particle_skull.png')
+        )
+        p_crit_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'crit.png')
+        )
+        p_blood_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'blood.png')
+        )
         tp_img = center_image(pyglet.image.load(
-            RES_PATH + 'tower_poison.png')
+            os.path.join(RES_PATH, 'tower_poison.png'))
         )
         tp_t_img = center_image(pyglet.image.load(
-            RES_PATH + 'tower_poison_turret.png')
+            os.path.join(RES_PATH, 'tower_poison_turret.png'))
         )
         ts_img = center_image(pyglet.image.load(
-            RES_PATH + 'tower_splash.png')
+            os.path.join(RES_PATH, 'tower_splash.png'))
         )
         ts_t_img = center_image(pyglet.image.load(
-            RES_PATH + 'tower_splash_turret.png')
+            os.path.join(RES_PATH, 'tower_splash_turret.png'))
         )
         tc_img = center_image(pyglet.image.load(
-            RES_PATH + 'tower_chain.png')
+            os.path.join(RES_PATH, 'tower_chain.png'))
         )
-        mob_1q = center_image(pyglet.image.load(RES_PATH + 'mob.png'))
-        mob_1w = center_image(pyglet.image.load(RES_PATH + 'mob_1w.png'))
-        mob_1e = center_image(pyglet.image.load(RES_PATH + 'mob_1e.png'))
-        mob_1r = center_image(pyglet.image.load(RES_PATH + 'mob_1r.png'))
-        mob_1a = center_image(pyglet.image.load(RES_PATH + 'mob_1a.png'))
-        mob_1s = center_image(pyglet.image.load(RES_PATH + 'mob_1s.png'))
-        mob_1d = center_image(pyglet.image.load(RES_PATH + 'mob_1d.png'))
-        mob_1f = center_image(pyglet.image.load(RES_PATH + 'mob_1f.png'))
-        mob_1z = center_image(pyglet.image.load(RES_PATH + 'mob_1z.png'))
+        mob_1q = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob.png'))
+        )
+        mob_1w = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1w.png'))
+        )
+        mob_1e = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1e.png'))
+        )
+        mob_1r = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1r.png'))
+        )
+        mob_1a = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1a.png'))
+        )
+        mob_1s = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1s.png'))
+        )
+        mob_1d = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1d.png'))
+        )
+        mob_1f = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1f.png'))
+        )
+        mob_1z = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'mob_1z.png'))
+        )
         # bg01 = pyglet.image.load(RES_PATH + 'bg01.png')
 
         self.textures = dict(
@@ -248,8 +284,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
         # Load images and create image grids for animations #
         # and centers their frame anchor point              #
-        death_img = pyglet.image.load(RES_PATH + 'mob_death.png')
-        pang_img = pyglet.image.load(RES_PATH + 'pang_01_32.png')
+        death_img = pyglet.image.load(os.path.join(RES_PATH, 'mob_death.png'))
+        pang_img = pyglet.image.load(os.path.join(RES_PATH, 'pang_01_32.png'))
         death_anim = pyglet.image.ImageGrid(death_img, 1, 7)
         pang_anim = pyglet.image.ImageGrid(pang_img, 1, 6)
         for i in death_anim:
@@ -264,12 +300,24 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def loadSFX(self):
         # impact1 = AudioFile(RES_PATH + "impact1.wav")
-        impact1 = pyglet.media.load(RES_PATH + "impact1.ogg", streaming=False)
-        impact2 = pyglet.media.load(RES_PATH + "impact2.ogg", streaming=False)
-        dart = pyglet.media.load(RES_PATH + "dart.ogg", streaming=False)
-        bang1 = pyglet.media.load(RES_PATH + "bang1.ogg", streaming=False)
-        bang2 = pyglet.media.load(RES_PATH + "bang2.ogg", streaming=False)
-        pluck = pyglet.media.load(RES_PATH + "pluck.ogg", streaming=False)
+        impact1 = pyglet.media.load(
+            os.path.join(RES_PATH, "impact1.ogg"), streaming=False
+        )
+        impact2 = pyglet.media.load(
+            os.path.join(RES_PATH, "impact2.ogg"), streaming=False
+        )
+        dart = pyglet.media.load(
+            os.path.join(RES_PATH, "dart.ogg"), streaming=False
+        )
+        bang1 = pyglet.media.load(
+            os.path.join(RES_PATH, "bang1.ogg"), streaming=False
+        )
+        bang2 = pyglet.media.load(
+            os.path.join(RES_PATH, "bang2.ogg"), streaming=False
+        )
+        pluck = pyglet.media.load(
+            os.path.join(RES_PATH, "pluck.ogg"), streaming=False
+        )
         # impact1.play()
         # tkSnack.audio.play()
         self.sfx = dict(
