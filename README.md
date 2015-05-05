@@ -11,6 +11,8 @@ F12: Debug (G: give gold)
 
 F2: Autospawn random mobs
 
-Q, W, E, R, A, S, D, F, Z, X, C, V: Mobs
+Q, W, E, R,
+A, S, D, F,
+Z, X, C, V: Mobs
 
 Space: Pause
