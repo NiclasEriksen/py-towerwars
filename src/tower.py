@@ -202,7 +202,7 @@ class SplashTower(Tower):
                     x, y, (1, 1, 1, 1)
                 )
 
-                r = self.splash_range / 4
+                r = self.splash_range // 2
                 # Spawns particle effects on mobs
                 anim = animation.Animation(
                     self.window, self.window.anim["pang01"], t.x, t.y
@@ -237,6 +237,11 @@ class SplashTower(Tower):
 
                             x = m.x + random.randrange(-5, 6)
                             y = m.y + random.randrange(-4, 5)
+                            anim = animation.Animation(
+                                self.window,
+                                self.window.anim["pang01"],
+                                m.x, m.y
+                            )
                             self.window.smoke_fx.addParticle(
                                 x, y, (0.75, 0.70, 0.60, 0.5)
                             )
@@ -314,7 +319,6 @@ class PoisonTower(Tower):
                     t.state = "dead"
                 else:
                     t.setDebuff("slow", slow=self.slow, time=self.slow_time)
-                    print("Slowing for {0} seconds".format(self.slow_time))
                     t.setDebuff("poison", tickdmg=self.dmg//4, time=5.0)
 
                 self.setCD(self.spd)

@@ -116,7 +116,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # self.generateGridSettings()
         self.game = Game(self)
 
-        print("Creating UI")
+        print("Creating UI.")
         self.userinterface = UI(self)
 
         # Spawn main menu
@@ -127,6 +127,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # Start a new game
         # self.newGame()
 
+    def showMainMenu(self):
+        self.mainmenu = MainMenu(self)
+        self.mainmenu.add_entry(title="New Game", action="newgame")
+        self.mainmenu.add_entry(title="Exit", action="quit")
+
     def flushWindow(self):
         try:
             if self.debug:
@@ -135,9 +140,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.particle_system.remove_group(self.gas_emitter_group)
         except AttributeError:
             pass
+        except ValueError:
+            pass
         try:
             pyglet.clock.unschedule(self.particle_system.update)
         except AttributeError:
+            pass
+        except ValueError:
             pass
         self.particle_system = default_system
         self.particle_system.run_ahead(2.0, 30.0)
@@ -514,7 +523,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             )
 
     def load_screen(self):
-        print("Loadscreen")
+        print("Loading game...")
         label = pyglet.text.Label(
                 "Loading...", font_name='Soft Elegance',
                 font_size=18,
@@ -582,6 +591,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             elif symbol == key.V:
                 mob = Mob1V(self.game, "YAY")
                 self.game.mobs.append(mob)
+            elif symbol == key.F10:
+                self.game.gameOver()
             elif symbol == key.F11:
                 self.set_fullscreen(not self.fullscreen)
                 self.activate()

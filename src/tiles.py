@@ -29,7 +29,6 @@ class TiledRenderer(object):
             if s.imagelayer:
                 s.x = self.window.offset_x
                 s.y = self.window.offset_y
-                print("Adjusting image layer: {0}, {1}".format(s.x, s.y))
             else:
                 s.x, s.y = self.window.get_windowpos(s.gx, s.gy)
 
@@ -47,7 +46,7 @@ class TiledRenderer(object):
 
         for l in self.tmx_data.layers:
             if isinstance(l, TiledTileLayer) and l.name == "Obstacles":
-                print("YEAH")
+                print("Removing obstacles from game grid.")
                 for x, y, image in l.tiles():
                     self.window.game.tiles_no_walk.append((x, y))
                     self.window.game.tiles_no_build.append((x, y))
@@ -133,7 +132,6 @@ class TiledRenderer(object):
                     # else:
                     image = layer.image
                     # image = center_image(image)
-                    print image
                     x = self.window.width // 2
                     y = self.window.height // 2
                     sprite = Sprite(image, batch=batch, x=x, y=y)

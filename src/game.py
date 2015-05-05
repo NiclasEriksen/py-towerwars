@@ -99,19 +99,19 @@ class Game():
         self.ai_gold = 0
         self.ai_flat_income = 0
         try:
-            pyglet.clock.unschedule(self.ai_income)
+            pyglet.clock.unschedule(self.aiIncome)
         except:
             pass
         try:
-            pyglet.clock.unschedule(self.autospawn_balanced)
+            pyglet.clock.unschedule(self.autospawnBalanced)
         except:
             pass
         pyglet.clock.schedule_interval(
-                        self.ai_income,
+                        self.aiIncome,
                         10.0
                     )
         pyglet.clock.schedule_interval(
-                        self.autospawn_balanced,
+                        self.autospawnBalanced,
                         0.25
                     )
         self.lives = 10
@@ -305,7 +305,7 @@ class Game():
 
             self.mobs.append(mob)
 
-    def autospawn_balanced(self, dt):
+    def autospawnBalanced(self, dt):
         if not self.paused and self.ai_gold > 0:
             mob_choices = 12
             choice = random.randint(0, mob_choices - 1)
@@ -341,13 +341,47 @@ class Game():
                 self.mobs.append(mob)
                 self.ai_gold -= mob.bounty * 2
 
-    def ai_income(self, dt):
+    def aiIncome(self, dt):
         self.ai_gold += self.ai_flat_income
         self.ai_flat_income += 1
         self.ai_gold += (self.get_total_value() + self.gold) // 10
-        print self.ai_gold
+        print("AI current gold: {0}".format(self.ai_gold))
+
+    def gameOver(self):
+        print("Game lost, returning to menu.")
+        self.loaded = False
+        self.paused = True
+        for m in self.mobs:
+            m.debuff_list = []
+        self.mobs = []  # Enemy mob sprite objects
+        self.mob_count = 0  # This serve as mob's id
+        for t in self.towers:
+            t.target = None
+        self.goal, self.spawn = None, None
+        self.towers = []  # Tower sprite objects
+        self.window.animations = []
+        self.selected_mouse = None
+        self.dragging = False
+        self.highlighted = []
+        self.active_tower = None
+        self.mouse_drag_tower = None
+        self.pf_queue = []
+
+        try:
+            pyglet.clock.unschedule(self.aiIncome)
+        except:
+            pass
+        try:
+            pyglet.clock.unschedule(self.autospawnBalanced)
+        except:
+            pass
+
+        self.window.flushWindow()
+        self.window.showMainMenu()
 
     def updateState(self):
+        if self.lives <= 0:
+            self.gameOver()
         for t in self.towers:
             if not t.target:  # if tower has no target
                 i = random.randrange(0, 1)
@@ -381,9 +415,6 @@ class Game():
 
         if self.gold > 999:     # Maximum amount of gold
             self.gold = 999
-
-        if self.lives <= 0:
-            self.newGame()
 
     def leaking(self):
         self.lives -= 1
