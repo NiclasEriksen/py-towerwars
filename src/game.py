@@ -55,7 +55,7 @@ class Game():
 
         # player.play()
 
-    def newGame(self, level="map1"):
+    def newGame(self, level="map2"):
 
         print("Starting a new game.")
         self.map = os.path.join(self.window.resourcepath, level + ".tmx")

@@ -126,6 +126,9 @@ class TiledRenderer(object):
             # draw image layers
             elif isinstance(layer, TiledImageLayer):
                 if layer.image:
+                    print layer.name
+                    print layer.image
+                    print layer.image.texture
                     # if isinstance(layer.image, ImageDataRegion):
                     #     print "heidu"
                     #     image = layer.image.get_texture()

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="25" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="obj_misk_atlas" tilewidth="32" tileheight="32">
+  <image source="obj_misk_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="1025" name="build_atlas" tilewidth="32" tileheight="32">
+  <image source="build_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="2049" name="base_out_atlas" tilewidth="32" tileheight="32">
+  <image source="base_out_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="3073" name="crater1" tilewidth="32" tileheight="32">
+  <image source="crater1.png" width="256" height="256"/>
+ </tileset>
+ <imagelayer name="Background">
+  <image source="map2bg.png"/>
+ </imagelayer>
+ <layer name="Obstacles" width="20" height="25" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJy7zsnAcJ0AJhZgU0uJefjswWUePnvw2U+qedT2EyH7qGEetcMeXZxa7iI1zRAT58SaSUgtKXmFGHX4xIhxHzFhQWncU6NsINY8YuOaXDvINQ+XuaMAPxgNI/oCAEYtcOE=
+  </data>
+ </layer>
+ <layer name="Foreground" width="20" height="25">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2D4ABlWBgZZ1oF2xSiAgdH4oB0QBGIhIBamknmGQGwExMZUMm84gsEe5gD/WQIf
+  </data>
+ </layer>
+ <layer name="Spawn" width="20" height="25">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjAIIUGcZaBeMglEwCsgFAKkMACw=
+  </data>
+ </layer>
+ <layer name="Goal" width="20" height="25">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOmMJKJYNGwSgYBaNgFIyCUUAyAACITwCa
+  </data>
+ </layer>
+</map>

@@ -380,14 +380,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # except:
         #     print("Unable to play sound {0}".format(sound))
 
-    def generateGridSettings(self):
-        """ These control the grid that is the game window """
-        w, h, gm, ssize = self.width, self.height, 0, 32
-        self.squaresize = ssize
-        self.grid_margin = gm
-        self.grid_dim = (36, 21)
-        self.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
-        self.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
+    # def generateGridSettings(self):
+    #     """ These control the grid that is the game window """
+    #     w, h, gm, ssize = self.width, self.height, 0, 32
+    #     self.squaresize = ssize
+    #     self.grid_margin = gm
+    #     self.grid_dim = (36, 21)
+    #     self.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
+    #     self.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
 
     # def updateGridSettings(self):
     #     w, h, gm, ssize = self.width, self.height, 0, 32
@@ -455,6 +455,35 @@ class GameWindow(pyglet.window.Window):  # Main game window
         x = (ox + x * (ss + gm)) + ss / 2
         y = self.height - ((oy + y * (ss + gm)) + ss / 2)
         return (x, y)
+
+    def get_gridpos(self, x, y):
+        if self.game.grid:
+            gw = self.game.grid.dim[0]
+            gh = self.game.grid.dim[1]
+            mh = self.game.grid.dim[1] - 1
+            w = self.game.squaresize
+            h = self.game.squaresize
+            ox = self.offset_x + 2
+            oy = self.offset_y - 2
+            for gx in xrange(gw):
+                for gy in xrange(gh):
+                    # print gx, gy
+                    if (
+                        x < ox + gx * w + w and
+                        x > ox + gx * w
+                    ):
+                        if (
+                            y < oy + gy * h + h and
+                            y > oy + gy * h
+                        ):
+                            return gx, mh - gy
+            else:
+                raise LookupError("No tower found on {0},{1}".format(x, y))
+                return False
+        else:
+            raise ValueError("No grid loaded.")
+            return False
+
 
     def span(self, dx, dy):
         self.offset_x += dx
@@ -629,14 +658,26 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     pass                                    # not on a button
                 else:
                     if not self.game.mouse_drag_tower:
-                        for t in self.game.towers:
-                            # Checks for towers under cursor
-                            if x < t.x + t.size//2 and x > t.x - t.size//2:
-
-                                if y < t.y + t.size//2 and y > t.y - t.size//2:
-                                    # Binds tower to mouse and removes tower
-                                    self.game.selected_mouse = t
+                        found = False
+                        try:
+                            gx, gy = self.get_gridpos(x, y)
+                            print gx, gy
+                            # if (gx, gy) in self.game.grid.t_grid:
+                            for t in self.game.towers:
+                                if t.gx == gx and t.gy == gy:
+                                    found = t
                                     break
+                            # found = (
+                            #     t for t in self.game.towers if (
+                            #         t.gx == gx and t.gy == gy
+                            #     )
+                            # )
+                            # print len(found)
+                        except LookupError or ValueError:
+                            print("Not found.")
+                            found = False
+                        if found:
+                            self.game.selected_mouse = found
 
                         if self.debug:
                             if not self.game.selected_mouse:
