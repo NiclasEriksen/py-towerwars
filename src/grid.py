@@ -75,37 +75,56 @@ class Grid:
     #     # points = expandPath(self.grid, points)
     #     return points
 
-    def update(self, new=True):
+    def update(self, new="update"):
         self.debug = self.g.debug
         if self.debug:
             print("generating new grid")
-        self.t_grid = []
-        self.w_grid = []
+
+        t_grid = []
+        w_grid = []
+
         for p in self.fullgrid:
-            self.t_grid.append(p)
-            self.w_grid.append(p)
+            t_grid.append(p)
+            w_grid.append(p)
         tc, wc = 0, 0
         for w in self.g.tiles_no_walk:
-            if w in self.w_grid:
-                self.w_grid.remove(w)
+            if w in w_grid:
+                w_grid.remove(w)
                 wc += 1
         for b in self.g.tiles_no_build:
-            if b in self.t_grid:
-                self.t_grid.remove(b)
+            if b in t_grid:
+                t_grid.remove(b)
                 tc += 1
         for t in self.g.towers:
-            for g in self.w_grid:  # Checks for towers in grid, removes them
+            for g in w_grid:  # Checks for towers in grid, removes them
                 if t.gx == g[0] and t.gy == g[1]:
-                    if (t.gx, t.gy) in self.t_grid:
-                        self.t_grid.remove(g)
-                    if (t.gx, t.gy) in self.w_grid:
-                        self.w_grid.remove(g)
+                    if (t.gx, t.gy) in t_grid:
+                        t_grid.remove(g)
+                    if (t.gx, t.gy) in w_grid:
+                        w_grid.remove(g)
                     tc += 1
         if self.debug:
             print("removed {0} grid points for towers".format(tc))
         if self.debug:
             print("removed {0} grid points for no walk".format(wc))
-        if new:
+        if new == "dry":
+            old_w, old_t = self.w_grid, self.t_grid
+            self.w_grid = w_grid
+            self.t_grid = t_grid
+            newpath = self.getPath(self.start)
+            if newpath:
+                self.path = newpath
+                return True
+            else:
+                self.w_grid = old_w
+                self.t_grid = old_t
+                return False
+        else:
+            self.w_grid = w_grid
+            self.t_grid = t_grid
+
+
+        if new == "update":
             # x1, y1 = str(self.start[0]), str(self.start[1])
             # x2, y2 = str(self.goal[0]), str(self.goal[1])
             # subprocess.call(["./genpath", x1, y1, x2, y2])

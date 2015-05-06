@@ -125,7 +125,7 @@ class Game():
         # Autospawn random mob every second
         self.autospawn = False
 
-        self.grid.update()
+        self.grid.update(new="update")
         pyglet.clock.schedule_interval(self.updateState, 1.0/30.0)
 
         # Adding buttons to UI
@@ -244,40 +244,48 @@ class Game():
             new_g = gx, gy
             new_rg = self.window.get_windowpos(gx, gy)
             self.gold -= t.price
+            w_grid = grid.w_grid
+            t_grid = grid.t_grid
             t.selected = False
             t.updatePos(new_rg[0], new_rg[1], new_g[0], new_g[1])
             t.id = self.tower_count
             self.tower_count += 1
             if new:
                 self.towers.append(t)
-            print("Towers: {0}".format(len(self.towers)))
 
-            update = False
-            if new_g in grid.path:
-                update = True
-            else:
-                for p in grid.path:
-                    if new_g in get_diagonal(
-                        grid.w_grid,
-                        p[0], p[1]
-                    ):
-                        update = True
-                        break
-                    elif new_g in get_neighbors(
-                        grid.w_grid,
-                        p[0], p[1]
-                    ):
-                        update = True
-                        break
+                print("Towers: {0}".format(len(self.towers)))
 
-            if update:
-                for m in self.mobs:
-                    if m not in self.pf_queue:
-                        if check_path(m, grid.w_grid, new_g):
-                            self.pf_queue.append(m)
+                update = False
+                if new_g in grid.path:
+                    update = True
+                else:
+                    for p in grid.path:
+                        if new_g in get_diagonal(
+                            w_grid,
+                            p[0], p[1]
+                        ):
+                            update = True
+                            break
+                        elif new_g in get_neighbors(
+                            w_grid,
+                            p[0], p[1]
+                        ):
+                            update = True
+                            break
 
-            grid.update(new=update)
-            # self.pathFinding(limit=100)
+                if update:
+                    for m in self.mobs:
+                        if m not in self.pf_queue:
+                            if check_path(m, w_grid, new_g):
+                                self.pf_queue.append(m)
+
+            if not grid.update(new="dry"):
+                print("TOWER BLOCKED")
+                t.sell()
+
+            # if grid.getPath(grid.start):
+            # # self.pathFinding(limit=100)
+            #     pass
 
             if self.debug:
                 print("New path for grid: {0}".format(update))

@@ -116,8 +116,10 @@ class Tower(Sprite):
         self.batch = None
         self.turret = None
         self.window.userinterface.wipe_context_menu()
+        if self.game.active_tower == self:
+            self.game.active_tower = None
         self.game.towers.remove(self)
-        self.game.grid.update(new=True)
+        self.game.grid.update(new="update")
 
     def doDamage(self, t):
         if t.hp <= 0:

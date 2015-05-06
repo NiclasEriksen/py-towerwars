@@ -38,11 +38,14 @@ def get_score(c, node, goal):
         score += 14
     else:
         score += 10
-
-    gx = abs(goal[0] - c.node[0])
-    gy = abs(goal[1] - c.node[1]) * 2
-    score += (gx + gy) * 10
     return score
+
+def get_def_score(c, goal):
+    gx = abs(goal[0] - c.node[0])
+    gy = abs(goal[1] - c.node[1])
+    score = (gx + gy) * 10
+    return score
+
 
 
 class Candidate:
@@ -67,7 +70,14 @@ def get_path(grid, all_nodes, node, goal):
         for n in neighbors(node, all_nodes, grid):
 
             c = Candidate(n, node)
+            c.d_score = get_def_score(c, goal)
             candidates.append(c)
+
+        candidates = sorted(
+            candidates,
+            key=lambda c: c.d_score,
+            reverse=True
+        )
 
         for c in candidates:
 
