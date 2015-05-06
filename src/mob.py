@@ -14,10 +14,19 @@ class Mob(Sprite):
             game.window.textures["mob1Q"],
             batch=game.window.batches["mobs"]
         )
+        self.move_type = "normal"
+        self.variant = variant
+        self.hp = 14.0
+        self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
+        self.spd = 1.0
+        self.bounty = 1    # Gold awarded for killing mob
+        self.spawn(game)
+
+    def spawn(self, game):
         self.g = game
+        self.debug = game.debug
         self.id = self.g.mob_count
         self.g.mob_count += 1
-        self.debug = game.debug
         s = game.grid.start
         self.x_offset = random.randrange(  # Offset for drawing position
             -self.g.squaresize // 8,
@@ -31,26 +40,25 @@ class Mob(Sprite):
         self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
         self.rx = self.x
         self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
         self.state = "alive"
-        self.move_type = "normal"
-        self.variant = variant
-        self.hp = 14.0
         self.hp_max = self.hp
-        self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
-        self.spd = 1.0
-        self.debuff_list = []
-        self.slow_cd = None
         self.orig_spd = self.spd
+        self.slow_cd = None
+        self.lastpoint = None
         self.stall_timer = None
+        self.debuff_list = []
+
+        self.currentpoint = s
         self.point = 0
-        self.path = game.grid.path
-        self.bounty = 1    # Gold awarded for killing mob
-        self.debug = debug
+        if self.move_type == "flying":
+            self.path = game.grid.getPath(self.currentpoint, flying=True)
+        else:
+            self.path = game.grid.path
+        self.targetpoint = self.path[1]
+
         if self.debug:
             print("Spawning mob!")
+
 
     def setDebuff(self, d_type, **kwargs):
         debuff = None
@@ -273,44 +281,15 @@ class Mob1W(Mob):
             game.window.textures["mob1W"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        # self.image = mob_img
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
-        self.move_type = "normal"
+
         self.variant = variant
+        self.move_type = "normal"
         self.hp = 35.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 3
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Mob1E(Mob):
@@ -320,45 +299,15 @@ class Mob1E(Mob):
             game.window.textures["mob1E"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        # self.image = mob_img
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
+
         self.move_type = "normal"
         self.variant = variant
         self.hp = 180.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.6
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 10
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
 
+        self.spawn(game)
 
 class Mob1R(Mob):
 
@@ -367,45 +316,14 @@ class Mob1R(Mob):
             game.window.textures["mob1R"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        # self.image = mob_img
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 80.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.8
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 10
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
 
+        self.spawn(game)
 
 class Mob1A(Mob):
 
@@ -414,44 +332,14 @@ class Mob1A(Mob):
             game.window.textures["mob1A"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 300.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 18
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
 
+        self.spawn(game)
 
 class Mob1S(Mob):
 
@@ -460,43 +348,14 @@ class Mob1S(Mob):
             game.window.textures["mob1S"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 300.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.25
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 20
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Mob1D(Mob):
@@ -506,43 +365,15 @@ class Mob1D(Mob):
             game.window.textures["mob1D"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
         self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 400.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.0
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 25
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Mob1F(Mob):
@@ -555,43 +386,14 @@ class Mob1F(Mob):
             batch=game.window.batches["flying_mobs"]
         )
         # Adds this mob to the batch with towers
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
         self.move_type = "flying"
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.variant = variant
         self.hp = 120.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.9
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.getPath(self.currentpoint, flying=True)
-        self.targetpoint = self.path[1]
         self.bounty = 12
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
     def updatePos(self, dt=0):
         if not self.stall_timer and (self not in self.g.pf_queue):
@@ -661,43 +463,14 @@ class Mob1Z(Mob):
             game.window.textures["mob1Z"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 900.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.5
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 35
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Mob1X(Mob):
@@ -707,44 +480,14 @@ class Mob1X(Mob):
             game.window.textures["mob1X"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 800.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.8
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 40
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
 
+        self.spawn(game)
 
 
 class Mob1C(Mob):
@@ -754,43 +497,14 @@ class Mob1C(Mob):
             game.window.textures["mob1C"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 900.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 1.0
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 50
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Mob1V(Mob):
@@ -800,43 +514,14 @@ class Mob1V(Mob):
             game.window.textures["mob1V"],
             batch=game.window.batches["mobs"]
         )
-        self.g = game
-        self.id = self.g.mob_count
-        self.g.mob_count += 1
-        self.debug = game.debug
-        s = game.grid.start
-        self.x_offset = random.randrange(  # Offset for drawing position
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.y_offset = random.randrange(
-            -self.g.squaresize // 8,
-            self.g.squaresize // 8
-        )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
-        self.rx = self.x
-        self.ry = self.y  # Real position, which is used in game logic
-        self.currentpoint = s
-        self.targetpoint = s
-        self.lastpoint = None
-        self.state = "alive"
         self.move_type = "normal"
         self.variant = variant
         self.hp = 2000.0
-        self.hp_max = self.hp
         self.def_type = 0  # 0 Normal, 1 Magic, 2 Chaos
         self.spd = 0.5
-        self.debuff_list = []
-        self.slow_cd = None
-        self.orig_spd = self.spd
-        self.stall_timer = None
-        self.point = 0
-        self.path = game.grid.path
         self.bounty = 75
-        self.debug = debug
-        if self.debug:
-            print("Spawning mob!")
+
+        self.spawn(game)
 
 
 class Debuff:

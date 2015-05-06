@@ -14,6 +14,7 @@ class Grid:
         self.debug = game.debug
         self.g = game
         self.path = []
+        self.flying_path = False
         self.dim = self.g.grid_dim
         self.generate()
         self.start = self.g.spawn
@@ -75,7 +76,7 @@ class Grid:
     #     # points = expandPath(self.grid, points)
     #     return points
 
-    def update(self, new="update"):
+    def update(self, new=False):
         self.debug = self.g.debug
         if self.debug:
             print("generating new grid")
@@ -138,10 +139,16 @@ class Grid:
 
     def getPath(self, start, flying=False):
         if flying:
-            path, success = pypf.get_path(
-                    self.fullgrid, self.fullgrid,
-                    start, self.goal
-            )
+            if not self.flying_path:
+                print("Generating flying path")
+                path, success = pypf.get_path(
+                        self.fullgrid, self.fullgrid,
+                        start, self.goal
+                )
+                self.flying_path = path
+            else:
+                success = True
+                path = self.flying_path
         else:
             path, success = pypf.get_path(
                     self.w_grid, self.w_grid,

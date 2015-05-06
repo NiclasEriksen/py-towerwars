@@ -118,6 +118,10 @@ class Tower(Sprite):
         self.window.userinterface.wipe_context_menu()
         if self.game.active_tower == self:
             self.game.active_tower = None
+        if self.game.selected_mouse == self:
+            self.game.selected_mouse = None
+        if self.game.mouse_drag_tower == self:
+            self.game.mouse_drag_tower = None
         self.game.towers.remove(self)
         self.game.grid.update(new="update")
 
