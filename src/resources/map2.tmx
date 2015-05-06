@@ -12,17 +12,25 @@
  <tileset firstgid="3073" name="crater1" tilewidth="32" tileheight="32">
   <image source="crater1.png" width="256" height="256"/>
  </tileset>
+ <tileset firstgid="3137" name="terrain_rocks" tilewidth="32" tileheight="32">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/terrain_rocks.png" width="256" height="224"/>
+ </tileset>
  <imagelayer name="Background">
   <image source="map2bg.png"/>
  </imagelayer>
+ <layer name="BG2" width="20" height="25" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4D+wIQTgkcBZWA0DEfBKBgFMAAAiq4AuA==
+  </data>
+ </layer>
  <layer name="Obstacles" width="20" height="25" visible="0">
   <data encoding="base64" compression="zlib">
-   eJy7zsnAcJ0AJhZgU0uJefjswWUePnvw2U+qedT2EyH7qGEetcMeXZxa7iI1zRAT58SaSUgtKXmFGHX4xIhxHzFhQWncU6NsINY8YuOaXDvINQ+XuaMAPxgNI/oCAEYtcOE=
+   eJztlDEOACAIA139/+P8jruRcghxookLaa4I0TXHWM6hunkzPJVj8VSOyo/yqu/k5VXwqmd/1jM8K4P0TXZOmZ438laIT9VIf2QW2d1X/A2UR3f9mvHKs7gtrZ7RX23vKW8h
   </data>
  </layer>
  <layer name="Foreground" width="20" height="25">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2D4ABlWBgZZ1oF2xSiAgdH4oB0QBGIhIBamknmGQGwExMZUMm84gsEe5gD/WQIf
+   eJxjYBhYkM3DwJADxLk8A+yQUTAsgAwrA4Ms60C7YhTAwGh80A4IArEQEAtTyTxDIDYCYmMqmTccwWAPcwBCsgOH
   </data>
  </layer>
  <layer name="Spawn" width="20" height="25">

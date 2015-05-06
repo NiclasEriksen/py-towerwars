@@ -380,20 +380,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # except:
         #     print("Unable to play sound {0}".format(sound))
 
-    # def generateGridSettings(self):
-    #     """ These control the grid that is the game window """
-    #     w, h, gm, ssize = self.width, self.height, 0, 32
-    #     self.squaresize = ssize
-    #     self.grid_margin = gm
-    #     self.grid_dim = (36, 21)
-    #     self.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
-    #     self.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
-
-    # def updateGridSettings(self):
-    #     w, h, gm, ssize = self.width, self.height, 0, 32
-    #     self.offset_x = (w - self.grid_dim[0] * (ssize + gm)) // 2
-    #     self.offset_y = (h - self.grid_dim[1] * (ssize + gm)) // 2
-
     def generateGridIndicators(self):
         """ Generates the squares that indicates available blocks """
         w = self.squaresize
@@ -479,10 +465,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
                             return gx, mh - gy
             else:
                 raise LookupError("No tower found on {0},{1}".format(x, y))
-                return False
         else:
             raise ValueError("No grid loaded.")
-            return False
 
 
     def span(self, dx, dy):
@@ -533,6 +517,33 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 p.position[1] + dy,
                 0
             )
+
+    def drawMobHP(self, mobs):
+        glColor4f(0.9, 0.2, 0.2, 1.0)
+        glLineWidth(3)
+        for m in mobs:
+            # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
+            if m.hp < m.hp_max and not m.state == "dead" and m.hp > 0.0:
+                height = m.image.height // 2
+                width = m.image.width // 2
+                pyglet.graphics.draw(
+                    2,
+                    GL_LINES,
+                    (
+                        'v2f',
+                        (
+                            m.x - 1 - int((m.hp / m.hp_max) * width),
+                            m.y + height,
+                            m.x - 1 + int((m.hp / m.hp_max) * width),
+                            m.y + height)
+                        )
+                    )
+
+    def drawRangeCircle(self, t):
+        glColor4f(0.5, 0.6, 0.8, 0.15)
+        self.draw_circle(
+            t.x, t.y, t.range
+        )
 
     def pause_game(self, state):
         self.game.paused = state
@@ -658,28 +669,20 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     pass                                    # not on a button
                 else:
                     if not self.game.mouse_drag_tower:
-                        found = False
                         try:
+                            found = False
                             gx, gy = self.get_gridpos(x, y)
-                            print gx, gy
-                            # if (gx, gy) in self.game.grid.t_grid:
                             for t in self.game.towers:
-                                if t.gx == gx and t.gy == gy:
+                                if [t.gx, t.gy] == [gx, gy]:
                                     found = t
                                     break
-                            # found = (
-                            #     t for t in self.game.towers if (
-                            #         t.gx == gx and t.gy == gy
-                            #     )
-                            # )
-                            # print len(found)
                         except LookupError or ValueError:
                             print("Not found.")
                             found = False
                         if found:
                             self.game.selected_mouse = found
 
-                        if self.debug:
+                        elif self.debug:
                             if not self.game.selected_mouse:
                                 tower = SplashTower(
                                     self.game, "Default", x=x, y=y
@@ -718,7 +721,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.active_tower = self.game.mouse_drag_tower
                 elif t_type == "sell":
                     # Sell active tower!
-                    print("Selling tower")
+                    print("Selling towerswer")
                     self.game.active_tower.sell()
                     print len(self.game.towers)
                     self.game.active_tower = None
@@ -784,30 +787,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         tower = ChainTower(self.game)
                         self.game.mouse_drag_tower = tower
                     self.game.selected_mouse = self.game.mouse_drag_tower
-                elif self.game.active_tower:
-                    t = self.game.active_tower
-                    if (
-                        (x <= t.x - t.size//2) or
-                        (x >= t.x + t.size//2) or
-                        (y <= t.y - t.size//2) or
-                        (y >= t.y + t.size//2)
-                    ):
-                        for t in self.game.towers:
-                            # Checks for towers under cursor
-                            if x < t.x + t.size//2 and x > t.x - t.size//2:
-
-                                if y < t.y + t.size//2 and y > t.y - t.size//2:
-                                    # Binds tower to mouse and removes tower
-                                    mdt = t
-                                    self.game.selected_mouse = mdt
-                                    self.game.active_tower = mdt
-                                    break
 
             if not self.game.selected_mouse:
                 self.game.active_tower = None
 
         elif buttons & mouse.RIGHT:
-            self.span(dx, dy)
+            if self.game.loaded:
+                self.span(dx, dy)
 
     def on_mouse_motion(self, x, y, dx, dy):
         if self.game.mouse_drag_tower:
@@ -1017,33 +1003,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 )
 
             # Draw mob health bars #
-            glColor4f(0.9, 0.2, 0.2, 1.0)
-            glLineWidth(3)
-            for m in self.game.mobs:
-                # glColor4f(0.6, 0.3, 0.3, 0.2 + (m.hp / 100.0) * 0.8)
-                if m.hp < m.hp_max and not m.state == "dead" and m.hp > 0.0:
-                    height = m.image.height // 2
-                    width = m.image.width // 2
-                    pyglet.graphics.draw(
-                        2,
-                        GL_LINES,
-                        (
-                            'v2f',
-                            (
-                                m.x - 1 - int((m.hp / m.hp_max) * width),
-                                m.y + height,
-                                m.x - 1 + int((m.hp / m.hp_max) * width),
-                                m.y + height)
-                            )
-                        )
+            self.drawMobHP(self.game.mobs)
 
             # Draw range circle on active tower
             if self.game.active_tower:
-                glColor4f(0.4, 0.5, 0.9, 0.2)
-                t = self.game.active_tower
-                self.draw_circle(
-                    t.x, t.y, t.range
-                )
+                self.drawRangeCircle(self.game.active_tower)
+            # Draw grid squares when dragging a tower
             if self.game.mouse_drag_tower:
                 if not self.rectangles:
                     self.game.createGridIndicators()
@@ -1052,7 +1017,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 glColor4f(0.7, 0.7, 0.3, 0.2)
                 self.batches["fg3"].draw()
 
-            else:
+            else:   # Clear the squares if tower is no longer dragged
                 self.batches["fg2"] = pyglet.graphics.Batch()
                 self.batches["fg3"] = pyglet.graphics.Batch()
                 self.rectangles = None
@@ -1061,13 +1026,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             # Update animations #
             for a in self.animations:
                 a.update()
-                if not a.playing:
-                    self.animations.remove(a)
 
             if self.debug:
                 fps_display.draw()
-
-            self.game.updateState()
 
 
 if __name__ == "__main__":

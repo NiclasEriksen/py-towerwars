@@ -103,6 +103,10 @@ class Game():
         except:
             pass
         try:
+            pyglet.clock.unschedule(self.updateState)
+        except:
+            pass
+        try:
             pyglet.clock.unschedule(self.autospawnBalanced)
         except:
             pass
@@ -122,6 +126,7 @@ class Game():
         self.autospawn = False
 
         self.grid.update()
+        pyglet.clock.schedule_interval(self.updateState, 1.0/30.0)
 
         # Adding buttons to UI
         for b in ("1", "2", "3", "4", "gold_icon"):
@@ -224,25 +229,20 @@ class Game():
 
     def place_tower(self, t, x, y, new=False):
         """Positions tower and updates game state accordingly."""
-        placed = False
         grid = self.grid
-        dist = self.window.height // 10  # Range to check for available square
+        placed = False
 
         if t.price <= self.gold:
-            for g in grid.t_grid:
-                if not g == grid.goal or g == grid.start:
-                    if x and y:
-                        gx = self.window.get_windowpos(g[0], g[1])[0]
-                        gy = self.window.get_windowpos(g[0], g[1])[1]
-                        if get_dist(gx, gy, x, y) < dist:
-                            dist = get_dist(gx, gy, x, y)
-                            placed = False
-                            if dist <= self.squaresize:
-                                placed = True
-                                new_g = g
-                                new_rg = (gx, gy)
+            try:
+                gx, gy = self.window.get_gridpos(x, y)
+                if (gx, gy) in grid.t_grid:
+                    placed = True
+            except LookupError or ValueError:
+                print("Available square not found.")
 
         if placed:
+            new_g = gx, gy
+            new_rg = self.window.get_windowpos(gx, gy)
             self.gold -= t.price
             t.selected = False
             t.updatePos(new_rg[0], new_rg[1], new_g[0], new_g[1])
@@ -372,6 +372,10 @@ class Game():
         except:
             pass
         try:
+            pyglet.clock.unschedule(self.updateState)
+        except:
+            pass
+        try:
             pyglet.clock.unschedule(self.autospawnBalanced)
         except:
             pass
@@ -379,42 +383,23 @@ class Game():
         self.window.flushWindow()
         self.window.showMainMenu()
 
-    def updateState(self):
+    def updateState(self, dt):
         if self.lives <= 0:
             self.gameOver()
         for t in self.towers:
+            if t.cd:
+                t.resetCD()
             if not t.target:  # if tower has no target
-                i = random.randrange(0, 1)
-                for m in self.mobs:
-                    if(m.move_type in t.target_types):
-                        dist = get_dist(m.x, m.y, t.x, t.y)
-                        if dist <= t.range:
-                            if i == 0:
-                                t.target = m
-                                break
-            else:  # if tower has a target, do something
-                dist = get_dist(t.target.x, t.target.y, t.x, t.y)
-                if dist > t.range:
-                    t.target = None
-
-                if t.target not in self.mobs:
-                    t.target = None
-
-                if t.target:
-                    if t.target.state == "alive":
-                        rads = get_angle(t.x, t.y, t.target.x, t.target.y)
-                        t.setAngle(rads)
-                        t.doDamage(t.target)  # Do damage
-                    if t.target.state == "dead":
-                        t.target = None
-            t.resetCD()
+                t.getTarget()
+            else:
+                t.updateTarget()
 
         for m in self.mobs:
-            m.updatePos()  # Update movement
+            m.updatePos(dt=dt)  # Update movement
             m.updateState()  # Update mob state, e.g. "dead", "alive"
 
-        if self.gold > 999:     # Maximum amount of gold
-            self.gold = 999
+        if self.gold > 9999:     # Maximum amount of gold
+            self.gold = 9999
 
     def leaking(self):
         self.lives -= 1
@@ -425,17 +410,3 @@ class Game():
         for t in self.towers:
             value += t.price
         return value
-
-    # def generateGridIndicators(self):
-    #     """ Generates the squares that indicates available blocks """
-    #     w = self.squaresize
-    #     points = []
-    #     rects = []
-    #     for p in self.grid.w_grid:
-    #         wp = self.window.get_windowpos(p[0], p[1])
-    #         x = wp[0] - w // 2
-    #         y = wp[1] - w // 2
-    #         points.append(wp[0])
-    #         points.append(wp[1])
-    #         r_points = [x, y, x + w, y, x + w, y + w, x, y + w]
-    #         rects = rects + r_points

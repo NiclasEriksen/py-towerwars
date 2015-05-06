@@ -58,6 +58,33 @@ class Tower(Sprite):
                 self.angle = angle
             self.turret.rotation = math.degrees(self.angle) + 90
 
+    def getTarget(self):
+        for m in self.game.mobs:
+            if(m.move_type in self.target_types):
+                dist = get_dist(m.x, m.y, self.x, self.y)
+                if dist <= self.range:
+                    self.target = m
+                    break
+
+    def updateTarget(self):
+        dist = get_dist(self.target.x, self.target.y, self.x, self.y)
+        if dist > self.range:
+            self.target = None
+
+        if self.target not in self.game.mobs:
+            self.target = None
+
+        if self.target:
+            if self.target.state == "alive":
+                if self.turret:
+                    rads = get_angle(
+                        self.x, self.y, self.target.x, self.target.y
+                    )
+                    self.setAngle(rads)
+                self.doDamage(self.target)  # Do damage
+            if self.target.state == "dead":
+                self.target = None
+
     def updatePos(self, x, y, gx, gy):
         self.x = x
         self.y = y

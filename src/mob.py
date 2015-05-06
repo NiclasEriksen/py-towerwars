@@ -77,7 +77,7 @@ class Mob(Sprite):
         self.x, self.y = self.g.window.get_windowpos(s[0], s[1])
         self.rx, self.ry = self.x, self.y
 
-    def updatePos(self):
+    def updatePos(self, dt=0):
         if (
             not self.stall_timer and (self not in self.g.pf_queue)
             and self.spd > 0.0
@@ -115,8 +115,8 @@ class Mob(Sprite):
                             self.rx, self.ry,
                             targetpos[0], targetpos[1]
                         )
-                        self.rx = self.rx + self.spd * math.cos(rads)
-                        self.ry = self.ry - self.spd * math.sin(rads)
+                        self.rx = self.rx + (self.spd + dt) * math.cos(rads)
+                        self.ry = self.ry - (self.spd + dt) * math.sin(rads)
                         self.x = self.rx + self.x_offset
                         self.y = self.ry + self.y_offset
 
@@ -593,7 +593,7 @@ class Mob1F(Mob):
         if self.debug:
             print("Spawning mob!")
 
-    def updatePos(self):
+    def updatePos(self, dt=0):
         if not self.stall_timer and (self not in self.g.pf_queue):
             points = self.path
             tp = self.targetpoint
@@ -624,8 +624,8 @@ class Mob1F(Mob):
                             self.rx, self.ry,
                             targetpos[0], targetpos[1]
                         )
-                        self.rx = self.rx + self.spd * math.cos(rads)
-                        self.ry = self.ry - self.spd * math.sin(rads)
+                        self.rx = self.rx + (self.spd + dt) * math.cos(rads)
+                        self.ry = self.ry - (self.spd + dt) * math.sin(rads)
                         self.x = self.rx + self.x_offset
                         self.y = self.ry + self.y_offset
 

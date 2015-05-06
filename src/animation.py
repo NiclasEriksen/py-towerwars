@@ -14,6 +14,7 @@ class Animation(Sprite):
         )
         self.x = x
         self.y = y
+        self.window = game
         self.image = image
         self.anim = anim
         self.timer = 0
@@ -26,3 +27,4 @@ class Animation(Sprite):
             self.image = self.anim[self.timer]
         else:
             self.playing = False
+            self.window.animations.remove(self)
