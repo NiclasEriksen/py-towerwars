@@ -1,9 +1,9 @@
-DEBUG = False
+from main import logger
 #  from functions import get_neighbors
 
 
 def neighbors(node, all_nodes, grid):
-    dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+    dirs = [[0, 1], [1, 0], [-1, 0], [0, -1]]
     ddirs = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     result = []
     for dir in dirs:
@@ -38,14 +38,10 @@ def get_score(c, node, goal):
         score += 14
     else:
         score += 10
-    return score
-
-def get_def_score(c, goal):
     gx = abs(goal[0] - c.node[0])
     gy = abs(goal[1] - c.node[1])
-    score = (gx + gy) * 10
+    score += (gx + gy) * 5
     return score
-
 
 
 class Candidate:
@@ -62,22 +58,23 @@ def get_path(grid, all_nodes, node, goal):
     closed_list = []
     path_list = []
     final_list = []
-    start = node
-
-    while node != goal:
+    start = Candidate(node, None)
+    current = Candidate(node, start)
+    count, current.count = 0, 0
+    while current.node != goal:
         candidates = []
 
-        for n in neighbors(node, all_nodes, grid):
+        for n in neighbors(current.node, all_nodes, grid):
 
-            c = Candidate(n, node)
-            c.d_score = get_def_score(c, goal)
+            c = Candidate(n, current)
+            # c.d_score = get_def_score(c, goal)
             candidates.append(c)
 
-        candidates = sorted(
-            candidates,
-            key=lambda c: c.d_score,
-            reverse=True
-        )
+        # candidates = sorted(
+        #     candidates,
+        #     key=lambda c: c.score,
+        #     reverse=True
+        # )
 
         for c in candidates:
 
@@ -90,7 +87,11 @@ def get_path(grid, all_nodes, node, goal):
                     closed = True
 
             if not closed:
-                c.score = get_score(c, node, goal)
+                c.count = count
+                count += 1
+                # c.lastnode = node
+                c.score = get_score(c, current.node, goal)
+                # c.score += 10 * len(get_path(grid, closed_list, c.node, start))
 
                 open_list.append(c)
 
@@ -109,35 +110,34 @@ def get_path(grid, all_nodes, node, goal):
 
         open_list = sorted(
             open_list,
-            key=lambda x: x.score,
+            key=lambda x: x.count,
             reverse=False
         )
         if len(open_list) > 0:
+            # count += 1
             next_c = open_list[0]
+            # next_c.lastnode = current
             closed_list.append(next_c)
-            node = next_c.node
+            current = next_c
             open_list.remove(next_c)
         else:
-            if DEBUG:
-                print("Goal not found. Node {0} broke it.".format(node))
+            logger.debug("Goal not found. Node {0} broke it.".format(node))
             break
 
-    nextnode = goal
-    for c in reversed(closed_list):
-        if c.node == nextnode:
-            path_list.append(c.node)
-            nextnode = c.lastnode
+    nextnode = current  # goal
+    path_list = [nextnode.node]
+    while nextnode.node != start.node:
+        nextnode = nextnode.lastnode
+        path_list.append(nextnode.node)
 
     for c in reversed(path_list):
         final_list.append(c)
 
     if len(final_list) > 0:
-        if DEBUG:
-            print("Pathfinding successful!")
-            print("Steps: {0}".format(len(final_list)))
+        logger.debug("Pathfinding successful!")
+        logger.debug("Steps: {0}".format(len(final_list)))
         return final_list, True
     else:
-        if DEBUG:
-            print("ERROR: Pathfinding went wrong, returning to start.")
+        logger.debug("ERROR: Pathfinding went wrong, returning to start.")
         final_list = [start]
         return final_list, False
