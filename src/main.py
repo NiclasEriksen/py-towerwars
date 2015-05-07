@@ -749,6 +749,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     if self.game.active_tower:
                         self.game.active_tower.upgrade()
 
+            elif self.mainmenu:
+                under_mouse = self.mainmenu.check_mouse((x, y))
+                active = self.mainmenu.active_entry
+                if active and active == under_mouse:
+                    self.mainmenu.do_action(active)
+                elif active:
+                    self.mainmenu.on_up(active)
+
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
                 self.game.place_tower(
@@ -772,7 +780,17 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
             self.game.dragging = True
-            if self.game.selected_mouse and self.debug:
+            
+            e = self.mainmenu.check_mouse((x, y))
+            if e:
+                if not e == self.mainmenu.active_entry:
+                    self.mainmenu.on_up(self.mainmenu.active_entry)
+                    self.mainmenu.active_entry = e
+            elif self.mainmenu.active_entry:
+                self.mainmenu.on_up(self.mainmenu.active_entry)
+                self.mainmenu.active_entry = False
+
+            elif self.game.selected_mouse and self.debug:
                 if self.game.selected_mouse in self.game.towers:
                     t = self.game.selected_mouse
                     self.game.gold += t.price

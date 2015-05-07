@@ -1,86 +1,23 @@
-15:24:23,23 main INFO Loading fonts.
-15:24:23,25 main INFO Loading sound files.
-15:24:23,75 main INFO Loading textures.
-15:24:23,82 main INFO Creating UI.
-15:24:43,667 main INFO Starting a new game.
-15:24:43,668 main DEBUG Load screen.
-15:24:43,675 main DEBUG Removing old particle system.
-15:24:43,675 main DEBUG 'GameWindow' object has no attribute 'flame_emitter_group'
-15:24:43,781 main DEBUG Removing obstacles from game grid.
-15:24:43,967 main DEBUG generating new grid
-15:24:43,971 main DEBUG removed 129 grid points for towers
-15:24:43,971 main DEBUG removed 127 grid points for no walk
-15:24:53,980 main INFO AI current gold: 2
-15:24:54,26 main DEBUG Spawning mob ID0: 14.0hp, 1.0spd
-15:24:54,27 main DEBUG Spawning mob ID1: 35.0hp, 0.9spd
-15:24:54,28 main DEBUG Spawning mob ID2: 180.0hp, 0.6spd
-15:24:54,29 main DEBUG Spawning mob ID3: 80.0hp, 1.8spd
-15:24:54,29 main DEBUG Spawning mob ID4: 300.0hp, 0.9spd
-15:24:54,30 main DEBUG Spawning mob ID5: 300.0hp, 1.25spd
-15:24:54,31 main DEBUG Spawning mob ID6: 400.0hp, 1.0spd
-15:24:54,32 main DEBUG Generating flying path
-15:24:54,210 main DEBUG Spawning mob ID7: 120.0hp, 0.9spd
-15:24:54,211 main DEBUG Spawning mob ID8: 900.0hp, 0.5spd
-15:24:54,211 main DEBUG Spawning mob ID9: 800.0hp, 0.8spd
-15:24:54,212 main DEBUG Spawning mob ID10: 900.0hp, 1.0spd
-15:24:54,212 main DEBUG Spawning mob ID11: 2000.0hp, 0.5spd
-15:24:54,277 main DEBUG Spawning mob ID12: 14.0hp, 1.0spd
-15:24:54,278 main DEBUG Spawning mob ID13: 35.0hp, 0.9spd
-15:24:54,278 main DEBUG Spawning mob ID14: 180.0hp, 0.6spd
-15:24:54,279 main DEBUG Spawning mob ID15: 80.0hp, 1.8spd
-15:24:54,279 main DEBUG Spawning mob ID16: 300.0hp, 0.9spd
-15:24:54,279 main DEBUG Spawning mob ID17: 300.0hp, 1.25spd
-15:24:54,280 main DEBUG Spawning mob ID18: 400.0hp, 1.0spd
-15:24:54,280 main DEBUG Spawning mob ID19: 120.0hp, 0.9spd
-15:24:54,280 main DEBUG Spawning mob ID20: 900.0hp, 0.5spd
-15:24:54,281 main DEBUG Spawning mob ID21: 800.0hp, 0.8spd
-15:24:54,281 main DEBUG Spawning mob ID22: 900.0hp, 1.0spd
-15:24:54,282 main DEBUG Spawning mob ID23: 2000.0hp, 0.5spd
-15:24:54,528 main DEBUG Spawning mob ID24: 14.0hp, 1.0spd
-15:24:54,529 main DEBUG Spawning mob ID25: 35.0hp, 0.9spd
-15:24:54,529 main DEBUG Spawning mob ID26: 180.0hp, 0.6spd
-15:24:54,530 main DEBUG Spawning mob ID27: 80.0hp, 1.8spd
-15:24:54,530 main DEBUG Spawning mob ID28: 300.0hp, 0.9spd
-15:24:54,531 main DEBUG Spawning mob ID29: 300.0hp, 1.25spd
-15:24:54,531 main DEBUG Spawning mob ID30: 400.0hp, 1.0spd
-15:24:54,532 main DEBUG Spawning mob ID31: 120.0hp, 0.9spd
-15:24:54,532 main DEBUG Spawning mob ID32: 900.0hp, 0.5spd
-15:24:54,533 main DEBUG Spawning mob ID33: 800.0hp, 0.8spd
-15:24:54,533 main DEBUG Spawning mob ID34: 900.0hp, 1.0spd
-15:24:54,534 main DEBUG Spawning mob ID35: 2000.0hp, 0.5spd
-15:24:54,778 main DEBUG Spawning mob ID36: 14.0hp, 1.0spd
-15:24:54,779 main DEBUG Spawning mob ID37: 35.0hp, 0.9spd
-15:24:54,780 main DEBUG Spawning mob ID38: 180.0hp, 0.6spd
-15:24:54,780 main DEBUG Spawning mob ID39: 80.0hp, 1.8spd
-15:24:54,781 main DEBUG Spawning mob ID40: 300.0hp, 0.9spd
-15:24:54,781 main DEBUG Spawning mob ID41: 300.0hp, 1.25spd
-15:24:54,782 main DEBUG Spawning mob ID42: 400.0hp, 1.0spd
-15:24:54,782 main DEBUG Spawning mob ID43: 120.0hp, 0.9spd
-15:24:54,783 main DEBUG Spawning mob ID44: 900.0hp, 0.5spd
-15:24:54,783 main DEBUG Spawning mob ID45: 800.0hp, 0.8spd
-15:24:54,784 main DEBUG Spawning mob ID46: 900.0hp, 1.0spd
-15:24:54,784 main DEBUG Spawning mob ID47: 2000.0hp, 0.5spd
-15:24:55,45 main DEBUG Spawning mob ID48: 14.0hp, 1.0spd
-15:24:55,45 main DEBUG Spawning mob ID49: 35.0hp, 0.9spd
-15:24:55,46 main DEBUG Spawning mob ID50: 180.0hp, 0.6spd
-15:24:55,47 main DEBUG Spawning mob ID51: 80.0hp, 1.8spd
-15:24:55,47 main DEBUG Spawning mob ID52: 300.0hp, 0.9spd
-15:24:55,48 main DEBUG Spawning mob ID53: 300.0hp, 1.25spd
-15:24:55,48 main DEBUG Spawning mob ID54: 400.0hp, 1.0spd
-15:24:55,48 main DEBUG Spawning mob ID55: 120.0hp, 0.9spd
-15:24:55,49 main DEBUG Spawning mob ID56: 900.0hp, 0.5spd
-15:24:55,49 main DEBUG Spawning mob ID57: 800.0hp, 0.8spd
-15:24:55,49 main DEBUG Spawning mob ID58: 900.0hp, 1.0spd
-15:24:55,50 main DEBUG Spawning mob ID59: 2000.0hp, 0.5spd
-15:24:55,311 main DEBUG Spawning mob ID60: 14.0hp, 1.0spd
-15:24:55,312 main DEBUG Spawning mob ID61: 35.0hp, 0.9spd
-15:24:55,313 main DEBUG Spawning mob ID62: 180.0hp, 0.6spd
-15:24:55,313 main DEBUG Spawning mob ID63: 80.0hp, 1.8spd
-15:24:55,314 main DEBUG Spawning mob ID64: 300.0hp, 0.9spd
-15:24:55,314 main DEBUG Spawning mob ID65: 300.0hp, 1.25spd
-15:24:55,314 main DEBUG Spawning mob ID66: 400.0hp, 1.0spd
-15:24:55,315 main DEBUG Spawning mob ID67: 120.0hp, 0.9spd
-15:24:55,315 main DEBUG Spawning mob ID68: 900.0hp, 0.5spd
-15:24:55,315 main DEBUG Spawning mob ID69: 800.0hp, 0.8spd
-15:24:55,316 main DEBUG Spawning mob ID70: 900.0hp, 1.0spd
-15:24:55,351 main DEBUG Spawning mob ID71: 2000.0hp, 0.5spd
+16:05:31,844 main INFO Loading fonts.
+16:05:31,845 main INFO Loading sound files.
+16:05:31,890 main INFO Loading textures.
+16:05:31,897 main INFO Creating UI.
+16:05:49,640 main INFO Starting a new game.
+16:05:49,652 main DEBUG Load screen.
+16:05:49,662 main DEBUG Removing old particle system.
+16:05:49,662 main DEBUG 'GameWindow' object has no attribute 'flame_emitter_group'
+16:05:49,702 main DEBUG Removing obstacles from game grid.
+16:05:49,702 main DEBUG Fligh path included in map, importing.
+16:05:49,753 main DEBUG generating new grid
+16:05:49,755 main DEBUG Flightgrid found, importing.
+16:05:49,755 main DEBUG removed 99 grid points for towers
+16:05:49,755 main DEBUG removed 97 grid points for no walk
+16:05:54,612 main INFO Starting a new game.
+16:05:54,620 main DEBUG Load screen.
+16:05:54,630 main DEBUG Removing old particle system.
+16:05:54,665 main DEBUG Removing obstacles from game grid.
+16:05:54,666 main DEBUG Fligh path included in map, importing.
+16:05:54,700 main DEBUG generating new grid
+16:05:54,701 main DEBUG Flightgrid found, importing.
+16:05:54,702 main DEBUG removed 99 grid points for towers
+16:05:54,702 main DEBUG removed 97 grid points for no walk

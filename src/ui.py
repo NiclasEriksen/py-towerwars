@@ -331,6 +331,7 @@ class MainMenu():
         self.w = window
         self.ui = window.userinterface
         self.entries = []
+        self.active_entry = False
 
     def add_entry(self, title="No title", action=None, top=False):
         b_sprite = Sprite(
@@ -363,27 +364,49 @@ class MainMenu():
         for e in self.entries:
             if x >= e.rectangle[0] and x <= e.rectangle[4]:
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
-                    self.w.play_sfx("pluck")
-                    if e.action == "newgame":
-                        self.w.game.newGame(self.w.selected_mapfile)
-                    elif e.action == "selectmap":
-                        index = self.w.maplist.index(self.w.selected_mapfile)
-                        if index == len(self.w.maplist) - 1:
-                            self.w.selected_mapfile = self.w.maplist[0]
-                        else:
-                            self.w.selected_mapfile = self.w.maplist[index + 1]
+                    if not self.active_entry:
+                        self.on_down(e)
+                        return e
+                    else:
+                        return e
 
-                        e.label.text = self.w.selected_mapfile
+        return False
 
-                    elif e.action == "resume":
-                        self.w.game.paused = False
-                        self.w.mainmenu = None
-                    elif e.action == "quit":
-                        self.w.quit_game()
+    def on_down(self, entry):
+        entry.rectangle = create_rectangle(entry.x, entry.y, 190, 30)
+        if entry.label:
+            entry.label.font_size = entry.label.font_size - 1
+        self.active_entry = entry
+
+    def on_up(self, entry):
+        entry.rectangle = create_rectangle(entry.x, entry.y, 200, 32)
+        if entry.label:
+            entry.label.font_size = entry.label.font_size + 1
+        self.active_entry = False
+
+    def do_action(self, entry):
+        self.w.play_sfx("pluck")
+        self.on_up(entry)
+        e = entry
+        if e.action == "newgame":
+            self.w.game.newGame(self.w.selected_mapfile)
+        elif e.action == "selectmap":
+            index = self.w.maplist.index(self.w.selected_mapfile)
+            if index == len(self.w.maplist) - 1:
+                self.w.selected_mapfile = self.w.maplist[0]
+            else:
+                self.w.selected_mapfile = self.w.maplist[index + 1]
+
+            e.label.text = self.w.selected_mapfile
+
+        elif e.action == "resume":
+            self.w.game.paused = False
+            self.w.mainmenu = None
+        elif e.action == "quit":
+            self.w.quit_game()
 
     def update_offset(self):
         for e in self.entries:
-            print self.entries.index(e), e.action
             x = self.w.width // 2
             y = self.w.height // 2 - (40 * self.entries.index(e))
             e.label.x, e.x, e.label.y, e.y = x, x, y, y
