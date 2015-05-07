@@ -332,15 +332,20 @@ class MainMenu():
         self.ui = window.userinterface
         self.but_h = 32
         self.but_w = 200
-        self.font_size = 14
+        self.spacing = 8
+        self.font_size = 12
         self.entries = []
+        self.under_mouse = None
         self.active_entry = False
 
     def add_entry(self, title="No title", action=None, top=False):
         h = self.but_h
         w = self.but_w
         x = self.w.width / 2
-        y = self.w.height / 2 - (h * len(self.entries))
+        y = (
+            self.w.height / 2 - (h * len(self.entries)) +
+            self.spacing
+        )
         b_sprite = Sprite(
                         self.w.textures["wall_stone"],
                         x=x,
@@ -375,25 +380,40 @@ class MainMenu():
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
                     if not self.active_entry:
                         self.on_down(e)
+                        self.active_entry = e
                         return e
                     else:
+                        self.on_down(e)
                         return e
-
         return False
+
+    def get_under_mouse(self, x, y):
+        for e in self.entries:
+            if x >= e.rectangle[0] and x <= e.rectangle[4]:
+                if y >= e.rectangle[1] and y <= e.rectangle[3]:
+                    e.label.font_size = self.font_size + 1
+                    self.under_mouse = e
+                    return True
+            else:
+                e.label.font_size = self.font_size
+        else:
+            if self.under_mouse:
+                self.under_mouse.label.font_size = self.font_size
+            self.under_mouse = None
+            return False
 
     def on_down(self, entry):
         entry.rectangle = create_rectangle(
-            entry.x, entry.y, self.but_w - 10, self.but_h - 2)
+            entry.x, entry.y, self.but_w - 10, self.but_h)
         if entry.label:
-            entry.label.font_size = entry.label.font_size - 1
-        self.active_entry = entry
+            entry.label.font_size = self.font_size - 1
 
     def on_up(self, entry):
         entry.rectangle = create_rectangle(
             entry.x, entry.y, self.but_w, self.but_h
         )
         if entry.label:
-            entry.label.font_size = entry.label.font_size + 1
+            entry.label.font_size = self.font_size
         self.active_entry = False
 
     def do_action(self, entry):
@@ -428,14 +448,17 @@ class MainMenu():
             self.w.quit_game()
 
     def update_offset(self):
-        offset_y = (len(self.entries) * self.but_h) // 2
-        #  print "Updating offset. {0}".format(offset_y)
+        count = len(self.entries)
+        offset_y = (count * (self.but_h + self.spacing)) // 2
         for e in self.entries:
             x = self.w.width // 2
             y = int(
                 self.w.height // 2 + offset_y -
-                (self.but_h * self.entries.index(e))
+                (self.but_h * self.entries.index(e)) -
+                (self.spacing * self.entries.index(e))
             )
+            # y -= self.spacing * 10
+
             # print "self.but_h, self.but_w, x, y = {0} {1} {2} {3}".format(
             #     self.but_h, self.but_w, x, y
             # )
@@ -443,8 +466,8 @@ class MainMenu():
             e.rectangle = create_rectangle(x, y, self.but_w, self.but_h)
 
     def render(self):
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         self.w.batches["mm_buttons"].draw()
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         gl.glColor3f(0.3, 0.3, 0.3, 1)
         for e in self.entries:
             graphics.draw(

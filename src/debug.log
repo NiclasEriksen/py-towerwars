@@ -1,27 +1,22 @@
-18:38:34,368 main INFO Loading fonts.
-18:38:34,369 main INFO Loading sound files.
-18:38:34,415 main INFO Loading textures.
-18:38:34,424 main INFO Creating UI.
-18:38:34,424 main DEBUG Showing main menu.
-18:38:35,470 main INFO Starting a new game.
-18:38:35,471 main DEBUG Load screen.
-18:38:35,478 main DEBUG Removing old particle system.
-18:38:35,478 main DEBUG 'GameWindow' object has no attribute 'flame_emitter_group'
-18:38:35,633 main DEBUG Fligh path included in map, importing.
-18:38:35,633 main DEBUG Removing obstacles from game grid.
-18:38:36,502 main DEBUG generating new grid
-18:38:36,518 main DEBUG Flightgrid found, importing.
-18:38:36,518 main DEBUG removed 345 grid points for towers
-18:38:36,518 main DEBUG removed 343 grid points for no walk
-18:38:36,951 main DEBUG Showing main menu.
-18:38:42,278 main INFO Starting a new game.
-18:38:42,287 main DEBUG Load screen.
-18:38:42,298 main DEBUG Removing old particle system.
-18:38:42,476 main DEBUG Fligh path included in map, importing.
-18:38:42,476 main DEBUG Removing obstacles from game grid.
-18:38:43,325 main DEBUG generating new grid
-18:38:43,341 main DEBUG Flightgrid found, importing.
-18:38:43,341 main DEBUG removed 345 grid points for towers
-18:38:43,341 main DEBUG removed 343 grid points for no walk
-18:38:43,897 main DEBUG Showing main menu.
-18:38:55,857 main DEBUG Showing main menu.
+19:05:38,20 main INFO Loading fonts.
+19:05:38,22 main INFO Loading sound files.
+19:05:38,67 main INFO Loading textures.
+19:05:38,73 main INFO Creating UI.
+19:05:38,74 main DEBUG Showing main menu.
+19:05:46,624 main DEBUG Showing settings menu.
+19:05:47,262 main DEBUG Showing main menu.
+19:05:47,962 main DEBUG Showing settings menu.
+19:05:58,718 main DEBUG Showing main menu.
+19:06:08,994 main INFO Starting a new game.
+19:06:08,995 main DEBUG Load screen.
+19:06:09,1 main DEBUG Removing old particle system.
+19:06:09,1 main DEBUG 'GameWindow' object has no attribute 'flame_emitter_group'
+19:06:09,111 main DEBUG Removing obstacles from game grid.
+19:06:09,286 main DEBUG generating new grid
+19:06:09,289 main DEBUG removed 129 grid points for towers
+19:06:09,289 main DEBUG removed 127 grid points for no walk
+19:06:12,809 main DEBUG Showing main menu.
+19:06:15,468 main DEBUG Showing settings menu.
+19:06:16,601 main DEBUG Showing main menu.
+19:06:19,407 main DEBUG Showing settings menu.
+19:06:21,218 main DEBUG Showing main menu.

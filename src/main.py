@@ -846,6 +846,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
         if self.game.mouse_drag_tower:
             self.game.mouse_drag_tower.updatePos(x, y, None, None)
         self.cx, self.cy = x, y
+        if self.mainmenu:
+            self.mainmenu.get_under_mouse(x, y)
 
     def on_resize(self, width, height):
         glViewport(0, 0, width, height)
