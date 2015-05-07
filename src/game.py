@@ -304,7 +304,8 @@ class Game():
             self.selected_mouse = None
 
     def spawnMob(self, variant, free=False):
-        name = str(self.mobtier) + variant
+        # name = str(self.mobtier) + variant
+        name = str(1) + variant
         options = {
             "1Q": Mob(self, name),
             "1W": Mob1W(self, name),
@@ -326,7 +327,9 @@ class Game():
             logger.debug("Mob not found: {0}".format(err))
             return False
         if self.mobtier == 2:
-            mob.hp *= 100
+            mob.hp_max *= 50
+            mob.hp = mob.hp_max
+            mob.bounty *= 50
         if mob.bounty * 2 <= self.ai_gold or free:
             if not free:
                 self.ai_gold -= mob.bounty * 2
@@ -404,6 +407,8 @@ class Game():
             self.ai_gold += self.ai_flat_income
             self.ai_flat_income += 1
             self.ai_gold += (self.get_total_value() + self.gold) // 10
+            if self.ai_gold > 1600:
+                self.mobtier = 2
             logger.info("AI current gold: {0}".format(self.ai_gold))
 
     def gameOver(self):

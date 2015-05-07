@@ -1,8 +1,8 @@
 # UI module
 from pyglet.sprite import Sprite
-from pyglet import gl, graphics, text, image
-import copy # to edit images without impacting the original
+from pyglet import gl, graphics, text
 from functions import *
+from main import logger
 
 
 class UI():
@@ -330,24 +330,30 @@ class MainMenu():
     def __init__(self, window):
         self.w = window
         self.ui = window.userinterface
+        self.but_h = 32
+        self.but_w = 200
+        self.font_size = 14
         self.entries = []
         self.active_entry = False
 
     def add_entry(self, title="No title", action=None, top=False):
+        h = self.but_h
+        w = self.but_w
+        x = self.w.width / 2
+        y = self.w.height / 2 - (h * len(self.entries))
         b_sprite = Sprite(
                         self.w.textures["wall_stone"],
-                        x=self.w.width / 2,
-                        y=self.w.height / 2 - (40 * len(self.entries)),
+                        x=x,
+                        y=y,
                         batch=self.w.batches["mm_buttons"],
                         group=self.w.ui_group
                     )
         # b_sprite.width, b_sprite.height = 3, 1
-        x, y = b_sprite.x, b_sprite.y
-        b_sprite.rectangle = create_rectangle(x, y, 200, 32)
+        b_sprite.rectangle = create_rectangle(x, y, w, h)
         b_sprite.action = action
         b_sprite.label = text.Label(
             title, font_name='Soft Elegance',
-            font_size=14,
+            font_size=self.font_size,
             x=x, y=y,
             batch=self.w.batches["mm_buttons"],
             anchor_x="center", anchor_y="center"
@@ -376,13 +382,16 @@ class MainMenu():
         return False
 
     def on_down(self, entry):
-        entry.rectangle = create_rectangle(entry.x, entry.y, 190, 30)
+        entry.rectangle = create_rectangle(
+            entry.x, entry.y, self.but_w - 10, self.but_h - 2)
         if entry.label:
             entry.label.font_size = entry.label.font_size - 1
         self.active_entry = entry
 
     def on_up(self, entry):
-        entry.rectangle = create_rectangle(entry.x, entry.y, 200, 32)
+        entry.rectangle = create_rectangle(
+            entry.x, entry.y, self.but_w, self.but_h
+        )
         if entry.label:
             entry.label.font_size = entry.label.font_size + 1
         self.active_entry = False
@@ -410,25 +419,36 @@ class MainMenu():
         elif e.action == "togglesound":
             self.w.sound_enabled = not self.w.sound_enabled
             e.label.text = "Sound: {0}".format(self.w.sound_enabled)
-            print("Not yet.")
+            logger.debug(
+                "Toggled sound_enabled to {0}.".format(self.w.sound_enabled)
+            )
         elif e.action == "topmenu":
             return self.w.showMainMenu()
         elif e.action == "quit":
             self.w.quit_game()
 
     def update_offset(self):
+        offset_y = (len(self.entries) * self.but_h) // 2
+        #  print "Updating offset. {0}".format(offset_y)
         for e in self.entries:
             x = self.w.width // 2
-            y = self.w.height // 2 - (40 * self.entries.index(e))
+            y = int(
+                self.w.height // 2 + offset_y -
+                (self.but_h * self.entries.index(e))
+            )
+            # print "self.but_h, self.but_w, x, y = {0} {1} {2} {3}".format(
+            #     self.but_h, self.but_w, x, y
+            # )
             e.label.x, e.x, e.label.y, e.y = x, x, y, y
-            e.rectangle = create_rectangle(x, y, 200, 32)
+            e.rectangle = create_rectangle(x, y, self.but_w, self.but_h)
 
     def render(self):
-        self.w.batches["mm_buttons"].draw()
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        self.w.batches["mm_buttons"].draw()
         gl.glColor3f(0.3, 0.3, 0.3, 1)
         for e in self.entries:
             graphics.draw(
                 4, gl.GL_QUADS, ('v2i', e.rectangle)
             )
             e.label.draw()
+        # self.w.flip()

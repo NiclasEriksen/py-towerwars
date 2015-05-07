@@ -148,6 +148,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # self.newGame()
 
     def showMainMenu(self):
+        logger.debug("Showing main menu.")
         self.mainmenu = MainMenu(self)
         if self.game.loaded:
             self.mainmenu.add_entry(
@@ -161,6 +162,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.mainmenu.add_entry(title="Exit", action="quit")
 
     def showSettingsMenu(self):
+        logger.debug("Showing settings menu.")
         self.mainmenu = MainMenu(self)
         self.mainmenu.add_entry(
             title="Sound: {0}".format(self.sound_enabled),
@@ -847,13 +849,16 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def on_resize(self, width, height):
         glViewport(0, 0, width, height)
-        glMatrixMode(gl.GL_PROJECTION)
+        # glMatrixMode(gl.GL_PROJECTION)
         glLoadIdentity()
         glOrtho(0, width, 0, height, -1, 1)
         glMatrixMode(gl.GL_MODELVIEW)
+        self.clear()
         self.activate()
 
-        if not self.mainmenu:
+        if self.mainmenu:
+            self.mainmenu.update_offset()
+        if self.game.loaded:
             self.game.updateGridSettings()
 
             for t in self.game.towers:
