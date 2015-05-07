@@ -2,6 +2,7 @@
 import pyglet   # Version 1.2.2
 # from audio import AudioFile  # Sound engine
 import os
+import glob
 from math import pi, sin, cos
 from collections import OrderedDict
 from pyglet.window import key, mouse
@@ -118,6 +119,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.fg_group = pyglet.graphics.OrderedGroup(1)
 
         self.loadFonts()    # Loads fonts into memory
+        self.loadMapFiles()
         self.currently_playing = []
         self.sound_enabled = True
         self.loadSFX()      # Load sound files into memory
@@ -138,9 +140,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.userinterface = UI(self)
 
         # Spawn main menu
-        self.mainmenu = MainMenu(self)
-        self.mainmenu.add_entry(title="New Game", action="newgame")
-        self.mainmenu.add_entry(title="Exit", action="quit")
+        self.showMainMenu()
 
         self.loading = False
 
@@ -150,6 +150,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def showMainMenu(self):
         self.mainmenu = MainMenu(self)
         self.mainmenu.add_entry(title="New Game", action="newgame")
+        self.mainmenu.add_entry(
+            title=self.selected_mapfile, action="selectmap"
+        )
         self.mainmenu.add_entry(title="Exit", action="quit")
 
     def flushWindow(self):
@@ -207,6 +210,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.crit_fx
         )
         self.flame_emitter, self.gas_emitter = None, None
+
+    def loadMapFiles(self):
+        self.maplist = sorted(glob.glob(os.path.join(RES_PATH, '*.tmx')))
+        self.selected_mapfile = self.maplist[0]
 
     def loadFonts(self):
         logger.info("Loading fonts.")
@@ -570,12 +577,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.game.paused = state
         if state:
             # Spawn main menu
-            self.mainmenu = MainMenu(self)
-            if self.game.loaded:
-                self.mainmenu.add_entry(title="Resume", action="resume")
-            self.mainmenu.add_entry(title="New Game", action="newgame")
-            self.mainmenu.add_entry(title="Exit", action="quit")
             pyglet.clock.unschedule(self.particle_system.update)
+            self.showMainMenu()
+            if self.game.loaded:
+                self.mainmenu.add_entry(
+                    title="Resume", action="resume", top=True
+                )
         else:
             self.mainmenu = None
             pyglet.clock.schedule_interval(

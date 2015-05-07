@@ -57,10 +57,10 @@ class Game():
 
         # player.play()
 
-    def newGame(self, level="map1"):
+    def newGame(self, level):
 
         logger.info("Starting a new game.")
-        self.map = os.path.join(self.window.resourcepath, level + ".tmx")
+        self.map = level
         # Display load screen
         self.window.mainmenu = None   # Kills the menu
         self.window.loading = True

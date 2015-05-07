@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="base_out_atlas" tilewidth="32" tileheight="32">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/base_out_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <layer name="BG1" width="16" height="16" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJwrZGBgKBzFo3gUj0gMAPM+cQE=
+  </data>
+ </layer>
+ <imagelayer name="Background">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/testmap.png"/>
+ </imagelayer>
+ <layer name="Obstacles" width="16" height="16" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJylkTEOACAIA/H/i092ckG4ViUxQCxtxYj/mOM8L5iMp97hrWrHQ8aSfuZ0PSptqpU2zZGHbl8d5maO7qs9qz9VvrqecqWpsquXw3m/4494SX/HArw1NvI=
+  </data>
+ </layer>
+ <layer name="Goal" width="16" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYMANLuCRGwWjYBQMfQAALW0A0Q==
+  </data>
+ </layer>
+ <layer name="Spawn" width="16" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjESgxcjAAAAEqwAs
+  </data>
+ </layer>
+ <layer name="Flightpath" width="16" height="16" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYMANuhkRmFyAbAa55lDDDHRz8JmPzy5S9eNSS6q78KnDZS4ut2EDxMjhC3tqxg+l+okNX3z6SUkThMwh1R3Emk0NMwBNqDAh
+  </data>
+ </layer>
+</map>

@@ -332,25 +332,31 @@ class MainMenu():
         self.ui = window.userinterface
         self.entries = []
 
-    def add_entry(self, title="No title", action=None):
+    def add_entry(self, title="No title", action=None, top=False):
         b_sprite = Sprite(
                         self.w.textures["wall_stone"],
                         x=self.w.width / 2,
-                        y=self.w.height / 2 - (32 * len(self.entries)),
+                        y=self.w.height / 2 - (40 * len(self.entries)),
                         batch=self.w.batches["mm_buttons"],
                         group=self.w.ui_group
                     )
         # b_sprite.width, b_sprite.height = 3, 1
         x, y = b_sprite.x, b_sprite.y
-        b_sprite.rectangle = create_rectangle(x, y, 128, 32)
+        b_sprite.rectangle = create_rectangle(x, y, 200, 32)
         b_sprite.action = action
         b_sprite.label = text.Label(
             title, font_name='Soft Elegance',
             font_size=14,
             x=x, y=y,
+            batch=self.w.batches["mm_buttons"],
             anchor_x="center", anchor_y="center"
         )
-        self.entries.append(b_sprite)
+        if top:
+            self.entries.insert(0, b_sprite)
+            self.update_offset()
+        else:
+            self.entries.append(b_sprite)
+            self.update_offset()
 
     def check_mouse(self, pos):
         x, y = pos[0], pos[1]
@@ -359,12 +365,29 @@ class MainMenu():
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
                     self.w.play_sfx("pluck")
                     if e.action == "newgame":
-                        self.w.game.newGame()
+                        self.w.game.newGame(self.w.selected_mapfile)
+                    elif e.action == "selectmap":
+                        index = self.w.maplist.index(self.w.selected_mapfile)
+                        if index == len(self.w.maplist) - 1:
+                            self.w.selected_mapfile = self.w.maplist[0]
+                        else:
+                            self.w.selected_mapfile = self.w.maplist[index + 1]
+
+                        e.label.text = self.w.selected_mapfile
+
                     elif e.action == "resume":
                         self.w.game.paused = False
                         self.w.mainmenu = None
                     elif e.action == "quit":
                         self.w.quit_game()
+
+    def update_offset(self):
+        for e in self.entries:
+            print self.entries.index(e), e.action
+            x = self.w.width // 2
+            y = self.w.height // 2 - (40 * self.entries.index(e))
+            e.label.x, e.x, e.label.y, e.y = x, x, y, y
+            e.rectangle = create_rectangle(x, y, 200, 32)
 
     def render(self):
         self.w.batches["mm_buttons"].draw()
