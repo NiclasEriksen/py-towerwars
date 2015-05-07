@@ -3,6 +3,7 @@ from pytmx.util_pyglet import load_pyglet
 from pyglet.sprite import Sprite
 from pyglet.image import ImageDataRegion
 from functions import *
+from main import logger
 
 
 class TiledRenderer(object):
@@ -46,7 +47,7 @@ class TiledRenderer(object):
 
         for l in self.tmx_data.layers:
             if isinstance(l, TiledTileLayer) and l.name == "Obstacles":
-                print("Removing obstacles from game grid.")
+                logger.debug("Removing obstacles from game grid.")
                 for x, y, image in l.tiles():
                     self.window.game.tiles_no_walk.append((x, y))
                     self.window.game.tiles_no_build.append((x, y))
@@ -72,7 +73,7 @@ class TiledRenderer(object):
             elif layer.name == "Foreground":
                 batch = self.window.batches["fg"]
             else:
-                print("Layer not recognized, skipping {0}".format(
+                logger.error("Layer not recognized, skipping {0}".format(
                         layer.name
                     )
                 )
@@ -126,9 +127,6 @@ class TiledRenderer(object):
             # draw image layers
             elif isinstance(layer, TiledImageLayer):
                 if layer.image:
-                    print layer.name
-                    print layer.image
-                    print layer.image.texture
                     # if isinstance(layer.image, ImageDataRegion):
                     #     print "heidu"
                     #     image = layer.image.get_texture()

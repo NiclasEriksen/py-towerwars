@@ -1,6 +1,7 @@
 from main import pypf
 import subprocess
 from functions import get_neighbors
+from main import logger
 
 
 class Grid:
@@ -78,8 +79,7 @@ class Grid:
 
     def update(self, new=False):
         self.debug = self.g.debug
-        if self.debug:
-            print("generating new grid")
+        logger.debug("generating new grid")
 
         t_grid = []
         w_grid = []
@@ -104,10 +104,8 @@ class Grid:
                     if (t.gx, t.gy) in w_grid:
                         w_grid.remove(g)
                     tc += 1
-        if self.debug:
-            print("removed {0} grid points for towers".format(tc))
-        if self.debug:
-            print("removed {0} grid points for no walk".format(wc))
+        logger.debug("removed {0} grid points for towers".format(tc))
+        logger.debug("removed {0} grid points for no walk".format(wc))
         if new == "dry":
             old_w, old_t = self.w_grid, self.t_grid
             self.w_grid = w_grid
@@ -140,7 +138,7 @@ class Grid:
     def getPath(self, start, flying=False):
         if flying:
             if not self.flying_path:
-                print("Generating flying path")
+                logger.debug("Generating flying path")
                 path, success = pypf.get_path(
                         self.fullgrid, self.fullgrid,
                         start, self.goal

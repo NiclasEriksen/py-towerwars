@@ -15,6 +15,24 @@ from lepton.controller import (
 )
 ############################
 # Import classes #
+# try:
+#     os.remove('debug.log')
+#     os.
+# except OSError:
+#     pass
+import logging
+logging.basicConfig(filename='debug.log',
+    filemode='w',
+    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+    datefmt='%H:%M:%S',
+    level=logging.DEBUG
+)
+logger = logging.getLogger(__name__)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+logger.addHandler(ch)
+logger.setLevel(logging.DEBUG)
+
 from game import *
 from tower import *
 from mob import *
@@ -28,7 +46,7 @@ from functions import *
 pyglet.options['audio'] = ('openal', 'pulse', 'silent')
 
 # Global variables #
-DEBUG = False
+# DEBUG = False
 ROOT = os.path.dirname(__file__)
 RES_PATH = os.path.join(ROOT, "resources")
 SCREENRES = (1440, 900)  # The resolution for the game window
@@ -56,13 +74,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
             samples=2,
             alpha_size=8
             )
-        self.debug = DEBUG
+        self.debug = False
         try:  # to enable multisampling
             gl_config = screen.get_best_config(gl_template)
         except pyglet.window.NoSuchConfigException:
             gl_template = pyglet.gl.Config(alpha_size=8)
             gl_config = screen.get_best_config(gl_template)
-            print("No multisampling.")
+            logger.debug('No multisampling.')
         # Create OpenGL context #
         gl_context = gl_config.create_context(None)
         super(GameWindow, self).__init__(
@@ -81,7 +99,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         glClearColor(0.1, 0.1, 0.1, 1)  # Background color
         self.particle_system = default_system
         self.tile_renderer = None
-        self.loading = False
+        self.loading = True
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
@@ -116,13 +134,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # self.generateGridSettings()
         self.game = Game(self)
 
-        print("Creating UI.")
+        logger.info("Creating UI.")
         self.userinterface = UI(self)
 
         # Spawn main menu
         self.mainmenu = MainMenu(self)
         self.mainmenu.add_entry(title="New Game", action="newgame")
         self.mainmenu.add_entry(title="Exit", action="quit")
+
+        self.loading = False
 
         # Start a new game
         # self.newGame()
@@ -134,20 +154,19 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def flushWindow(self):
         try:
-            if self.debug:
-                print("Removing old particle system.")
+            logger.debug("Removing old particle system.")
             self.particle_system.remove_group(self.flame_emitter_group)
             self.particle_system.remove_group(self.gas_emitter_group)
-        except AttributeError:
-            pass
-        except ValueError:
-            pass
+        except AttributeError as err:
+            logger.debug(err)
+        except ValueError as err:
+            logger.debug(err)
         try:
             pyglet.clock.unschedule(self.particle_system.update)
-        except AttributeError:
-            pass
-        except ValueError:
-            pass
+        except AttributeError as err:
+            logger.debug(err)
+        except ValueError as err:
+            logger.debug(err)
         self.particle_system = default_system
         self.particle_system.run_ahead(2.0, 30.0)
         pyglet.clock.schedule_interval(self.particle_system.update, 1.0/30.0)
@@ -190,12 +209,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.flame_emitter, self.gas_emitter = None, None
 
     def loadFonts(self):
+        logger.info("Loading fonts.")
         pyglet.font.add_file(os.path.join(RES_PATH, 'soft_elegance.ttf'))
         pyglet.font.add_file(os.path.join(RES_PATH, 'visitor1.ttf'))
         self.ui_font = pyglet.font.load('Soft Elegance')
         self.small_font = pyglet.font.load('Visitor TT1 BRK')
 
     def loadTextures(self):
+        logger.info("Loading textures.")
         ws_img = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'wall_stone.png'))
         )
@@ -333,7 +354,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
 
     def loadSFX(self):
-        # impact1 = AudioFile(RES_PATH + "impact1.wav")
+        logger.info("Loading sound files.")
         impact1 = pyglet.media.load(
             os.path.join(RES_PATH, "impact1.ogg"), streaming=False
         )
@@ -369,7 +390,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 if s.time == 0.0:
                     self.currently_playing.remove(s)
 
-            if len(self.currently_playing) < 5:
+            if len(self.currently_playing) < 6:
                 playing = self.sfx[sound].play()
                 playing.volume = volume
                 self.currently_playing.append(playing)
@@ -563,7 +584,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             )
 
     def load_screen(self):
-        print("Loading game...")
+        logger.debug("Load screen.")
         label = pyglet.text.Label(
                 "Loading...", font_name='Soft Elegance',
                 font_size=18,
@@ -580,7 +601,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         label.draw()
 
     def quit_game(self):
-        print("Exiting...")
+        logger.info("Exiting...")
         pyglet.app.exit()
 
     # EVENT HANDLERS #
@@ -676,8 +697,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
                                 if [t.gx, t.gy] == [gx, gy]:
                                     found = t
                                     break
-                        except LookupError or ValueError:
-                            print("Not found.")
+                        except LookupError or ValueError as err:
+                            logger.info("Not found.")
+                            logger.debug(err)
                             found = False
                         if found:
                             self.game.selected_mouse = found
@@ -721,7 +743,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.active_tower = self.game.mouse_drag_tower
                 elif t_type == "sell":
                     # Sell active tower!
-                    print("Selling towerswer")
+                    print("Selling tower")
                     self.game.active_tower.sell()
                     print len(self.game.towers)
                     self.game.active_tower = None

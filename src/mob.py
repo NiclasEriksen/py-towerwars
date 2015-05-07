@@ -1,7 +1,7 @@
 # import subprocess
 from pyglet.sprite import Sprite
 from functions import *
-import animation
+from main import logger
 import random
 
 
@@ -56,8 +56,7 @@ class Mob(Sprite):
             self.path = game.grid.path
         self.targetpoint = self.path[1]
 
-        if self.debug:
-            print("Spawning mob!")
+        logger.debug("Spawning mob!")
 
 
     def setDebuff(self, d_type, **kwargs):
@@ -77,8 +76,8 @@ class Mob(Sprite):
         if debuff:
             debuff.update()
             self.debuff_list.append(debuff)
-        elif self.debug:
-            print("Could not set debuff for type {0}".format(d_type))
+        else:
+            logger.debug("Could not set debuff for type {0}".format(d_type))
 
     def updateOffset(self):
         s = self.currentpoint
@@ -101,8 +100,7 @@ class Mob(Sprite):
                     self.lastpoint = self.currentpoint
                     self.currentpoint = self.targetpoint
                     if self.currentpoint == self.g.grid.goal:
-                        if self.debug:
-                            print("Mob reached goal.")
+                        logger.info("Mob reached goal.")
                         self.state = "reached_goal"
                     else:
                         self.point += 1
@@ -110,8 +108,7 @@ class Mob(Sprite):
                             self.targetpoint = points[self.point]
                         except IndexError:
                             self.g.pf_queue.append(self)
-                        if self.debug:
-                            print(
+                        logger.debug(
                                 "Reached pos {0}, new target is {1}".format(
                                     self.currentpoint, self.targetpoint
                                 )
@@ -130,17 +127,17 @@ class Mob(Sprite):
 
             else:
                 if (self not in self.g.pf_queue):
-                    if self.debug:
-                        print("Need to recalculate mob route.")
+                    logger.debug("Need to recalculate mob route.")
                     self.g.pf_queue.append(self)
 
     def updateTarget(self):
         if not self.state == "stalled":
-            if self.debug:
-                print("Updating target for mob.")
-                print("currentpoint: {0}".format(self.currentpoint))
-                print("target_pos: {0}".format(self.targetpoint))
-                print("point: {0}".format(self.point))
+            logger.debug(
+                "Updating target for mob.",
+                "currentpoint: {0}".format(self.currentpoint),
+                "target_pos: {0}".format(self.targetpoint),
+                "point: {0}".format(self.point)
+            )
 
             self.point = 0
             g = self.g.grid
@@ -309,6 +306,7 @@ class Mob1E(Mob):
 
         self.spawn(game)
 
+
 class Mob1R(Mob):
 
     def __init__(self, game, variant, debug=False):
@@ -325,6 +323,7 @@ class Mob1R(Mob):
 
         self.spawn(game)
 
+
 class Mob1A(Mob):
 
     def __init__(self, game, variant, debug=False):
@@ -340,6 +339,7 @@ class Mob1A(Mob):
         self.bounty = 18
 
         self.spawn(game)
+
 
 class Mob1S(Mob):
 

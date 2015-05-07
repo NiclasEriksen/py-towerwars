@@ -1,3 +1,4 @@
+from main import logger
 from functions import *
 from grid import *
 from mob import *
@@ -57,7 +58,7 @@ class Game():
 
     def newGame(self, level="map2"):
 
-        print("Starting a new game.")
+        logger.info("Starting a new game.")
         self.map = os.path.join(self.window.resourcepath, level + ".tmx")
         # Display load screen
         self.window.mainmenu = None   # Kills the menu
@@ -237,8 +238,8 @@ class Game():
                 gx, gy = self.window.get_gridpos(x, y)
                 if (gx, gy) in grid.t_grid:
                     placed = True
-            except LookupError or ValueError:
-                print("Available square not found.")
+            except LookupError or ValueError as err:
+                logger.debug("Available square not found: {0}".format(err))
 
         if placed:
             new_g = gx, gy
@@ -253,7 +254,7 @@ class Game():
             if new:
                 self.towers.append(t)
 
-                print("Towers: {0}".format(len(self.towers)))
+                logger.debug("Towers: {0}".format(len(self.towers)))
 
                 update = False
                 if new_g in grid.path:
@@ -280,18 +281,16 @@ class Game():
                                 self.pf_queue.append(m)
 
             if not grid.update(new="dry"):
-                print("TOWER BLOCKED")
+                logger.warning("TOWER BLOCKING PATH")
                 t.sell()
 
             # if grid.getPath(grid.start):
             # # self.pathFinding(limit=100)
             #     pass
 
-            if self.debug:
-                print("New path for grid: {0}".format(update))
+            logger.debug("New path for grid: {0}".format(update))
 
-            if self.debug:
-                print("Tower placed at [{0},{1}]".format(new_g[0], new_g[1]))
+            logger.debug("Tower placed at [{0},{1}]".format(new_g[0], new_g[1]))
 
         elif t in self.towers:
             self.towers.remove(t)
@@ -350,13 +349,14 @@ class Game():
                 self.ai_gold -= mob.bounty * 2
 
     def aiIncome(self, dt):
-        self.ai_gold += self.ai_flat_income
-        self.ai_flat_income += 1
-        self.ai_gold += (self.get_total_value() + self.gold) // 10
-        print("AI current gold: {0}".format(self.ai_gold))
+        if not self.paused:
+            self.ai_gold += self.ai_flat_income
+            self.ai_flat_income += 1
+            self.ai_gold += (self.get_total_value() + self.gold) // 10
+            logger.info("AI current gold: {0}".format(self.ai_gold))
 
     def gameOver(self):
-        print("Game lost, returning to menu.")
+        logger.info("Game lost, returning to menu.")
         self.loaded = False
         self.paused = True
         for m in self.mobs:
