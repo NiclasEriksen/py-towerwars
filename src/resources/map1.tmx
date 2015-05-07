@@ -35,6 +35,11 @@
  <imagelayer name="Background">
   <image source="map1bg.png"/>
  </imagelayer>
+ <layer name="Flightpath" width="40" height="22" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztk8kNACAIBLX/yuzKAkRcEWQfTOJPYMLRWlEUnoy+PhYkNwZHzSXbE6mf0U9LvSy/33E3s7Lw0vdTnNeMovbCc3+QXKhbxP15zivq9tB9R/NEsMud3TstP4ubVIfNbeeI/meF3W8CaPFlAQ==
+  </data>
+ </layer>
  <layer name="Obstacles" width="40" height="22" visible="0">
   <data encoding="base64" compression="zlib">
    eJzNl79PFEEUgN/ucYAN/4MaG4iJJgYJjQKdXlQao3YHHSQCCQ1QAQ3hjGBjIoIJ0Bl//APGRFAOCqDBwkBBqKAwhJaY6De5mdw47O1O7lbiS77M7d3u7Jf3Zt/sLWZEljTLcJoVGXP4Bf2ByHiTyIRmEm7BM763I18n0gsXueaSw1sowDs4CErH7+EjrIQiq9CAwzy/LcAb+MLximY1I5ExzXltXLuIz5JmGVqCs+cavw7u2elg+13NlI5/wjG8Yq45eA2fYIDvPkfMHxU3cHvIfC/hMTzSn7dj/PLM3+Ng++1ky34n8MFhRo9ph/FzY92q+WUY1n6bsBWDTxwHpZzZOUzKX1SYmndBSE2aGVsS8Am1/jYs1oOzz4WPn6r5FeiF2/UidxgPOfcI7vL5evbv8bDCPFF+RVjTbt+q9HND+TXCBe3T7YyNnvnLWbkrwFRKfn2qb1Xgh5RICpW7rzp/yu9mGN1XqvGLi3buMeLRX+zcGcdKuUvTb4x7jCb4medC1bM1LNf3PPzs+B2zbxStdReXvw6cOqEnxfomhd1X1vRzW8kvr90mYDIFv6TaGj/TV6Y0cX5p1vVJxD12WWN7Yfk459R1IwW/e/Tl+/AAuuur93f3jCS/cc+6PsVpAAZhqEa/ou59dm+O630+8RynGZiFFzX45fQ7n0/uzjtM7grW+8D/5Ofut6Y3F2P8VP/rSrkvu6H+Y+SsnmL2DuPqs+9eaxDZ/wfvvdNOztyekvRcGL8d1vz3Gta9G38AGcO7Vg==

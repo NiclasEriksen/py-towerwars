@@ -9,7 +9,7 @@ class Mob(Sprite):
 
     """The main mob constructor"""
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1Q"],
             batch=game.window.batches["mobs"]
@@ -50,14 +50,19 @@ class Mob(Sprite):
 
         self.currentpoint = s
         self.point = 0
+        self.path = False
         if self.move_type == "flying":
             self.path = game.grid.getPath(self.currentpoint, flying=True)
-        else:
+        if not self.path:
             self.path = game.grid.path
+
         self.targetpoint = self.path[1]
 
-        logger.debug("Spawning mob!")
-
+        logger.debug(
+            "Spawning mob ID{2}: {0}hp, {1}spd".format(
+                self.hp_max, self.spd, self.id
+            )
+        )
 
     def setDebuff(self, d_type, **kwargs):
         debuff = None
@@ -132,12 +137,10 @@ class Mob(Sprite):
 
     def updateTarget(self):
         if not self.state == "stalled":
-            logger.debug(
-                "Updating target for mob.",
-                "currentpoint: {0}".format(self.currentpoint),
-                "target_pos: {0}".format(self.targetpoint),
-                "point: {0}".format(self.point)
-            )
+            logger.debug("Updating target for mob {0}".format(self.id))
+            logger.debug("currentpoint: {0}".format(self.currentpoint))
+            logger.debug("target_pos: {0}".format(self.targetpoint))
+            logger.debug("point: {0}".format(self.point))
 
             self.point = 0
             g = self.g.grid
@@ -148,8 +151,7 @@ class Mob(Sprite):
                 try:
                     self.targetpoint = g.path[self.point + 1]
                 except IndexError:
-                    if self.debug:
-                        print("Target point out of range, panick!")
+                    logger.debug("Target point out of range, panick!")
                     self.targetpoint = g.goal
                 share = True
 
@@ -179,10 +181,9 @@ class Mob(Sprite):
                             break
 
                 if genpath:
-                    if self.debug:
-                        print(
-                            "Mob {0} had to generate new path.".format(self.id)
-                        )
+                    logger.debug(
+                        "Mob {0} had to generate new path.".format(self.id)
+                    )
                     newpath = g.getPath(self.currentpoint)
 
                     if newpath:
@@ -194,16 +195,16 @@ class Mob(Sprite):
 
                     # if pathfinding is not successfull, stall for a second
                     else:
-                        print("Mob is stalling!")
+                        logger.debug("Mob is stalling!")
                         self.state = "stalled"
                         self.stall_timer = self.g.window.fps * 2
 
                 else:
-                    if self.debug:
-                        print(
-                            "New path was nearby, mob {0} rejoined it.".format(
-                                self.id)
+                    logger.debug(
+                        "New path was nearby, mob {0} rejoined it.".format(
+                            self.id
                         )
+                    )
                     self.path = g.path
                     self.point = g.path.index(self.targetpoint) - 1
 
@@ -216,14 +217,13 @@ class Mob(Sprite):
                             m.targetpoint = self.targetpoint
                             m.path = self.path
                             self.g.pf_queue.remove(m)
-                            if self.debug:
-                                print("Shared path with nearby mob.")
+                            logger.debug("Shared path with nearby mob.")
 
     def kill(self):
-        if self.debug:
-            print("Mob {0} died at x:{1}, y:{2}".format(
+        logger.debug("Mob {0} died at x:{1}, y:{2}".format(
                 self.id, self.x, self.y
-            ))
+            )
+        )
         i = 0
         while i < 3:    # Spawn three blood splats
                     x = self.x + random.randrange(-8, 8)
@@ -244,7 +244,7 @@ class Mob(Sprite):
         if self.state == "dead":
             self.kill()
         elif self.state == "reached_goal":
-            print("You are leaking!")
+            logger.info("You are leaking!")
             if self in self.g.pf_queue:
                 self.g.pf_queue.remove(self)
             self.debuff_list = []
@@ -273,7 +273,7 @@ class Mob(Sprite):
 
 class Mob1W(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1W"],
             batch=game.window.batches["mobs"]
@@ -291,7 +291,7 @@ class Mob1W(Mob):
 
 class Mob1E(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1E"],
             batch=game.window.batches["mobs"]
@@ -309,7 +309,7 @@ class Mob1E(Mob):
 
 class Mob1R(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1R"],
             batch=game.window.batches["mobs"]
@@ -326,7 +326,7 @@ class Mob1R(Mob):
 
 class Mob1A(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1A"],
             batch=game.window.batches["mobs"]
@@ -343,7 +343,7 @@ class Mob1A(Mob):
 
 class Mob1S(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1S"],
             batch=game.window.batches["mobs"]
@@ -360,7 +360,7 @@ class Mob1S(Mob):
 
 class Mob1D(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1D"],
             batch=game.window.batches["mobs"]
@@ -380,7 +380,7 @@ class Mob1F(Mob):
 
     """Flying mob"""
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1F"],
             batch=game.window.batches["flying_mobs"]
@@ -407,18 +407,16 @@ class Mob1F(Mob):
                     self.lastpoint = self.currentpoint
                     self.currentpoint = self.targetpoint
                     if self.currentpoint == self.g.grid.goal:
-                        if self.debug:
-                            print("Mob reached goal.")
+                        logger.debug("Mob reached goal.")
                         self.state = "reached_goal"
                     else:
                         self.point += 1
                         self.targetpoint = points[self.point]
-                        if self.debug:
-                            print(
-                                "Reached pos {0}, new target is {1}".format(
-                                    self.currentpoint, self.targetpoint
-                                )
+                        logger.debug(
+                            "Reached pos {0}, new target is {1}".format(
+                                self.currentpoint, self.targetpoint
                             )
+                        )
 
                 else:
                     if (self not in self.g.pf_queue):
@@ -436,20 +434,14 @@ class Mob1F(Mob):
 
     def updateTarget(self):
         if not self.state == "stalled":
-            if self.debug:
-                print("Updating target for mob.")
-                print("currentpoint: {0}".format(self.currentpoint))
-                print("target_pos: {0}".format(self.targetpoint))
-                print("point: {0}".format(self.point))
-
+            logger.debug("Updating target for flying mob.")
             self.point = 0
             if self.targetpoint in self.path:
                 self.point = self.path.index(self.targetpoint)
                 try:
                     self.targetpoint = self.path[self.point + 1]
                 except IndexError:
-                    if self.debug:
-                        print("Target point out of range, panick!")
+                    logger.debug("Target point out of range, panick!")
                     self.targetpoint = g.goal
 
             else:
@@ -458,7 +450,7 @@ class Mob1F(Mob):
 
 class Mob1Z(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1Z"],
             batch=game.window.batches["mobs"]
@@ -475,7 +467,7 @@ class Mob1Z(Mob):
 
 class Mob1X(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1X"],
             batch=game.window.batches["mobs"]
@@ -492,7 +484,7 @@ class Mob1X(Mob):
 
 class Mob1C(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1C"],
             batch=game.window.batches["mobs"]
@@ -509,7 +501,7 @@ class Mob1C(Mob):
 
 class Mob1V(Mob):
 
-    def __init__(self, game, variant, debug=False):
+    def __init__(self, game, variant="YAY", debug=False):
         super(Mob, self).__init__(
             game.window.textures["mob1V"],
             batch=game.window.batches["mobs"]

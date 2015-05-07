@@ -51,6 +51,11 @@ class TiledRenderer(object):
                 for x, y, image in l.tiles():
                     self.window.game.tiles_no_walk.append((x, y))
                     self.window.game.tiles_no_build.append((x, y))
+            elif isinstance(l, TiledTileLayer) and l.name == "Flightpath":
+                logger.debug("Fligh path included in map, importing.")
+                self.window.game.flightgrid = []
+                for x, y, image in l.tiles():
+                    self.window.game.flightgrid.append((x, y))
 
         for layer in self.tmx_data.visible_layers:
             nw, nb = False, False   # nowalk, nobuild
@@ -77,6 +82,7 @@ class TiledRenderer(object):
                         layer.name
                     )
                 )
+                break
             # draw map tile layers
             if isinstance(layer, TiledTileLayer):
                 if not layer.name == "Obstacles":

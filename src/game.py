@@ -16,6 +16,7 @@ class Game():
         self.window = window    # Need to keep track of the game window
         # Lists of game objects
         self.mobs = []  # Enemy mob sprite objects
+        self.mobtier = 1
         self.mob_count = 0  # This serve as mob's id
         self.tower_count = 0  # This serve as towers's id
         self.towers = []  # Tower sprite objects
@@ -56,7 +57,7 @@ class Game():
 
         # player.play()
 
-    def newGame(self, level="map2"):
+    def newGame(self, level="map1"):
 
         logger.info("Starting a new game.")
         self.map = os.path.join(self.window.resourcepath, level + ".tmx")
@@ -72,6 +73,7 @@ class Game():
         # Generates grid parameters for game instance
         self.tiles_no_build = []
         self.tiles_no_walk = []
+        self.flightgrid = []
         self.generateGridSettings()
         self.grid = Grid(self)
 
@@ -301,16 +303,44 @@ class Game():
             self.mouse_drag_tower = None
             self.selected_mouse = None
 
+    def spawnMob(self, variant, free=False):
+        name = str(self.mobtier) + variant
+        options = {
+            "1Q": Mob(self, name),
+            "1W": Mob1W(self, name),
+            "1E": Mob1E(self, name),
+            "1R": Mob1R(self, name),
+            "1A": Mob1A(self, name),
+            "1S": Mob1S(self, name),
+            "1D": Mob1D(self, name),
+            "1F": Mob1F(self, name),
+            "1Z": Mob1Z(self, name),
+            "1X": Mob1X(self, name),
+            "1C": Mob1C(self, name),
+            "1V": Mob1V(self, name),
+        }
+
+        try:
+            mob = options[name]
+        except KeyError as err:
+            logger.debug("Mob not found: {0}".format(err))
+            return False
+        if self.mobtier == 2:
+            mob.hp *= 100
+        if mob.bounty * 2 <= self.ai_gold or free:
+            if not free:
+                self.ai_gold -= mob.bounty * 2
+
+            self.mobs.append(mob)
+
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
-            choice = random.randint(0, 2)
+            choice = random.randint(0, 1)
             if choice:
-                mob = Mob(self, "YAY")
+                self.spawnMob("Q", free=True)
             else:
-                mob = Mob1W(self, "YAY")
-
-            self.mobs.append(mob)
+                self.spawnMob("E", free=True)
 
     def autospawnBalanced(self, dt):
         if not self.paused and self.ai_gold > 0:
@@ -320,33 +350,54 @@ class Game():
                 choice += 2
             mob = None
             if choice == 0:
-                mob = Mob(self, "YAY")
+                self.spawnMob("Q")
             elif choice == 1:
-                mob = Mob1W(self, "YAY")
+                self.spawnMob("W")
             elif choice == 2:
-                mob = Mob1E(self, "YAY")
+                self.spawnMob("E")
             elif choice == 3:
-                mob = Mob1R(self, "YAY")
+                self.spawnMob("R")
             elif choice == 4:
-                mob = Mob1A(self, "YAY")
+                self.spawnMob("A")
             elif choice == 5:
-                mob = Mob1S(self, "YAY")
+                self.spawnMob("S")
             elif choice == 6:
-                mob = Mob1D(self, "YAY")
+                self.spawnMob("D")
             elif choice == 7:
-                mob = Mob1F(self, "YAY")
+                self.spawnMob("F")
             elif choice == 8:
-                mob = Mob1Z(self, "YAY")
+                self.spawnMob("Z")
             elif choice == 9:
-                mob = Mob1X(self, "YAY")
+                self.spawnMob("X")
             elif choice == 10:
-                mob = Mob1C(self, "YAY")
+                self.spawnMob("C")
             elif choice == 11:
-                mob = Mob1V(self, "YAY")
+                self.spawnMob("V")
+            # if choice == 0:
+            #     mob = Mob(self, "YAY")
+            # elif choice == 1:
+            #     mob = Mob1W(self, "YAY")
+            # elif choice == 2:
+            #     mob = Mob1E(self, "YAY")
+            # elif choice == 3:
+            #     mob = Mob1R(self, "YAY")
+            # elif choice == 4:
+            #     mob = Mob1A(self, "YAY")
+            # elif choice == 5:
+            #     mob = Mob1S(self, "YAY")
+            # elif choice == 6:
+            #     mob = Mob1D(self, "YAY")
+            # elif choice == 7:
+            #     mob = Mob1F(self, "YAY")
+            # elif choice == 8:
+            #     mob = Mob1Z(self, "YAY")
+            # elif choice == 9:
+            #     mob = Mob1X(self, "YAY")
+            # elif choice == 10:
+            #     mob = Mob1C(self, "YAY")
+            # elif choice == 11:
+            #     mob = Mob1V(self, "YAY")
 
-            if mob and mob.bounty * 2 <= self.ai_gold:
-                self.mobs.append(mob)
-                self.ai_gold -= mob.bounty * 2
 
     def aiIncome(self, dt):
         if not self.paused:

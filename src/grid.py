@@ -83,6 +83,7 @@ class Grid:
 
         t_grid = []
         w_grid = []
+        f_grid = []
 
         for p in self.fullgrid:
             t_grid.append(p)
@@ -96,6 +97,14 @@ class Grid:
             if b in t_grid:
                 t_grid.remove(b)
                 tc += 1
+        if len(self.g.flightgrid) > 0:
+            logger.debug("Flightgrid found, importing.")
+            for f in self.g.flightgrid:
+                f_grid.append(f)
+        else:
+            for p in self.fullgrid:
+                f_grid.append(p)
+        self.f_grid = f_grid
         for t in self.g.towers:
             for g in w_grid:  # Checks for towers in grid, removes them
                 if t.gx == g[0] and t.gy == g[1]:
@@ -140,10 +149,13 @@ class Grid:
             if not self.flying_path:
                 logger.debug("Generating flying path")
                 path, success = pypf.get_path(
-                        self.fullgrid, self.fullgrid,
+                        self.f_grid, self.f_grid,
                         start, self.goal
                 )
-                self.flying_path = path
+                if success:
+                    self.flying_path = path
+                else:
+                    logger.debug("Could not find path to goal for flying.")
             else:
                 success = True
                 path = self.flying_path

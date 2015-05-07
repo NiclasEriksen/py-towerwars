@@ -617,41 +617,29 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.pause_game(not self.game.paused)
         if not self.game.paused:  # Only listen for keys if game is running
             if symbol == key.Q:
-                mob = Mob(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("Q", free=True)
             elif symbol == key.W:
-                mob = Mob1W(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("W", free=True)
             elif symbol == key.E:
-                mob = Mob1E(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("E", free=True)
             elif symbol == key.R:
-                mob = Mob1R(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("R", free=True)
             elif symbol == key.A:
-                mob = Mob1A(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("A", free=True)
             elif symbol == key.S:
-                mob = Mob1S(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("S", free=True)
             elif symbol == key.D:
-                mob = Mob1D(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("D", free=True)
             elif symbol == key.F:
-                mob = Mob1F(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("F", free=True)
             elif symbol == key.Z:
-                mob = Mob1Z(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("Z", free=True)
             elif symbol == key.X:
-                mob = Mob1X(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("X", free=True)
             elif symbol == key.C:
-                mob = Mob1C(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("C", free=True)
             elif symbol == key.V:
-                mob = Mob1V(self.game, "YAY")
-                self.game.mobs.append(mob)
+                self.game.spawnMob("V", free=True)
             elif symbol == key.F10:
                 self.game.gameOver()
             elif symbol == key.F11:
