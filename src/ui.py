@@ -359,6 +359,9 @@ class MainMenu():
             self.entries.append(b_sprite)
             self.update_offset()
 
+    def clear_entries(self):
+        self.entries = []
+
     def check_mouse(self, pos):
         x, y = pos[0], pos[1]
         for e in self.entries:
@@ -402,6 +405,14 @@ class MainMenu():
         elif e.action == "resume":
             self.w.game.paused = False
             self.w.mainmenu = None
+        elif e.action == "settings":
+            return self.w.showSettingsMenu()
+        elif e.action == "togglesound":
+            self.w.sound_enabled = not self.w.sound_enabled
+            e.label.text = "Sound: {0}".format(self.w.sound_enabled)
+            print("Not yet.")
+        elif e.action == "topmenu":
+            return self.w.showMainMenu()
         elif e.action == "quit":
             self.w.quit_game()
 

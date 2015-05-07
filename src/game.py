@@ -443,22 +443,23 @@ class Game():
         self.window.showMainMenu()
 
     def updateState(self, dt):
-        if self.lives <= 0:
-            self.gameOver()
-        for t in self.towers:
-            if t.cd:
-                t.resetCD()
-            if not t.target:  # if tower has no target
-                t.getTarget()
-            else:
-                t.updateTarget()
+        if not self.paused:
+            if self.lives <= 0:
+                self.gameOver()
+            for t in self.towers:
+                if t.cd:
+                    t.resetCD()
+                if not t.target:  # if tower has no target
+                    t.getTarget()
+                else:
+                    t.updateTarget()
 
-        for m in self.mobs:
-            m.updatePos(dt=dt)  # Update movement
-            m.updateState()  # Update mob state, e.g. "dead", "alive"
+            for m in self.mobs:
+                m.updatePos(dt=dt)  # Update movement
+                m.updateState()  # Update mob state, e.g. "dead", "alive"
 
-        if self.gold > 9999:     # Maximum amount of gold
-            self.gold = 9999
+            if self.gold > 9999:     # Maximum amount of gold
+                self.gold = 9999
 
     def leaking(self):
         self.lives -= 1

@@ -149,11 +149,24 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def showMainMenu(self):
         self.mainmenu = MainMenu(self)
+        if self.game.loaded:
+            self.mainmenu.add_entry(
+                title="Resume", action="resume", top=True
+            )
         self.mainmenu.add_entry(title="New Game", action="newgame")
         self.mainmenu.add_entry(
             title=self.selected_mapfile, action="selectmap"
         )
+        self.mainmenu.add_entry(title="Settings", action="settings")
         self.mainmenu.add_entry(title="Exit", action="quit")
+
+    def showSettingsMenu(self):
+        self.mainmenu = MainMenu(self)
+        self.mainmenu.add_entry(
+            title="Sound: {0}".format(self.sound_enabled),
+            action="togglesound"
+        )
+        self.mainmenu.add_entry(title="Back", action="topmenu")
 
     def flushWindow(self):
         try:
@@ -577,18 +590,14 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.game.paused = state
         if state:
             # Spawn main menu
-            pyglet.clock.unschedule(self.particle_system.update)
+            # pyglet.clock.unschedule(self.particle_system.update)
             self.showMainMenu()
-            if self.game.loaded:
-                self.mainmenu.add_entry(
-                    title="Resume", action="resume", top=True
-                )
         else:
             self.mainmenu = None
-            pyglet.clock.schedule_interval(
-                self.particle_system.update,
-                1.0/30.0
-            )
+            # pyglet.clock.schedule_interval(
+            #     self.particle_system.update,
+            #     1.0/30.0
+            # )
 
     def load_screen(self):
         logger.debug("Load screen.")
@@ -781,14 +790,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
         if buttons & mouse.LEFT:
             self.game.dragging = True
             
-            e = self.mainmenu.check_mouse((x, y))
-            if e:
-                if not e == self.mainmenu.active_entry:
+            if self.mainmenu:
+                e = self.mainmenu.check_mouse((x, y))
+                if e:
+                    if not e == self.mainmenu.active_entry:
+                        self.mainmenu.on_up(self.mainmenu.active_entry)
+                        self.mainmenu.active_entry = e
+                elif self.mainmenu.active_entry:
                     self.mainmenu.on_up(self.mainmenu.active_entry)
-                    self.mainmenu.active_entry = e
-            elif self.mainmenu.active_entry:
-                self.mainmenu.on_up(self.mainmenu.active_entry)
-                self.mainmenu.active_entry = False
+                    self.mainmenu.active_entry = False
 
             elif self.game.selected_mouse and self.debug:
                 if self.game.selected_mouse in self.game.towers:
