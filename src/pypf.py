@@ -67,14 +67,7 @@ def get_path(grid, all_nodes, node, goal):
         for n in neighbors(current.node, all_nodes, grid):
 
             c = Candidate(n, current)
-            # c.d_score = get_def_score(c, goal)
             candidates.append(c)
-
-        # candidates = sorted(
-        #     candidates,
-        #     key=lambda c: c.score,
-        #     reverse=True
-        # )
 
         for c in candidates:
 
@@ -89,24 +82,9 @@ def get_path(grid, all_nodes, node, goal):
             if not closed:
                 c.count = count
                 count += 1
-                # c.lastnode = node
                 c.score = get_score(c, current.node, goal)
-                # c.score += 10 * len(get_path(grid, closed_list, c.node, start))
 
                 open_list.append(c)
-
-        # score_list = []
-        # for c in open_list:
-        #     score_list.append(c.score)
-
-        # score_list.sort()
-
-        # for s in score_list:
-        #     for c in open_list:
-        #         if c.score == s:
-        #             c = c
-        #             sorted_open_list.append(c)
-        #             open_list.remove(c)
 
         open_list = sorted(
             open_list,
@@ -116,7 +94,6 @@ def get_path(grid, all_nodes, node, goal):
         if len(open_list) > 0:
             # count += 1
             next_c = open_list[0]
-            # next_c.lastnode = current
             closed_list.append(next_c)
             current = next_c
             open_list.remove(next_c)

@@ -486,6 +486,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         return (x, y)
 
     def get_gridpos(self, x, y):
+        """Returns grid point at window location"""
         if self.game.grid:
             gw = self.game.grid.dim[0]
             gh = self.game.grid.dim[1]
@@ -494,6 +495,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             h = self.game.squaresize
             ox = self.offset_x + 2
             oy = self.offset_y - 2
+            print ox, oy
             for gx in xrange(gw):
                 for gy in xrange(gh):
                     # print gx, gy
@@ -502,10 +504,10 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         x > ox + gx * w
                     ):
                         if (
-                            y < oy + gy * h + h and
-                            y > oy + gy * h
+                            y > self.height - (oy + gy * h + h) and
+                            y < self.height - (oy + gy * h)
                         ):
-                            return gx, mh - gy
+                            return gx, gy
             else:
                 raise LookupError("No tower found on {0},{1}".format(x, y))
         else:
@@ -515,6 +517,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def span(self, dx, dy):
         self.offset_x += dx
         self.offset_y -= dy
+
+        self.userinterface.update_offset()
 
         for t in self.game.towers:
             t.updateOffset()
