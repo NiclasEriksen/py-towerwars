@@ -403,7 +403,7 @@ class ChainTower(Tower):
         self.spd = 3.5
         self.stun_time = 1.5
         self.cd = False
-        self.price = 90
+        self.price = 70
         self.dmg_type = 1  # 0 Normal, 1 Magic, 2 Chaos
         self.target_types = ["normal", "flying"]
         self.range = int(game.squaresize * 3.5)
@@ -420,11 +420,29 @@ class ChainTower(Tower):
         self.turret = None
         self.selected = False
 
+    def upgrade(self):
+        if self.game.gold >= self.price // 2:
+            self.spd *= 0.90
+            self.dmg = int(self.dmg * 1.25)
+            self.stun_time *= 1.1
+            self.range = int(self.range * 1.05)
+            self.game.gold -= self.price // 2
+            self.price = int(self.price * 1.5)
+
     def doDamage(self, t):
         if t.hp <= 0:
             t.state = "dead"
         else:
             if not self.cd:
+                ss = self.game.squaresize
+                i = 0
+                while i < 8:
+                    x = self.x + random.randrange(-ss // 2, ss // 2)
+                    y = self.y + random.randrange(-ss // 2, ss // 2)
+                    self.window.smoke_fx.addParticle(
+                        x, y, (0.6, 0.7, 1.0, 0.8)
+                    )
+                    i += 1
                 volume = 0.6
                 t.hp -= self.dmg
 
@@ -438,22 +456,22 @@ class ChainTower(Tower):
                 self.setCD(self.spd)
 
                 i = 0
-                while i < 4:
-                    x = t.x + random.randrange(-6, 6)
-                    y = t.y + random.randrange(-6, 6)
-                    self.window.smoke_fx.addParticle(
-                        x, y, (0.7, 0.8, 1.0, 0.7)
-                    )
-                    i += 1
-                self.window.smoke_fx.addParticle(
-                    t.x, t.y, (0.5, 0.5, 1.0, 0.9)
-                )
                 while i < 3:
                     x = t.x + random.randrange(-6, 6)
-                    y = t.y
-                    self.window.puff_fx.addParticle(
-                        x, y, (0.4, 0.6, 1.0, 1.0)
+                    y = t.y + random.randrange(-6, 6)
+                    self.window.lightning_fx.addParticle(
+                        x, y, (0.7, 0.8, 0.8, 0.7)
                     )
                     i += 1
+                # self.window.smoke_fx.addParticle(
+                #     t.x, t.y, (0.5, 0.5, 1.0, 0.9)
+                # )
+                # while i < 3:
+                #     x = t.x + random.randrange(-6, 6)
+                #     y = t.y
+                #     self.window.lightning_fx.addParticle(
+                #         x, y, (0.4, 0.6, 1.0, 1.0)
+                #     )
+                #     i += 1
 
                 self.window.play_sfx("pluck", volume)

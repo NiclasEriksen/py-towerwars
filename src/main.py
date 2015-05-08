@@ -214,6 +214,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.puff_fx = ParticleCategory(self, "simple", "puff")
         self.smoke_fx = ParticleCategory(self, "simple", "smoke")
         self.muzzle_fx = ParticleCategory(self, "simple", "pang")
+        self.lightning_fx = ParticleCategory(self, "simple", "lightning")
         self.skull_fx = ParticleCategory(self, "simple", "skull")
         self.crit_fx = ParticleCategory(self, "simple", "crit")
         self.blood_fx = ParticleCategory(self, "simple", "blood")
@@ -265,6 +266,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
         p_skull_texture = pyglet.image.load(
             os.path.join(RES_PATH, 'particle_skull.png')
+        )
+        p_lightning_texture = pyglet.image.load(
+            os.path.join(RES_PATH, 'particle_lightning.png')
         )
         p_crit_texture = pyglet.image.load(
             os.path.join(RES_PATH, 'crit.png')
@@ -357,6 +361,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             pang=p_pang_texture,
             crit=p_crit_texture,
             blood=p_blood_texture,
+            lightning=p_lightning_texture,
         )
 
         # Load images and create image grids for animations #
@@ -961,6 +966,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
         self.particlestest = (
             self.puff_fx,
+            self.lightning_fx,
             self.smoke_fx,
             self.muzzle_fx,
             self.skull_fx,

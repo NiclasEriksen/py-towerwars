@@ -389,13 +389,12 @@ class MainMenu():
 
     def get_under_mouse(self, x, y):
         for e in self.entries:
+            e.label.font_size = self.font_size
             if x >= e.rectangle[0] and x <= e.rectangle[4]:
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
                     e.label.font_size = self.font_size + 1
                     self.under_mouse = e
                     return True
-            else:
-                e.label.font_size = self.font_size
         else:
             if self.under_mouse:
                 self.under_mouse.label.font_size = self.font_size

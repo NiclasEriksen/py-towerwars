@@ -24,7 +24,7 @@ class Game():
             "1": 10,
             "2": 25,
             "3": 40,
-            "4": 90,
+            "4": 70,
         }
         self.selected_mouse = None  # Holds the object mouse is dragging
         self.dragging = False   # If an object is currently being dragged

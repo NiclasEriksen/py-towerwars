@@ -566,4 +566,8 @@ class Debuff:
                     self.owner.state = "dead"
 
         elif self.d_type == "stun":
+            if self.time % self.owner.g.window.fps // 2 == 0:
+                self.owner.g.window.lightning_fx.addParticle(
+                            self.owner.x, self.owner.y, (0.7, 0.8, 0.8, 0.7)
+                        )
             self.owner.spd = 0.0

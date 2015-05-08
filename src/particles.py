@@ -31,6 +31,8 @@ class ParticleCategory:
             self.createSimpleSmoke()
         elif t == "simple" and e == "pang":
             self.createSimplePang()
+        elif t == "simple" and e == "lightning":
+            self.createSimpleLightning()
         elif t == "simple" and e == "skull":
             self.createSimpleSkull()
         elif t == "simple" and e == "crit":
@@ -107,6 +109,18 @@ class ParticleCategory:
                 10,
                 SpriteTexturizer(
                     self.tex["pang"].texture.id))
+        )
+
+    def createSimpleLightning(self):
+        self.group = ParticleGroup(
+            controllers=[
+                Lifetime(0.1),
+            ],
+            system=self.game.particle_system,
+            renderer=PointRenderer(
+                32,
+                SpriteTexturizer(
+                    self.tex["lightning"].texture.id))
         )
 
     def createSimpleBlood(self):
