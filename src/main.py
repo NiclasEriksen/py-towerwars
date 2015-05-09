@@ -400,6 +400,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
         pluck = pyglet.media.load(
             os.path.join(RES_PATH, "pluck.ogg"), streaming=False
         )
+        bzzt = pyglet.media.load(
+            os.path.join(RES_PATH, "bzzt.ogg"), streaming=False
+        )
+        splat = pyglet.media.load(
+            os.path.join(RES_PATH, "splat.ogg"), streaming=False
+        )
         # impact1.play()
         # tkSnack.audio.play()
         self.sfx = dict(
@@ -408,7 +414,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
             dart=dart,
             bang1=bang1,
             bang2=bang2,
-            pluck=pluck
+            pluck=pluck,
+            bzzt=bzzt,
+            splat=splat
         )
 
     def play_sfx(self, sound="default", volume=1.0):
@@ -1057,7 +1065,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 )
 
                 points, count = self.generateMobPathIndicators()
-                glColor4f(0.7, 0.5, 0.3, 1.0)
+                glColor4f(0.6, 0.3, 0.3, 0.5)
                 pyglet.graphics.draw(
                     count,
                     GL_POINTS,

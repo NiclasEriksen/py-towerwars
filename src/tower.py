@@ -163,14 +163,23 @@ class Tower(Sprite):
 
                 self.window.play_sfx("bang1", volume)   # play sound
 
-    def upgrade(self):
+    def pay_upgrade(self):
+        if self.game.debug:
+            self.price = int(self.price * 1.5)
+            return True
         if self.game.gold >= self.price // 2:
+            self.game.gold -= self.price // 2
+            self.price = int(self.price * 1.5)
+            return True
+        else:
+            return False
+
+    def upgrade(self):
+        if self.pay_upgrade():  # Try to pay for upgrade
             self.spd *= 0.90
             self.crit *= 1.1
             self.dmg = int(self.dmg * 1.30)
             self.range = int(self.range * 1.05)
-            self.game.gold -= self.price // 2
-            self.price = int(self.price * 1.5)
 
 
 class SplashTower(Tower):
@@ -214,12 +223,10 @@ class SplashTower(Tower):
         self.setAngle()
 
     def upgrade(self):
-        if self.game.gold >= self.price // 2:
+        if self.pay_upgrade():
             self.dmg = int(self.dmg * 1.40)
             self.splash_limit += 1
             self.splash_range = int(self.splash_range * 1.1)
-            self.game.gold -= self.price // 2
-            self.price += self.price // 2
 
     def doDamage(self, t):
         if t.hp <= 0:
@@ -375,15 +382,15 @@ class PoisonTower(Tower):
 
                 self.window.play_sfx("dart", volume)
 
-
     def upgrade(self):
-        if self.game.gold >= self.price // 2:
+        if self.pay_upgrade():
             self.dmg = int(self.dmg * 1.25)
-            self.slow = int(self.slow * 1.1)
+            if self.slow < 85:
+                self.slow = int(self.slow * 1.1)
+            else:
+                self.spd *= 0.95
             self.slow_time = self.slow_time * 1.1
             self.spd *= 0.90
-            self.game.gold -= self.price // 2
-            self.price += self.price // 2
 
 
 class ChainTower(Tower):
@@ -421,13 +428,11 @@ class ChainTower(Tower):
         self.selected = False
 
     def upgrade(self):
-        if self.game.gold >= self.price // 2:
+        if self.pay_upgrade():
             self.spd *= 0.90
             self.dmg = int(self.dmg * 1.25)
             self.stun_time *= 1.1
             self.range = int(self.range * 1.05)
-            self.game.gold -= self.price // 2
-            self.price = int(self.price * 1.5)
 
     def doDamage(self, t):
         if t.hp <= 0:
@@ -442,6 +447,10 @@ class ChainTower(Tower):
                     self.window.smoke_fx.addParticle(
                         x, y, (0.6, 0.7, 1.0, 0.8)
                     )
+                    if not i // 2:
+                        self.window.lightning_fx.addParticle(
+                            x, y, (0.7, 0.8, 0.8, 0.7)
+                        )
                     i += 1
                 volume = 0.6
                 t.hp -= self.dmg
@@ -474,4 +483,4 @@ class ChainTower(Tower):
                 #     )
                 #     i += 1
 
-                self.window.play_sfx("pluck", volume)
+                self.window.play_sfx("bzzt", volume)

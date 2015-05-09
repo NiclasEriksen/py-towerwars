@@ -235,7 +235,7 @@ class Game():
         grid = self.grid
         placed = False
 
-        if t.price <= self.gold:
+        if t.price <= self.gold or self.debug:
             try:
                 gx, gy = self.window.get_gridpos(x, y)
                 if (gx, gy) in grid.t_grid:
@@ -246,7 +246,8 @@ class Game():
         if placed:
             new_g = gx, gy
             new_rg = self.window.get_windowpos(gx, gy)
-            self.gold -= t.price
+            if not self.debug:
+                self.gold -= t.price
             w_grid = grid.w_grid
             t_grid = grid.t_grid
             t.selected = False
@@ -467,7 +468,8 @@ class Game():
                 self.gold = 9999
 
     def leaking(self):
-        self.lives -= 1
+        if not self.debug:
+            self.lives -= 1
         self.window.play_sfx("pluck")
 
     def get_total_value(self):

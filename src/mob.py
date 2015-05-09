@@ -237,6 +237,7 @@ class Mob(Sprite):
             self.g.pf_queue.remove(self)
         self.g.gold += self.bounty
         self.g.mobs.remove(self)
+        self.g.window.play_sfx("splat", 0.7)
 
     def updateState(self):
         self.debug = self.g.debug
@@ -541,6 +542,8 @@ class Debuff:
         if self.d_type == "slow":
             newspeed = ((100 - self.slow) * self.owner.orig_spd / 100.0)
             if newspeed <= self.owner.spd:
+                if newspeed < 0.0:
+                    newspeed = 0.0
                 self.owner.spd = newspeed
         elif self.d_type == "poison":
             if self.time % self.owner.g.window.fps == 0:
