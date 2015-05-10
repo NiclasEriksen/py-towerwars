@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="19" height="24" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="32" tileheight="32" spacing="2">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/roguelikeSheet_transparent.png" width="1936" height="1052"/>
+ </tileset>
+ <layer name="BG1" width="19" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJx7z8LA8J4MHEumvsGG7Rlwy7FhkQOJoWN7NBrGRsfo+pyZEBhdDxsWNjazsZlFrDnY+Ojqsal7QYR7CJmFSz2u8MSlH18YYdOLz33YzCXkBmLswGc2IXNItYMa5lBTL6lhQ6reKcz4MTFhD8OEzBrFIw8DADlEsqo=
+  </data>
+ </layer>
+ <layer name="BG2" width="19" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJy7wczAcAOIbwIxpeAGnc36zES5PfjAFhbCalyJUAMC6qwMDJqsuOVdgH6pAppVRwR2ImAnyCxVPHaR435iQBUV42MmI6ZYNDAtxJCRtrCZNZEZgqORMLLZ9kAciMU/2MyawoyJpxLhTmLNmojFfcjAGYf52MxCNpOUsMRnFjb/duFJC6SahQ6ikOIMGeCK52g8eBKSvYTMIheMmkUaOEcFsy4xQvBFCs0CAJXFPGc=
+  </data>
+ </layer>
+ <layer name="BG3" width="19" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYGBg+MnCwPAViAmBKVA1xcyotBIReokB/0EEIwPDU2bi1Kcx4pfvZiLeLEKgFehHETL9KQbEzkC9gUyo4hpA979ngGBqgyom3HLrCeitYUJgDiCeBg3nFzjUw8RVWRFiiljsv8CIMIsaYCaZZtmi8RWYKDNLDs2vMLOakdILLjYhQKy7QGE7g4BaUtyFzzxFEsKrGM1udDAdKH6RxLAnN67Q7b1Eht20cg8hs1rw5GdSzSIHkGIWLGxx4S1MmGLo4BJS/ID8fh1JDaxskceRDrGZBwNOQD0uaGEpz4TbjwCgrjVo
+  </data>
+ </layer>
+ <layer name="Obstacles" width="19" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJz7ycLAoMvIwNACpANZGRjagTiAFcKWAeLHQPFuJgaGyUD6OgMDQzEzA8NSBggA0VOg4kxAtd9ZINiAlYEssApoTxAQWwP1f2OE4JvMCHkXIOZGwq5AzAPFdWhm/QdiXaBePSBOBeI2Fgi9EIh9gebPB9IiUDEQFkVig3AzC8IsEDsIqCcfyPZnQuAAJoj8aaA7lYB6zkBpZPZZIC2Gw78w/9QCsQR5QQYH2kB7PgDpZCA9lxEitg6I12PBE5gg9AYs5jBjEQOB50AcDtT3Akj3QmkY7gPyX2LRY4PDLAWg+xTxYCVGTDeV4PI4icAG6g9qmTUBmg6WAbEfUpoAAfQ0hI0NA6VAbA3EeUD95lBMCSiF0iuA5pgCsRCSeYFI7C4094LCGlv2NSPDPbCwJrM4QAEg/5QBcTkO+RYm7OyBBkJUcAvIP95E+o+fCPvIDR8RAuaB5Mn1bzAefdlAuRwqxekSoDlLoWYR41YAvhdB4g==
+  </data>
+ </layer>
+ <imagelayer name="Background">
+  <image source="map3bg.png"/>
+ </imagelayer>
+ <layer name="Goal" width="19" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAPcDCSqXEUjIJRMApGwSgYAgAARUcACg==
+  </data>
+ </layer>
+ <layer name="Spawn" width="19" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMAqGBzBhop5ZABcmADc=
+  </data>
+ </layer>
+ <layer name="Foreground" width="19" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYBj84DYzA8MdIL4LxLpArAfE+swQOQMgbQjERkDcxILQg8weBcMb4Ip3QmkglwlTzJMFO9uLjPRErruwAS8c7vIcwuncmwk7ezgAkH8Gs/9o7Z7B5l9yAQD+jgxX
+  </data>
+ </layer>
+</map>

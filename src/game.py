@@ -213,11 +213,10 @@ class Game():
 
     def pathFinding(self, dt, limit=1):
         if len(self.pf_queue) > 0:
-            if len(self.pf_queue) >= 60:
+            if len(self.pf_queue) >= 30:
                 limit *= 2
-            if self.debug:
-                print("Calculating paths for pf_queue.")
-                print("Length of queue: {0}.".format(len(self.pf_queue)))
+            logger.debug("Calculating paths for pf_queue.")
+            logger.debug("Length of queue: {0}.".format(len(self.pf_queue)))
             count = 0
             for m in self.pf_queue:
                 if count == limit:

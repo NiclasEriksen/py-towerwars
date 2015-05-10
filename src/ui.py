@@ -186,10 +186,11 @@ class UI():
                             return b.b_type
         for b in self.context_sprites:
             if not isinstance(b, text.Label):
-                radius = b.width // 2
+                xrad = b.width // 2
+                yrad = b.height // 2
                 if b.active:
-                    if pos[0] <= b.x + radius and pos[0] >= b.x - radius:
-                        if pos[1] <= b.y + radius and pos[1] >= b.y - radius:
+                    if pos[0] <= b.x + xrad and pos[0] >= b.x - xrad:
+                        if pos[1] <= b.y + yrad and pos[1] >= b.y - yrad:
                             return b.b_type
         return False
 
@@ -236,8 +237,8 @@ class UI():
         category = "context"
         texture = self.w.textures['upgrade']
         offset =  (
-            0.0 - texture.width // 2,
-            obj.height // 2 + texture.height // 2
+            -texture.width,
+            0
         )
         b_sprite = Sprite(
                 texture,
@@ -259,8 +260,8 @@ class UI():
 
         size = 10
         offset = (
-            0.0 - texture.width // 2 + 1,
-            obj.height // 2 + texture.height // 2 + (size * 1.5) - 1
+            -texture.width - 1,
+            texture.width // 2 - 1
         )
         x = obj.x + offset[0]
         y = obj.y + offset[1]
@@ -280,9 +281,33 @@ class UI():
         label.shadow = True
         self.context_sprites.append(label)
 
+
+        size = 10
         offset = (
-            0.0 - texture.width // 2,
-            obj.height // 2 + texture.height // 2 + (size * 1.5)
+            0,
+            obj.image.height
+        )
+        x = obj.x + offset[0]
+        y = obj.y + offset[1]
+        label = text.Label(
+            str(int(obj.dmg)), font_name='Visitor TT1 BRK',
+            font_size=size,
+            x=x,
+            y=y,
+            batch=self.w.batches["buttons"],
+            anchor_x="center", anchor_y="center",
+            color=(32, 32, 32, 255)
+        )
+        label.offset = offset
+        label.owner = obj
+        label.b_type = "towerinfo"
+        label.category = category
+        label.shadow = False
+        self.context_sprites.append(label)
+
+        offset = (
+            -texture.width,
+            texture.width // 2
         )
         x = obj.x + offset[0]
         y = obj.y + offset[1]
@@ -306,8 +331,8 @@ class UI():
 
         texture = self.w.textures["sell"]
         offset =  (
-            texture.width // 2,
-            obj.height // 2 + texture.height // 2
+            texture.width,
+            0
         )
         b_sprite = Sprite(
                 texture,
@@ -331,7 +356,10 @@ class MainMenu():
         self.w = window
         self.ui = window.userinterface
         self.but_h = 32
-        self.but_w = 200
+        self.but_w = 192
+        self.max_char = 18
+        self.font_clr = (225, 225, 200, 255)
+        self.font_a_clr = (128, 128, 128, 255)
         self.spacing = 8
         self.font_size = 12
         self.entries = []
@@ -346,21 +374,29 @@ class MainMenu():
             self.w.height / 2 - (h * len(self.entries)) +
             self.spacing
         )
+        if title == "New Game":
+            btn_texture = self.w.textures["button_green_jagged"]
+        elif title == "Exit":
+            btn_texture = self.w.textures["button_red"]
+        else:
+            btn_texture = self.w.textures["button_brown"]
         b_sprite = Sprite(
-                        self.w.textures["wall_stone"],
+                        btn_texture,
                         x=x,
                         y=y,
                         batch=self.w.batches["mm_buttons"],
-                        group=self.w.ui_group
+                        group=self.w.ui_group,
                     )
+        b_sprite.opacity = 150
         # b_sprite.width, b_sprite.height = 3, 1
         b_sprite.rectangle = create_rectangle(x, y, w, h)
         b_sprite.action = action
         b_sprite.label = text.Label(
-            title, font_name='Soft Elegance',
+            title, font_name='Visitor TT1 BRK',
             font_size=self.font_size,
+            color=self.font_clr,
             x=x, y=y,
-            batch=self.w.batches["mm_buttons"],
+            batch=self.w.batches["mm_labels"],
             anchor_x="center", anchor_y="center"
         )
         if top:
@@ -371,6 +407,8 @@ class MainMenu():
             self.update_offset()
 
     def clear_entries(self):
+        self.w.batches["mm_labels"] = graphics.Batch()
+        self.w.batches["mm_buttons"] = graphics.Batch()
         self.entries = []
 
     def check_mouse(self, pos):
@@ -390,33 +428,29 @@ class MainMenu():
     def get_under_mouse(self, x, y):
         for e in self.entries:
             e.label.font_size = self.font_size
+            e.opacity = 150
             if x >= e.rectangle[0] and x <= e.rectangle[4]:
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
-                    e.label.font_size = self.font_size + 1
+                    e.opacity = 255
                     self.under_mouse = e
                     return True
         else:
             if self.under_mouse:
-                self.under_mouse.label.font_size = self.font_size
+                self.under_mouse.opacity = 150
             self.under_mouse = None
             return False
 
     def on_down(self, entry):
-        entry.rectangle = create_rectangle(
-            entry.x, entry.y, self.but_w - 10, self.but_h)
-        if entry.label:
-            entry.label.font_size = self.font_size - 1
+        pass
 
     def on_up(self, entry):
-        entry.rectangle = create_rectangle(
-            entry.x, entry.y, self.but_w, self.but_h
-        )
+
         if entry.label:
-            entry.label.font_size = self.font_size
+            pass
         self.active_entry = False
 
     def do_action(self, entry):
-        self.w.play_sfx("pluck")
+        self.w.play_sfx("click")
         self.on_up(entry)
         e = entry
         if e.action == "newgame":
@@ -428,7 +462,12 @@ class MainMenu():
             else:
                 self.w.selected_mapfile = self.w.maplist[index + 1]
 
-            e.label.text = self.w.selected_mapfile
+            str_len = len(self.w.selected_mapfile)
+            if str_len > self.max_char:
+                string = self.w.selected_mapfile[str_len - self.max_char:]
+            else:
+                string = self.w.selected_mapfile
+            e.label.text = string
 
         elif e.action == "resume":
             self.w.game.paused = False
@@ -465,12 +504,14 @@ class MainMenu():
             e.rectangle = create_rectangle(x, y, self.but_w, self.but_h)
 
     def render(self):
-        self.w.batches["mm_buttons"].draw()
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-        gl.glColor3f(0.3, 0.3, 0.3, 1)
-        for e in self.entries:
-            graphics.draw(
-                4, gl.GL_QUADS, ('v2i', e.rectangle)
-            )
-            e.label.draw()
+        self.w.batches["mm_buttons"].draw()
+        gl.glColor4f(0.3, 0.3, 0.9, 1)
+        self.w.batches["mm_labels"].draw()
+        # for e in self.entries:
+            # graphics.draw(
+            #     4, gl.GL_QUADS, ('v2i', e.rectangle)
+            # )
+            # e.draw()
+            #e.label.draw()
         # self.w.flip()

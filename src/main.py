@@ -113,6 +113,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
         self.batches["mm_buttons"] = pyglet.graphics.Batch()
+        self.batches["mm_labels"] = pyglet.graphics.Batch()
         # self.batches["walls"] = pyglet.graphics.Batch()
         self.batches["anim"] = pyglet.graphics.Batch()
         self.ui_group = pyglet.graphics.OrderedGroup(2)
@@ -149,20 +150,35 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def showMainMenu(self):
         logger.debug("Showing main menu.")
+        try:
+            logger.debug("Clearing old menu screen.")
+            self.mainmenu.clear_entries()
+        except AttributeError:
+            logger.debug("No main menu to clear")
         self.mainmenu = MainMenu(self)
         if self.game.loaded:
             self.mainmenu.add_entry(
                 title="Resume", action="resume", top=True
             )
         self.mainmenu.add_entry(title="New Game", action="newgame")
+        str_len = len(self.selected_mapfile)
+        if str_len > self.mainmenu.max_char:
+            string = self.selected_mapfile[str_len - self.mainmenu.max_char:]
+        else:
+            string = self.selected_mapfile
         self.mainmenu.add_entry(
-            title=self.selected_mapfile, action="selectmap"
+            title=string, action="selectmap"
         )
         self.mainmenu.add_entry(title="Settings", action="settings")
         self.mainmenu.add_entry(title="Exit", action="quit")
 
     def showSettingsMenu(self):
         logger.debug("Showing settings menu.")
+        try:
+            logger.debug("Clearing old menu screen.")
+            self.mainmenu.clear_entries()
+        except AttributeError:
+            logger.debug("No main menu to clear")
         self.mainmenu = MainMenu(self)
         self.mainmenu.add_entry(
             title="Sound: {0}".format(self.sound_enabled),
@@ -200,6 +216,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.batches["towers"] = pyglet.graphics.Batch()
         self.batches["buttons"] = pyglet.graphics.Batch()
         self.batches["mm_buttons"] = pyglet.graphics.Batch()
+        self.batches["mm_labels"] = pyglet.graphics.Batch()
         self.batches["anim"] = pyglet.graphics.Batch()
         self.ui_group = pyglet.graphics.OrderedGroup(2)
         self.fg_group = pyglet.graphics.OrderedGroup(1)
@@ -240,6 +257,18 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def loadTextures(self):
         logger.info("Loading textures.")
+        btn_grey = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'btn_grey.png'))
+        )
+        btn_red = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'btn_red.png'))
+        )
+        btn_green_d = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'btn_green_d.png'))
+        )
+        btn_brown = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'ui', 'btn_brown.png'))
+        )
         ws_img = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'wall_stone.png'))
         )
@@ -251,9 +280,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
         upgr_img = center_image(
             pyglet.image.load(os.path.join(RES_PATH, 'ui', 'upgrade.png'))
-        )
-        tw_img = center_image(
-            pyglet.image.load(os.path.join(RES_PATH, 'tower_wood.png'))
         )
         p_texture = pyglet.image.load(
             os.path.join(RES_PATH, 'particle.png')
@@ -275,6 +301,12 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
         p_blood_texture = pyglet.image.load(
             os.path.join(RES_PATH, 'blood.png')
+        )
+        tw_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'tower_wood.png'))
+        )
+        tw_t_img = center_image(
+            pyglet.image.load(os.path.join(RES_PATH, 'tower_1q_turret.png'))
         )
         tp_img = center_image(pyglet.image.load(
             os.path.join(RES_PATH, 'tower_poison.png'))
@@ -333,8 +365,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
             wall_stone=ws_img,
             sell=sell_img,
             gold=gold_img,
+            button_grey=btn_grey,
+            button_green_jagged=btn_green_d,
+            button_red=btn_red,
+            button_brown=btn_brown,
             upgrade=upgr_img,
             tower_wood=tw_img,
+            tower_wood_turret=tw_t_img,
             tower_poison=tp_img,
             tower_poison_turret=tp_t_img,
             tower_splash=ts_img,
@@ -406,6 +443,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
         splat = pyglet.media.load(
             os.path.join(RES_PATH, "splat.ogg"), streaming=False
         )
+        click = pyglet.media.load(
+            os.path.join(RES_PATH, "click.ogg"), streaming=False
+        )
         # impact1.play()
         # tkSnack.audio.play()
         self.sfx = dict(
@@ -416,7 +456,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             bang2=bang2,
             pluck=pluck,
             bzzt=bzzt,
-            splat=splat
+            splat=splat,
+            click=click
         )
 
     def play_sfx(self, sound="default", volume=1.0):
@@ -508,7 +549,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
             h = self.game.squaresize
             ox = self.offset_x + 2
             oy = self.offset_y - 2
-            print ox, oy
             for gx in xrange(gw):
                 for gy in xrange(gh):
                     # print gx, gy
@@ -612,6 +652,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             # pyglet.clock.unschedule(self.particle_system.update)
             self.showMainMenu()
         else:
+            if self.mainmenu:
+                self.mainmenu.clear_entries()
             self.mainmenu = None
             # pyglet.clock.schedule_interval(
             #     self.particle_system.update,
@@ -621,7 +663,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def load_screen(self):
         logger.debug("Load screen.")
         label = pyglet.text.Label(
-                "Loading...", font_name='Soft Elegance',
+                "Loading...", font_name='Visitor TT1 BRK',
                 font_size=18,
                 x=self.width // 2, y=self.height // 2,
                 anchor_x="center", anchor_y="center",
@@ -766,9 +808,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.game.active_tower = self.game.mouse_drag_tower
                 elif t_type == "sell":
                     # Sell active tower!
-                    print("Selling tower")
+                    logger.debug("Selling tower")
                     self.game.active_tower.sell()
-                    print len(self.game.towers)
                     self.game.active_tower = None
                     self.game.selected_mouse = None
                     self.game.mouse_drag_tower = None
@@ -808,7 +849,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
             self.game.dragging = True
-            
+
             if self.mainmenu:
                 e = self.mainmenu.check_mouse((x, y))
                 if e:
@@ -850,10 +891,18 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     if t_type == "4":
                         tower = ChainTower(self.game)
                         self.game.mouse_drag_tower = tower
-                    self.game.selected_mouse = self.game.mouse_drag_tower
+                    try:
+                        tower
+                        self.userinterface.wipe_context_menu()
+                        self.game.active_tower = None
+                        self.game.selected_mouse = self.game.mouse_drag_tower
+                    except UnboundLocalError:
+                        pass
 
             if not self.game.selected_mouse:
-                self.game.active_tower = None
+                if not self.userinterface.check_mouse((x, y)):
+                    self.userinterface.wipe_context_menu()
+                    self.game.active_tower = None
 
         elif buttons & mouse.RIGHT:
             if self.game.loaded:

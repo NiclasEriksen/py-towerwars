@@ -21,7 +21,7 @@ class Tower(Sprite):
             group=game.window.fg_group
         )
         self.turret = Sprite(
-            game.window.textures["tower_wood_turret"],
+            game.window.textures["tower_splash_turret"],
             x=self.x, y=self.y,
             batch=game.window.batches["anim"]
         )
