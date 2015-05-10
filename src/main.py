@@ -446,6 +446,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
         click = pyglet.media.load(
             os.path.join(RES_PATH, "click.ogg"), streaming=False
         )
+        leak = pyglet.media.load(
+            os.path.join(RES_PATH, "leak.ogg"), streaming=False
+        )
         # impact1.play()
         # tkSnack.audio.play()
         self.sfx = dict(
@@ -457,7 +460,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             pluck=pluck,
             bzzt=bzzt,
             splat=splat,
-            click=click
+            click=click,
+            leak=leak
         )
 
     def play_sfx(self, sound="default", volume=1.0):

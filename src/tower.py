@@ -412,11 +412,11 @@ class ChainTower(Tower):
                     x = self.x + random.randrange(-ss // 2, ss // 2)
                     y = self.y + random.randrange(-ss // 2, ss // 2)
                     self.window.smoke_fx.addParticle(
-                        x, y, (0.6, 0.7, 1.0, 0.8)
+                        x, y, (0.8, 0.8, 1.0, 0.7)
                     )
                     if not i // 2:
                         self.window.lightning_fx.addParticle(
-                            x, y, (0.7, 0.8, 0.8, 0.7)
+                            x, y, (0.7, 0.7, 0.8, 0.8)
                         )
                     i += 1
                 volume = 0.6

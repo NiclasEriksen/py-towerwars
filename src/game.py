@@ -469,7 +469,8 @@ class Game():
     def leaking(self):
         if not self.debug:
             self.lives -= 1
-        self.window.play_sfx("pluck")
+        vol = 1.0 - float(self.lives) / 10.0
+        self.window.play_sfx("leak", vol)
 
     def get_total_value(self):
         value = 0
