@@ -401,13 +401,12 @@ class Game():
             # elif choice == 11:
             #     mob = Mob1V(self, "YAY")
 
-
     def aiIncome(self, dt):
         if not self.paused:
             self.ai_gold += self.ai_flat_income
             self.ai_flat_income += 1
             self.ai_gold += (self.get_total_value() + self.gold) // 10
-            if self.ai_gold > 1600:
+            if self.ai_gold > 2000:
                 self.mobtier = 2
             logger.info("AI current gold: {0}".format(self.ai_gold))
 
@@ -416,15 +415,23 @@ class Game():
             selection = []
             for t in self.towers:
                 if check_point_rectangle(t.x, t.y, rect):
-                    print "Found {0}".format(t)
+                    logger.debug("Found {0} in drag rectangle.".format(t))
                     selection.append(t)
             if not len(selection):
-                self.highlighted = []
-                print("No towers in rect {0}".format(rect))
+                logger.debug("No towers in rect {0}".format(rect))
+                return False
             else:
-                self.highlighted = selection
+                return selection
         else:
-            self.highlighted = []
+            return False
+
+    def highlightItems(self, items):
+        if items:
+            if len(items) == 1:
+                print("Adding it as acctive tower")
+                self.selected_mouse = items[0]
+            else:
+                self.highlighted = items
 
     def gameOver(self):
         logger.info("Game lost, returning to menu.")

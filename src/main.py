@@ -770,7 +770,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                                     found = t
                                     break
                         except LookupError or ValueError as err:
-                            logger.info("Not found.")
+                            logger.debug("Not found.")
                             logger.debug(err)
                             found = False
                         if found:
@@ -797,7 +797,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             # First, check if mouse is released over a UI element
             t_type = self.userinterface.check_mouse((x, y))
             if self.game.dragging:
-                self.game.getDragSelection(self.dragrect)
+                selected = self.game.getDragSelection(self.dragrect)
+                self.game.highlightItems(selected)
                 self.dragrect = None
                 self.drag_rect_start = 0, 0
                 self.drag_rect_stop = 0, 0
