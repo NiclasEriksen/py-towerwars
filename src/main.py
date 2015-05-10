@@ -101,6 +101,9 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.particle_system = default_system
         self.tile_renderer = None
         self.loading = True
+        self.drag_rect_start = 0, 0
+        self.drag_rect_stop = 0, 0
+        self.dragrect = None
 
         self.batches = OrderedDict()
         self.batches["mobs"] = pyglet.graphics.Batch()
@@ -644,7 +647,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     )
 
     def drawRangeCircle(self, t):
-        glColor4f(0.5, 0.6, 0.8, 0.15)
+        glColor4f(0.5, 0.6, 0.8, 0.20)
         self.draw_circle(
             t.x, t.y, t.range
         )
@@ -793,6 +796,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
         if button == mouse.LEFT:
             # First, check if mouse is released over a UI element
             t_type = self.userinterface.check_mouse((x, y))
+            if self.game.dragging:
+                self.game.getDragSelection(self.dragrect)
+                self.dragrect = None
+                self.drag_rect_start = 0, 0
+                self.drag_rect_stop = 0, 0
+            else:
+                self.game.highlighted = []
             if t_type:  # check_mouse returns false if not on a button
                 if t_type == "1":
                     tower = Tower(self.game)
@@ -829,7 +839,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     self.mainmenu.do_action(active)
                 elif active:
                     self.mainmenu.on_up(active)
-
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
                 self.game.place_tower(
@@ -902,6 +911,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         self.game.selected_mouse = self.game.mouse_drag_tower
                     except UnboundLocalError:
                         pass
+                else:
+                    if self.drag_rect_start[0] or self.drag_rect_start[1]:
+                        self.drag_rect_stop = x, y
+                    else:
+                        self.drag_rect_start = x, y
 
             if not self.game.selected_mouse:
                 if not self.userinterface.check_mouse((x, y)):
@@ -1131,6 +1145,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
             # Draw range circle on active tower
             if self.game.active_tower:
                 self.drawRangeCircle(self.game.active_tower)
+            for t in self.game.highlighted:
+                self.drawRangeCircle(t)
             # Draw grid squares when dragging a tower
             if self.game.mouse_drag_tower:
                 if not self.rectangles:
@@ -1139,10 +1155,30 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.batches["fg2"].draw()
                 glColor4f(0.7, 0.7, 0.3, 0.2)
                 self.batches["fg3"].draw()
-
+            elif self.game.dragging and not self.game.active_tower:
+                if (
+                    (self.drag_rect_stop[0] or self.drag_rect_stop[0]) and
+                    (self.drag_rect_start[0] or self.drag_rect_start[0])
+                ):
+                    start = self.drag_rect_start
+                    stop = self.drag_rect_stop
+                    w = start[0] - stop[0]
+                    h = start[1] - stop[1]
+                    self.dragrect = (
+                        create_rectangle(start[0], start[1], w, h, False)
+                    )
+                    self.batches["fg3"] = pyglet.graphics.Batch()
+                    self.batches["fg3"].add(
+                        4, GL_QUADS, None,
+                        ('v2i', self.dragrect),
+                    )
+                    glColor4f(0.5, 0.5, 0.3, 0.4)
+                    self.batches["fg3"].draw()
             else:   # Clear the squares if tower is no longer dragged
                 self.batches["fg2"] = pyglet.graphics.Batch()
                 self.batches["fg3"] = pyglet.graphics.Batch()
+                self.drag_rect_start = 0, 0
+                self.drag_rect_stop = 0, 0
                 self.rectangles = None
                 self._rectangles = None
 

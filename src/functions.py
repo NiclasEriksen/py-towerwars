@@ -12,14 +12,36 @@ def get_color(r, g, b, a):
     """ converts rgba values of 0 - 255 to the equivalent in 0 - 1 """
     return (r / 255.0, g / 255.0, b / 255.0, a / 255.0)
 
-def create_rectangle(cx, cy, w, h):
-    rectangle = [
-                cx - w // 2, cy - h // 2,
-                cx - w // 2, cy + h // 2,
-                cx + w // 2, cy + h // 2,
-                cx + w // 2, cy - h // 2,
-            ]
+def create_rectangle(cx, cy, w, h, centered=True):
+    if centered:
+        rectangle = [
+                    cx - w // 2, cy - h // 2,
+                    cx - w // 2, cy + h // 2,
+                    cx + w // 2, cy + h // 2,
+                    cx + w // 2, cy - h // 2,
+        ]
+    else:
+        rectangle = [
+            cx - w, cy,
+            cx - w, cy - h,
+            cx, cy - h,
+            cx, cy
+        ]
     return rectangle
+
+def check_point_rectangle(px, py, rect):
+    if rect[0] <= rect[4]:
+        x1, x2 = rect[0], rect[4]
+    else:
+        x1, x2 = rect[4], rect[0]
+    if rect[1] <= rect[5]:
+        y1, y2 = rect[1], rect[5]
+    else:
+        y1, y2 = rect[5], rect[1]
+    if px >= x1 and px <= x2:
+        if py >= y1 and py <= y2:
+            return True
+    return False
 
 def check_path(m, grid, new):
     update = False

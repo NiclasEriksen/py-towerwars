@@ -411,6 +411,21 @@ class Game():
                 self.mobtier = 2
             logger.info("AI current gold: {0}".format(self.ai_gold))
 
+    def getDragSelection(self, rect):
+        if rect:
+            selection = []
+            for t in self.towers:
+                if check_point_rectangle(t.x, t.y, rect):
+                    print "Found {0}".format(t)
+                    selection.append(t)
+            if not len(selection):
+                self.highlighted = []
+                print("No towers in rect {0}".format(rect))
+            else:
+                self.highlighted = selection
+        else:
+            self.highlighted = []
+
     def gameOver(self):
         logger.info("Game lost, returning to menu.")
         self.loaded = False
