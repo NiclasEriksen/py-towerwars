@@ -16,7 +16,7 @@ class UI():
         self.active_tower = None
         self.b_size = 32
 
-    def add_text(self, t_type):
+    def addText(self, t_type):
         if t_type == "gold":
             x = 32
             y = self.w.height - 16
@@ -78,7 +78,7 @@ class UI():
 
         self.texts.append(label)
 
-    def add_button(self, b_type):
+    def addButton(self, b_type):
         if b_type == "1":
             x = 20
             y = 20
@@ -131,7 +131,7 @@ class UI():
         b_sprite.b_price = b_price
         self.sprites.append(b_sprite)
 
-    def update_buttons(self):
+    def updateButtons(self):
         gold = self.w.game.gold
         for b in self.sprites:
             if b.category == "tower":
@@ -167,15 +167,15 @@ class UI():
                     pass
                 else:
                     self.active_tower = self.w.game.active_tower
-                    self.context_menu(self.active_tower)
+                    self.showContextMenu(self.active_tower)
             else:
                 self.active_tower = self.w.game.active_tower
-                self.context_menu(self.active_tower)
+                self.showContextMenu(self.active_tower)
         else:
-            self.wipe_context_menu()
+            self.wipeContextMenu()
             self.active_tower = None
 
-    def check_mouse(self, pos):
+    def checkMouse(self, pos):
         # Checks if mouse position is on a button
         for b in self.sprites:
             if not isinstance(b, text.Label):
@@ -195,7 +195,7 @@ class UI():
         return False
 
     def render(self):
-        self.update_buttons()
+        self.updateButtons()
         self.w.batches["buttons"].draw()
         for t in self.texts:
             if t.t_type == "gold":  # Updates gold count
@@ -210,7 +210,7 @@ class UI():
                 t.text = str(self.w.game.lives)
             t.draw()
 
-    def update_offset(self):
+    def updateOffset(self):
         ri = 0      # right counter
         for t in self.texts:
             if t.align == "right":
@@ -226,14 +226,14 @@ class UI():
             s.x = s.owner.x + s.offset[0]
             s.y = s.owner.y + s.offset[1]
 
-    def wipe_context_menu(self):
+    def wipeContextMenu(self):
         for s in self.context_sprites:
             if isinstance(s, text.Label):
                 s.delete()
         self.context_sprites = []
 
-    def context_menu(self, obj, action="show"):
-        self.wipe_context_menu()
+    def showContextMenu(self, obj, action="show"):
+        self.wipeContextMenu()
         category = "context"
         texture = self.w.textures['upgrade']
         offset =  (
@@ -280,7 +280,6 @@ class UI():
         label.category = category
         label.shadow = True
         self.context_sprites.append(label)
-
 
         size = 10
         offset = (
@@ -330,7 +329,7 @@ class UI():
         self.context_sprites.append(label)
 
         texture = self.w.textures["sell"]
-        offset =  (
+        offset = (
             texture.width,
             0
         )
@@ -366,7 +365,7 @@ class MainMenu():
         self.under_mouse = None
         self.active_entry = False
 
-    def add_entry(self, title="No title", action=None, top=False):
+    def addEntry(self, title="No title", action=None, top=False):
         h = self.but_h
         w = self.but_w
         x = self.w.width / 2
@@ -401,31 +400,31 @@ class MainMenu():
         )
         if top:
             self.entries.insert(0, b_sprite)
-            self.update_offset()
+            self.updateOffset()
         else:
             self.entries.append(b_sprite)
-            self.update_offset()
+            self.updateOffset()
 
-    def clear_entries(self):
+    def clearEntries(self):
         self.w.batches["mm_labels"] = graphics.Batch()
         self.w.batches["mm_buttons"] = graphics.Batch()
         self.entries = []
 
-    def check_mouse(self, pos):
+    def checkMouse(self, pos):
         x, y = pos[0], pos[1]
         for e in self.entries:
             if x >= e.rectangle[0] and x <= e.rectangle[4]:
                 if y >= e.rectangle[1] and y <= e.rectangle[3]:
                     if not self.active_entry:
-                        self.on_down(e)
+                        self.onDown(e)
                         self.active_entry = e
                         return e
                     else:
-                        self.on_down(e)
+                        self.onDown(e)
                         return e
         return False
 
-    def get_under_mouse(self, x, y):
+    def getUnderMouse(self, x, y):
         for e in self.entries:
             e.label.font_size = self.font_size
             e.opacity = 150
@@ -440,18 +439,18 @@ class MainMenu():
             self.under_mouse = None
             return False
 
-    def on_down(self, entry):
+    def onDown(self, entry):
         pass
 
-    def on_up(self, entry):
+    def onUp(self, entry):
 
         if entry.label:
             pass
         self.active_entry = False
 
-    def do_action(self, entry):
+    def doAction(self, entry):
         self.w.playSFX("click")
-        self.on_up(entry)
+        self.onUp(entry)
         e = entry
         if e.action == "newgame":
             self.w.game.newGame(self.w.selected_mapfile)
@@ -485,7 +484,7 @@ class MainMenu():
         elif e.action == "quit":
             self.w.quitGame()
 
-    def update_offset(self):
+    def updateOffset(self):
         count = len(self.entries)
         offset_y = (count * (self.but_h + self.spacing)) // 2
         for e in self.entries:
@@ -508,10 +507,3 @@ class MainMenu():
         self.w.batches["mm_buttons"].draw()
         gl.glColor4f(0.3, 0.3, 0.9, 1)
         self.w.batches["mm_labels"].draw()
-        # for e in self.entries:
-            # graphics.draw(
-            #     4, gl.GL_QUADS, ('v2i', e.rectangle)
-            # )
-            # e.draw()
-            #e.label.draw()
-        # self.w.flip()

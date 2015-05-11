@@ -141,7 +141,7 @@ class Game():
                         0.25
                     )
         self.lives = 10
-        pyglet.clock.unschedule(self.autospawn_random)
+        pyglet.clock.unschedule(self.autospawnRandom)
         pyglet.clock.schedule_interval(self.pathFinding, 1.0/60.0)
 
         # Autospawn random mob every second
@@ -152,8 +152,8 @@ class Game():
 
         # Adding buttons to UI
         for b in ("1", "2", "3", "4", "gold_icon"):
-            self.window.userinterface.add_button(b)
-        self.window.userinterface.add_text("gold")
+            self.window.userinterface.addButton(b)
+        self.window.userinterface.addText("gold")
         self.window.loading = False
         self.loaded = True
         self.paused = False
@@ -285,7 +285,7 @@ class Game():
         #     if m.state == "stalled":
         #         m.updateState()
 
-    def place_tower(self, t, x, y, new=False):
+    def placeTower(self, t, x, y, new=False):
         """Positions tower and updates game state accordingly."""
         grid = self.grid
         placed = False
@@ -395,7 +395,7 @@ class Game():
         vol = 1.0 - float(self.lives) / 10.0
         self.window.playSFX("leak", vol)
 
-    def autospawn_random(self, dt):
+    def autospawnRandom(self, dt):
         """Spawns a random mob"""
         if not self.paused:
             choice = random.randint(0, 1)
@@ -439,12 +439,12 @@ class Game():
         if not self.paused:
             self.ai_gold += self.ai_flat_income
             self.ai_flat_income += 1
-            self.ai_gold += (self.get_total_value() + self.gold) // 10
+            self.ai_gold += (self.getTotalValue() + self.gold) // 10
             if self.ai_gold > 2000:
                 self.mobtier = 2
             logger.info("AI current gold: {0}".format(self.ai_gold))
 
-    def get_total_value(self):
+    def getTotalValue(self):
         value = 0
         for t in self.towers:
             value += t.price

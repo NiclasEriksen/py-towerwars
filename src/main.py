@@ -151,39 +151,39 @@ class GameWindow(pyglet.window.Window):  # Main game window
         logger.debug("Showing main menu.")
         try:
             logger.debug("Clearing old menu screen.")
-            self.mainmenu.clear_entries()
+            self.mainmenu.clearEntries()
         except AttributeError:
             logger.debug("No main menu to clear")
         self.mainmenu = MainMenu(self)
         if self.game.loaded:
-            self.mainmenu.add_entry(
+            self.mainmenu.addEntry(
                 title="Resume", action="resume", top=True
             )
-        self.mainmenu.add_entry(title="New Game", action="newgame")
+        self.mainmenu.addEntry(title="New Game", action="newgame")
         str_len = len(self.selected_mapfile)
         if str_len > self.mainmenu.max_char:
             string = self.selected_mapfile[str_len - self.mainmenu.max_char:]
         else:
             string = self.selected_mapfile
-        self.mainmenu.add_entry(
+        self.mainmenu.addEntry(
             title=string, action="selectmap"
         )
-        self.mainmenu.add_entry(title="Settings", action="settings")
-        self.mainmenu.add_entry(title="Exit", action="quit")
+        self.mainmenu.addEntry(title="Settings", action="settings")
+        self.mainmenu.addEntry(title="Exit", action="quit")
 
     def showSettingsMenu(self):
         logger.debug("Showing settings menu.")
         try:
             logger.debug("Clearing old menu screen.")
-            self.mainmenu.clear_entries()
+            self.mainmenu.clearEntries()
         except AttributeError:
             logger.debug("No main menu to clear")
         self.mainmenu = MainMenu(self)
-        self.mainmenu.add_entry(
+        self.mainmenu.addEntry(
             title="Sound: {0}".format(self.sound_enabled),
             action="togglesound"
         )
-        self.mainmenu.add_entry(title="Back", action="topmenu")
+        self.mainmenu.addEntry(title="Back", action="topmenu")
 
     def flushWindow(self):
         try:
@@ -578,7 +578,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.offset_x += dx
         self.offset_y -= dy
 
-        self.userinterface.update_offset()
+        self.userinterface.updateOffset()
 
         for t in self.game.towers:
             t.updateOffset()
@@ -669,7 +669,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.showMainMenu()
         else:
             if self.mainmenu:
-                self.mainmenu.clear_entries()
+                self.mainmenu.clearEntries()
             self.mainmenu = None
 
     def quitGame(self):
@@ -736,17 +736,17 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.autospawn = not self.game.autospawn
                 if self.game.autospawn:
                     pyglet.clock.schedule_interval(
-                        self.game.autospawn_random,
+                        self.game.autospawnRandom,
                         1.0
                     )
                 else:
-                    pyglet.clock.unschedule(self.game.autospawn_random)
+                    pyglet.clock.unschedule(self.game.autospawnRandom)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == mouse.LEFT:
             if not self.game.paused:
                 # First, check if mouse is on a UI element
-                if self.userinterface.check_mouse((x, y)):  # returns false if
+                if self.userinterface.checkMouse((x, y)):  # returns false if
                     pass                                    # not on a button
                 else:
                     if not self.game.mouse_drag_tower:
@@ -769,21 +769,21 @@ class GameWindow(pyglet.window.Window):  # Main game window
                                 tower = SplashTower(
                                     self.game, "Default", x=x, y=y
                                 )
-                                self.game.place_tower(tower, x, y, new=True)
+                                self.game.placeTower(tower, x, y, new=True)
 
                     else:
-                        self.game.place_tower(
+                        self.game.placeTower(
                             self.game.mouse_drag_tower, x, y, new=True
                         )
                         self.game.mouse_drag_tower = None
             elif self.mainmenu:
                 pos = (x, y)
-                self.mainmenu.check_mouse(pos)
+                self.mainmenu.checkMouse(pos)
 
     def on_mouse_release(self, x, y, button, modifiers):
         if button == mouse.LEFT:
             # First, check if mouse is released over a UI element
-            t_type = self.userinterface.check_mouse((x, y))
+            t_type = self.userinterface.checkMouse((x, y))
             if self.game.dragging:
                 selected = self.game.getDragSelection(self.dragrect)
                 self.game.highlightItems(selected)
@@ -822,15 +822,15 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         self.game.active_tower.upgrade()
 
             elif self.mainmenu:
-                under_mouse = self.mainmenu.check_mouse((x, y))
+                under_mouse = self.mainmenu.checkMouse((x, y))
                 active = self.mainmenu.active_entry
                 if active and active == under_mouse:
-                    self.mainmenu.do_action(active)
+                    self.mainmenu.doAction(active)
                 elif active:
-                    self.mainmenu.on_up(active)
+                    self.mainmenu.onUp(active)
             elif self.game.mouse_drag_tower:
                 self.game.active_tower = self.game.mouse_drag_tower
-                self.game.place_tower(
+                self.game.placeTower(
                     self.game.mouse_drag_tower, x, y, new=True
                 )
                 self.game.selected_mouse = None
@@ -853,13 +853,13 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.game.dragging = True
 
             if self.mainmenu:
-                e = self.mainmenu.check_mouse((x, y))
+                e = self.mainmenu.checkMouse((x, y))
                 if e:
                     if not e == self.mainmenu.active_entry:
-                        self.mainmenu.on_up(self.mainmenu.active_entry)
+                        self.mainmenu.onUp(self.mainmenu.active_entry)
                         self.mainmenu.active_entry = e
                 elif self.mainmenu.active_entry:
-                    self.mainmenu.on_up(self.mainmenu.active_entry)
+                    self.mainmenu.onUp(self.mainmenu.active_entry)
                     self.mainmenu.active_entry = False
 
             elif self.game.selected_mouse and self.debug:
@@ -876,7 +876,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 self.game.mouse_drag_tower = self.game.selected_mouse
                 self.game.selected_mouse.updatePos(x, y, None, None)
             else:
-                t_type = self.userinterface.check_mouse((x, y))
+                t_type = self.userinterface.checkMouse((x, y))
                 if self.game.mouse_drag_tower:
                     self.game.mouse_drag_tower.updatePos(x, y, None, None)
                 # First, check if mouse is released over a UI element
@@ -895,7 +895,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         self.game.mouse_drag_tower = tower
                     try:
                         tower
-                        self.userinterface.wipe_context_menu()
+                        self.userinterface.wipeContextMenu()
                         self.game.active_tower = None
                         self.game.selected_mouse = self.game.mouse_drag_tower
                     except UnboundLocalError:
@@ -907,8 +907,8 @@ class GameWindow(pyglet.window.Window):  # Main game window
                         self.drag_rect_start = x, y
 
             if not self.game.selected_mouse:
-                if not self.userinterface.check_mouse((x, y)):
-                    self.userinterface.wipe_context_menu()
+                if not self.userinterface.checkMouse((x, y)):
+                    self.userinterface.wipeContextMenu()
                     self.game.active_tower = None
 
         elif buttons & mouse.RIGHT:
@@ -920,7 +920,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             self.game.mouse_drag_tower.updatePos(x, y, None, None)
         self.cx, self.cy = x, y
         if self.mainmenu:
-            self.mainmenu.get_under_mouse(x, y)
+            self.mainmenu.getUnderMouse(x, y)
 
     def on_resize(self, width, height):
         glViewport(0, 0, width, height)
@@ -932,7 +932,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.activate()
 
         if self.mainmenu:
-            self.mainmenu.update_offset()
+            self.mainmenu.updateOffset()
         if self.game.loaded:
             self.game.updateGridSettings()
 
@@ -942,7 +942,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             for m in self.game.mobs:
                 m.updateOffset()
 
-            self.userinterface.update_offset()
+            self.userinterface.updateOffset()
 
             self.tile_renderer.update_offset()
 

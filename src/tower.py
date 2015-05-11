@@ -170,7 +170,7 @@ class Tower(Sprite):
 
                 self.window.playSFX("bang1", volume)   # play sound
 
-    def pay_upgrade(self):
+    def payUpgrade(self):
         if self.game.debug:
             self.price = int(self.price * 1.5)
             return True
@@ -182,7 +182,7 @@ class Tower(Sprite):
             return False
 
     def upgrade(self):
-        if self.pay_upgrade():  # Try to pay for upgrade
+        if self.payUpgrade():  # Try to pay for upgrade
             self.spd *= 0.90
             self.crit *= 1.1
             self.dmg = int(self.dmg * 1.30)
@@ -217,7 +217,7 @@ class SplashTower(Tower):
 
 
     def upgrade(self):
-        if self.pay_upgrade():
+        if self.payUpgrade():
             self.dmg = int(self.dmg * 1.40)
             self.splash_limit += 1
             self.splash_range = int(self.splash_range * 1.1)
@@ -364,7 +364,7 @@ class PoisonTower(Tower):
                 self.window.playSFX("dart", volume)
 
     def upgrade(self):
-        if self.pay_upgrade():
+        if self.payUpgrade():
             self.dmg = int(self.dmg * 1.25)
             if self.slow < 85:
                 self.slow = int(self.slow * 1.1)
@@ -395,7 +395,7 @@ class ChainTower(Tower):
         self.place(game, name, x, y)
 
     def upgrade(self):
-        if self.pay_upgrade():
+        if self.payUpgrade():
             self.spd *= 0.90
             self.dmg = int(self.dmg * 1.25)
             self.stun_time *= 1.1
