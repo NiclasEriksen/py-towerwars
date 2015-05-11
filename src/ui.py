@@ -450,7 +450,7 @@ class MainMenu():
         self.active_entry = False
 
     def do_action(self, entry):
-        self.w.play_sfx("click")
+        self.w.playSFX("click")
         self.on_up(entry)
         e = entry
         if e.action == "newgame":
@@ -483,7 +483,7 @@ class MainMenu():
         elif e.action == "topmenu":
             return self.w.showMainMenu()
         elif e.action == "quit":
-            self.w.quit_game()
+            self.w.quitGame()
 
     def update_offset(self):
         count = len(self.entries)

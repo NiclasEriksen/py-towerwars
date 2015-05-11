@@ -102,7 +102,7 @@ class Tower(Sprite):
             self.turret.y = self.y
 
     def updateOffset(self):
-        self.x, self.y = self.window.get_windowpos(self.gx, self.gy)
+        self.x, self.y = self.window.getWindowPos(self.gx, self.gy)
         if self.turret:
             self.turret.x, self.turret.y = self.x, self.y
 
@@ -168,7 +168,7 @@ class Tower(Sprite):
 
                 self.setCD(self.spd)
 
-                self.window.play_sfx("bang1", volume)   # play sound
+                self.window.playSFX("bang1", volume)   # play sound
 
     def pay_upgrade(self):
         if self.game.debug:
@@ -227,7 +227,7 @@ class SplashTower(Tower):
             t.state = "dead"
         else:
             if not self.cd:
-                self.window.play_sfx("bang2")
+                self.window.playSFX("bang2")
                 t.hp -= self.dmg
                 # Spawns muzzle particle effect
                 x = int(self.x + self.turret_size * math.cos(-self.angle))
@@ -361,7 +361,7 @@ class PoisonTower(Tower):
                     )
                     i += 1
 
-                self.window.play_sfx("dart", volume)
+                self.window.playSFX("dart", volume)
 
     def upgrade(self):
         if self.pay_upgrade():
@@ -450,4 +450,4 @@ class ChainTower(Tower):
                 #     )
                 #     i += 1
 
-                self.window.play_sfx("bzzt", volume)
+                self.window.playSFX("bzzt", volume)

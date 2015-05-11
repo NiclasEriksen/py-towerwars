@@ -36,8 +36,8 @@ class Mob(Sprite):
             -self.g.squaresize // 8,
             self.g.squaresize // 8
         )
-        self.x = game.window.get_windowpos(s[0], s[1])[0]
-        self.y = game.window.get_windowpos(s[0], s[1])[1]  # Drawing position
+        self.x = game.window.getWindowPos(s[0], s[1])[0]
+        self.y = game.window.getWindowPos(s[0], s[1])[1]  # Drawing position
         self.rx = self.x
         self.ry = self.y  # Real position, which is used in game logic
         self.state = "alive"
@@ -86,7 +86,7 @@ class Mob(Sprite):
 
     def updateOffset(self):
         s = self.currentpoint
-        self.x, self.y = self.g.window.get_windowpos(s[0], s[1])
+        self.x, self.y = self.g.window.getWindowPos(s[0], s[1])
         self.rx, self.ry = self.x, self.y
 
     def updatePos(self, dt=0):
@@ -99,7 +99,7 @@ class Mob(Sprite):
             tp = self.targetpoint
 
             if tp in points and tp in self.g.grid.w_grid:
-                targetpos = self.g.window.get_windowpos(tp[0], tp[1])
+                targetpos = self.g.window.getWindowPos(tp[0], tp[1])
 
                 if get_dist(targetpos[0], targetpos[1], self.rx, self.ry) < 2:
                     self.lastpoint = self.currentpoint
@@ -237,7 +237,7 @@ class Mob(Sprite):
             self.g.pf_queue.remove(self)
         self.g.gold += self.bounty
         self.g.mobs.remove(self)
-        self.g.window.play_sfx("splat", 0.7)
+        self.g.window.playSFX("splat", 0.7)
 
     def updateState(self):
         self.debug = self.g.debug
@@ -402,7 +402,7 @@ class Mob1F(Mob):
             tp = self.targetpoint
 
             if tp in points and tp in self.g.grid.fullgrid:
-                targetpos = self.g.window.get_windowpos(tp[0], tp[1])
+                targetpos = self.g.window.getWindowPos(tp[0], tp[1])
 
                 if get_dist(targetpos[0], targetpos[1], self.rx, self.ry) < 2:
                     self.lastpoint = self.currentpoint

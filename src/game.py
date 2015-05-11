@@ -57,6 +57,25 @@ class Game():
 
         # player.play()
 
+    def updateState(self, dt):
+        if not self.paused:
+            if self.lives <= 0:
+                self.gameOver()
+            for t in self.towers:
+                if t.cd:
+                    t.resetCD()
+                if not t.target:  # if tower has no target
+                    t.getTarget()
+                else:
+                    t.updateTarget()
+
+            for m in self.mobs:
+                m.updatePos(dt=dt)  # Update movement
+                m.updateState()  # Update mob state, e.g. "dead", "alive"
+
+            if self.gold > 9999:     # Maximum amount of gold
+                self.gold = 9999
+
     def newGame(self, level):
 
         logger.info("Starting a new game.")
@@ -139,6 +158,43 @@ class Game():
         self.loaded = True
         self.paused = False
 
+    def gameOver(self):
+        logger.info("Game lost, returning to menu.")
+        self.loaded = False
+        self.paused = True
+        for m in self.mobs:
+            m.debuff_list = []
+        self.mobs = []  # Enemy mob sprite objects
+        self.mob_count = 0  # This serve as mob's id
+        for t in self.towers:
+            t.target = None
+        self.goal, self.spawn = None, None
+        self.towers = []  # Tower sprite objects
+        self.window.animations = []
+        self.selected_mouse = None
+        self.dragging = False
+        self.highlighted = []
+        self.active_tower = None
+        self.mouse_drag_tower = None
+        self.pf_queue = []
+
+        try:
+            pyglet.clock.unschedule(self.aiIncome)
+        except:
+            pass
+        try:
+            pyglet.clock.unschedule(self.updateState)
+        except:
+            pass
+        try:
+            pyglet.clock.unschedule(self.autospawnBalanced)
+        except:
+            pass
+
+        self.window.flushWindow()
+        self.window.showMainMenu()
+
+
     def generateGridSettings(self):
         """ These control the grid that is the game window """
         tiles = TiledRenderer(self.window, self.map)
@@ -181,14 +237,14 @@ class Game():
             except ValueError:
                 pass
         for p in grid:
-            pos = self.window.get_windowpos(p[0], p[1])
+            pos = self.window.getWindowPos(p[0], p[1])
             x, y = pos
             ss = self.squaresize - 2
             rectangle = create_rectangle(x, y, ss, ss)
             self.window.rectangles.append(rectangle)
 
         for p in path:
-            pos = self.window.get_windowpos(p[0], p[1])
+            pos = self.window.getWindowPos(p[0], p[1])
             x, y = pos
             ss = self.squaresize - 6
             rectangle = create_rectangle(x, y, ss, ss)
@@ -236,7 +292,7 @@ class Game():
 
         if t.price <= self.gold or self.debug:
             try:
-                gx, gy = self.window.get_gridpos(x, y)
+                gx, gy = self.window.getGridPos(x, y)
                 if (gx, gy) in grid.t_grid:
                     placed = True
             except LookupError or ValueError as err:
@@ -244,11 +300,10 @@ class Game():
 
         if placed:
             new_g = gx, gy
-            new_rg = self.window.get_windowpos(gx, gy)
+            new_rg = self.window.getWindowPos(gx, gy)
             if not self.debug:
                 self.gold -= t.price
             w_grid = grid.w_grid
-            t_grid = grid.t_grid
             t.selected = False
             t.updatePos(new_rg[0], new_rg[1], new_g[0], new_g[1])
             t.id = self.tower_count
@@ -286,13 +341,11 @@ class Game():
                 logger.warning("TOWER BLOCKING PATH")
                 t.sell()
 
-            # if grid.getPath(grid.start):
-            # # self.pathFinding(limit=100)
-            #     pass
-
             logger.debug("New path for grid: {0}".format(update))
 
-            logger.debug("Tower placed at [{0},{1}]".format(new_g[0], new_g[1]))
+            logger.debug(
+                "Tower placed at [{0},{1}]".format(new_g[0], new_g[1])
+            )
 
         elif t in self.towers:
             self.towers.remove(t)
@@ -336,6 +389,12 @@ class Game():
 
             self.mobs.append(mob)
 
+    def leaking(self):
+        if not self.debug:
+            self.lives -= 1
+        vol = 1.0 - float(self.lives) / 10.0
+        self.window.playSFX("leak", vol)
+
     def autospawn_random(self, dt):
         """Spawns a random mob"""
         if not self.paused:
@@ -351,7 +410,6 @@ class Game():
             choice = random.randint(0, mob_choices - 1)
             if choice < mob_choices - 1 and len(self.mobs) >= 100:
                 choice += 2
-            mob = None
             if choice == 0:
                 self.spawnMob("Q")
             elif choice == 1:
@@ -376,30 +434,6 @@ class Game():
                 self.spawnMob("C")
             elif choice == 11:
                 self.spawnMob("V")
-            # if choice == 0:
-            #     mob = Mob(self, "YAY")
-            # elif choice == 1:
-            #     mob = Mob1W(self, "YAY")
-            # elif choice == 2:
-            #     mob = Mob1E(self, "YAY")
-            # elif choice == 3:
-            #     mob = Mob1R(self, "YAY")
-            # elif choice == 4:
-            #     mob = Mob1A(self, "YAY")
-            # elif choice == 5:
-            #     mob = Mob1S(self, "YAY")
-            # elif choice == 6:
-            #     mob = Mob1D(self, "YAY")
-            # elif choice == 7:
-            #     mob = Mob1F(self, "YAY")
-            # elif choice == 8:
-            #     mob = Mob1Z(self, "YAY")
-            # elif choice == 9:
-            #     mob = Mob1X(self, "YAY")
-            # elif choice == 10:
-            #     mob = Mob1C(self, "YAY")
-            # elif choice == 11:
-            #     mob = Mob1V(self, "YAY")
 
     def aiIncome(self, dt):
         if not self.paused:
@@ -409,6 +443,12 @@ class Game():
             if self.ai_gold > 2000:
                 self.mobtier = 2
             logger.info("AI current gold: {0}".format(self.ai_gold))
+
+    def get_total_value(self):
+        value = 0
+        for t in self.towers:
+            value += t.price
+        return value
 
     def getDragSelection(self, rect):
         if rect:
@@ -428,74 +468,7 @@ class Game():
     def highlightItems(self, items):
         if items:
             if len(items) == 1:
-                print("Adding it as acctive tower")
+                logger.debug("Adding {0} as selected tower".format(items[0]))
                 self.selected_mouse = items[0]
             else:
                 self.highlighted = items
-
-    def gameOver(self):
-        logger.info("Game lost, returning to menu.")
-        self.loaded = False
-        self.paused = True
-        for m in self.mobs:
-            m.debuff_list = []
-        self.mobs = []  # Enemy mob sprite objects
-        self.mob_count = 0  # This serve as mob's id
-        for t in self.towers:
-            t.target = None
-        self.goal, self.spawn = None, None
-        self.towers = []  # Tower sprite objects
-        self.window.animations = []
-        self.selected_mouse = None
-        self.dragging = False
-        self.highlighted = []
-        self.active_tower = None
-        self.mouse_drag_tower = None
-        self.pf_queue = []
-
-        try:
-            pyglet.clock.unschedule(self.aiIncome)
-        except:
-            pass
-        try:
-            pyglet.clock.unschedule(self.updateState)
-        except:
-            pass
-        try:
-            pyglet.clock.unschedule(self.autospawnBalanced)
-        except:
-            pass
-
-        self.window.flushWindow()
-        self.window.showMainMenu()
-
-    def updateState(self, dt):
-        if not self.paused:
-            if self.lives <= 0:
-                self.gameOver()
-            for t in self.towers:
-                if t.cd:
-                    t.resetCD()
-                if not t.target:  # if tower has no target
-                    t.getTarget()
-                else:
-                    t.updateTarget()
-
-            for m in self.mobs:
-                m.updatePos(dt=dt)  # Update movement
-                m.updateState()  # Update mob state, e.g. "dead", "alive"
-
-            if self.gold > 9999:     # Maximum amount of gold
-                self.gold = 9999
-
-    def leaking(self):
-        if not self.debug:
-            self.lives -= 1
-        vol = 1.0 - float(self.lives) / 10.0
-        self.window.play_sfx("leak", vol)
-
-    def get_total_value(self):
-        value = 0
-        for t in self.towers:
-            value += t.price
-        return value

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="32" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="32" tileheight="32" spacing="2">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/roguelikeSheet_transparent.png" width="1936" height="1052"/>
+ </tileset>
+ <layer name="BG1" width="24" height="32" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwzENAAAMA6A+82+vcipkkNBLqqqqvjgUcJcf
+  </data>
+ </layer>
+ <layer name="BG2" width="24" height="32" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzNlVEOwCAIQz231/KC+1piFqCl6JSELMHZPauy1v6NbuQI6t5YB/rRvCjneVawusx7VX/QeNafAcZVfjUz/BGvt64KPzqbkb56Nm/yP+PTiv1lNL91xF/dBytYtqj+1hB/dS8UfzKeKfyM/i5/GH41rPWt1h/TM8O0y5/T+kp/tvS9Xo/+QQp/9X55/Mp3MvpKL2X1d93TE33gtngAWMXwbQ==
+  </data>
+ </layer>
+ <layer name="BG3" width="24" height="32" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztlU0OAiEMhesgs1bvH/UAkrmF8W9vvIOHEKImtSnSKdWwmJe8zZD5Qh4PuvYAm5fPHcDRyJfobWReo99yDmBn5MS6MXwrSfk4s1P3uXYgeWj4OLOBrAeSh5YvUQv8Pck45dsb7x9nHJhca/ml/6z5cye7r17Jxx38ZtrdVu7vxP8fX9rF3Dwp8aVd5LopuV+1ebTGHzPvJe8Dt6cxZ6DhazXxn8p1wBvxcx0YBHz8XtC5n+slVokfmP7dZ/x3Db9Wib/oAZY/8ir6ATG9rcc=
+  </data>
+ </layer>
+ <imagelayer name="Background">
+  <image source="../../../../../../../home/fredspipa/src/peace-tw/src/resources/map4bg.png"/>
+ </imagelayer>
+ <layer name="Obstacles" width="24" height="32" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJybzMTAMHkYYWqBwWI+PnlS5PCZT6x7R4L5yOpIifPB4v6BMJ+cvDlY8teo+cPLfErwqPlDz3xap59R8ykzn5ppghbmY7OLFml7sGIAcGr2yQ==
+  </data>
+ </layer>
+ <layer name="Goal" width="24" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztzkENAAAIBKB7mMD+YY2hc5CABH7p2h4AANw11cQAFw==
+  </data>
+ </layer>
+ <layer name="Spawn" width="24" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztzkEBAAAEBLDTP6oSWvCwJVgCAAA/dV0P9g3s7wDt
+  </data>
+ </layer>
+</map>

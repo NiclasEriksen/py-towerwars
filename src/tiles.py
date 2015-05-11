@@ -31,7 +31,7 @@ class TiledRenderer(object):
                 s.x = self.window.offset_x
                 s.y = self.window.offset_y
             else:
-                s.x, s.y = self.window.get_windowpos(s.gx, s.gy)
+                s.x, s.y = self.window.getWindowPos(s.gx, s.gy)
 
     def loadmap(self):
 
