@@ -484,6 +484,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
     def playSFX(self, sound="default", volume=1.0):
         if self.sound_enabled:
+            logger.debug("Playing sound '{0}'".format(sound))
             for s in self.currently_playing:
                 if s.time == 0.0:
                     self.currently_playing.remove(s)
@@ -499,66 +500,6 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 playing.volume = volume
                 playing.id = sound
                 self.currently_playing.append(playing)
-
-        # try:
-        #     print self.sfx[sound].duration
-        #     print playing.time
-        # except:
-        #     print("Unable to play sound {0}".format(sound))
-
-    def generateGridIndicators(self):
-        """ Generates the squares that indicates available blocks """
-        w = self.squaresize
-        points = []
-        rects = []
-        for p in self.grid.w_grid:
-            wp = self.getWindowPos(p[0], p[1])
-            x = wp[0] - w // 2
-            y = wp[1] - w // 2
-            points.append(wp[0])
-            points.append(wp[1])
-            r_points = [x, y, x + w, y, x + w, y + w, x, y + w]
-            rects = rects + r_points
-
-    def generateGridPathIndicators(self):
-        # Makes a list of points that represent lines of the grid path #
-        points = []
-        i = 0
-        g = self.game.grid
-        s = self.getWindowPos(g.start[0], g.start[1])
-        g0 = self.getWindowPos(g.path[0][0], g.path[0][1])
-        points.append(s[0])
-        points.append(s[1])
-        points.append(g0[0])
-        points.append(g0[1])
-        for p in g.path:
-            if i < len(g.path) - 1:
-                points.append(self.getWindowPos(p[0], p[1])[0])
-                points.append(self.getWindowPos(p[0], p[1])[1])
-                pn = g.path[i+1]
-                points.append(self.getWindowPos(pn[0], pn[1])[0])
-                points.append(self.getWindowPos(pn[0], pn[1])[1])
-            i += 1
-
-        return points, len(points) // 2
-
-    def generateMobPathIndicators(self):
-        points = []
-        i_points = []
-        s1 = set(self.game.grid.path)
-        for m in self.game.mobs:
-            s2 = set(m.path)
-            if len(s2.difference(s1)) > 0:
-                for p in s2.difference(s1):
-                    points.append(p)
-
-        if len(points) > 0:
-            points = list(OrderedDict.fromkeys(points))
-            for p in points:
-                i_points.append(self.getWindowPos(p[0], p[1])[0])
-                i_points.append(self.getWindowPos(p[0], p[1])[1])
-
-        return i_points, len(i_points) / 2
 
     def getWindowPos(self, x, y):
         """Gets position of a grid coordinate on the window, in pixels"""
@@ -1145,7 +1086,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
 
             if self.debug:
                 glLineWidth(3)
-                points, count = self.generateGridPathIndicators()
+                points, count = self.game.generateGridPathIndicators()
                 glColor4f(0.4, 0.4, 0.8, 0.7)
                 pyglet.graphics.draw(
                     count,
@@ -1153,7 +1094,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
                     ('v2f', points)
                 )
 
-                points, count = self.generateMobPathIndicators()
+                points, count = self.game.generateMobPathIndicators()
                 glColor4f(0.6, 0.3, 0.3, 0.5)
                 pyglet.graphics.draw(
                     count,

@@ -266,6 +266,48 @@ class Game():
                 ('v2i', r),
             )
 
+
+
+    def generateGridPathIndicators(self):
+        # Makes a list of points that represent lines of the grid path #
+        points = []
+        i = 0
+        g = self.grid
+        s = self.window.getWindowPos(g.start[0], g.start[1])
+        g0 = self.window.getWindowPos(g.path[0][0], g.path[0][1])
+        points.append(s[0])
+        points.append(s[1])
+        points.append(g0[0])
+        points.append(g0[1])
+        for p in g.path:
+            if i < len(g.path) - 1:
+                points.append(self.window.getWindowPos(p[0], p[1])[0])
+                points.append(self.window.getWindowPos(p[0], p[1])[1])
+                pn = g.path[i+1]
+                points.append(self.window.getWindowPos(pn[0], pn[1])[0])
+                points.append(self.window.getWindowPos(pn[0], pn[1])[1])
+            i += 1
+
+        return points, len(points) // 2
+
+    def generateMobPathIndicators(self):
+        points = []
+        i_points = []
+        s1 = set(self.grid.path)
+        for m in self.mobs:
+            s2 = set(m.path)
+            if len(s2.difference(s1)) > 0:
+                for p in s2.difference(s1):
+                    points.append(p)
+
+        if len(points) > 0:
+            points = list(OrderedDict.fromkeys(points))
+            for p in points:
+                i_points.append(self.window.getWindowPos(p[0], p[1])[0])
+                i_points.append(self.window.getWindowPos(p[0], p[1])[1])
+
+        return i_points, len(i_points) / 2
+
     def pathFinding(self, dt, limit=1):
         if len(self.pf_queue) > 0:
             if len(self.pf_queue) >= 30:
