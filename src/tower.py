@@ -122,7 +122,7 @@ class Tower(Sprite):
         self.game.gold += int(self.price * 0.75)
         self.batch = None
         self.turret = None
-        self.window.userinterface.wipe_context_menu()
+        self.window.userinterface.wipeContextMenu()
         if self.game.active_tower == self:
             self.game.active_tower = None
         if self.game.selected_mouse == self:
