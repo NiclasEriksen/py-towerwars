@@ -368,6 +368,20 @@ class MainMenu():
         self.animation_running = False
         self.animation_counter = 0
         self.current_animation = None
+        self.header = None
+
+    def addHeader(self, title="No title"):
+        label = text.Label(
+            title, font_name="Visitor TT1 BRK",
+            font_size=self.font_size * 2,
+            color=self.font_clr,
+            x=self.w.width / 2,
+            y=self.w.height - self.font_size * 3,
+            batch=self.w.batches["mm_labels"],
+            anchor_x="center", anchor_y="center"
+        )
+
+        self.header = label
 
     def addEntry(self, title="No title", action=None, top=False):
         h = self.but_h
@@ -417,6 +431,7 @@ class MainMenu():
         self.w.batches["mm_labels"] = graphics.Batch()
         self.w.batches["mm_buttons"] = graphics.Batch()
         self.entries = []
+        self.header = None
 
     def checkMouse(self, pos):
         x, y = pos[0], pos[1]
@@ -519,7 +534,7 @@ class MainMenu():
         if self.animation_counter > 0:
             a = log2(self.animation_counter)*(30/log2(30)) / 30
             for e in self.entries:
-                e.label.font_size = 0
+                e.label.font_size = e.label.oldfontsize * (1.0 - a)
                 e.scale = 1.0 - a
             self.animation_counter -= 9
         else:
@@ -541,7 +556,7 @@ class MainMenu():
         if self.animation_counter > 0:
             a = log2(self.animation_counter)*(30/log2(30)) / 30
             for e in self.entries:
-                e.label.font_size = 0
+                e.label.font_size = e.label.oldfontsize * a
                 e.scale = a
             self.animation_counter -= 9
         else:

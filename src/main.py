@@ -168,6 +168,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         self.mainmenu.addEntry(
             title=string, action="selectmap"
         )
+        self.mainmenu.addHeader(title="Peace-TW")
         self.mainmenu.addEntry(title="Settings", action="settings")
         self.mainmenu.addEntry(title="Exit", action="quit")
         self.mainmenu.animateIn()
@@ -180,11 +181,25 @@ class GameWindow(pyglet.window.Window):  # Main game window
         except AttributeError:
             logger.debug("No main menu to clear")
         self.mainmenu = MainMenu(self)
+        self.mainmenu.addHeader(title="Settings")
         self.mainmenu.addEntry(
             title="Sound: {0}".format(self.sound_enabled),
             action="togglesound"
         )
         self.mainmenu.addEntry(title="Back", action="topmenu")
+        self.mainmenu.animateIn()
+
+    def showGameOverMenu(self):
+        logger.debug("Showing game-over screen.")
+        try:
+            logger.debug("Clearing old menu items.")
+            self.mainmenu.clearEntries()
+        except AttributeError:
+            logger.debug("No main menu to clear")
+        self.mainmenu = MainMenu(self)
+        self.mainmenu.addHeader(title="Game Over")
+        self.mainmenu.addEntry(title="Restart", action="newgame")
+        self.mainmenu.addEntry(title="Main menu", action="topmenu")
         self.mainmenu.animateIn()
 
     def flushWindow(self):

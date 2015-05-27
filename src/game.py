@@ -192,7 +192,7 @@ class Game():
             pass
 
         self.window.flushWindow()
-        self.window.showMainMenu()
+        self.window.showGameOverMenu()
 
 
     def generateGridSettings(self):
