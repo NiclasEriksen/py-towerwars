@@ -170,6 +170,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
         )
         self.mainmenu.addEntry(title="Settings", action="settings")
         self.mainmenu.addEntry(title="Exit", action="quit")
+        self.mainmenu.animateIn()
 
     def showSettingsMenu(self):
         logger.debug("Showing settings menu.")
@@ -184,6 +185,7 @@ class GameWindow(pyglet.window.Window):  # Main game window
             action="togglesound"
         )
         self.mainmenu.addEntry(title="Back", action="topmenu")
+        self.mainmenu.animateIn()
 
     def flushWindow(self):
         try:

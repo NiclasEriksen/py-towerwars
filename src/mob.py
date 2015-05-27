@@ -56,7 +56,11 @@ class Mob(Sprite):
         if not self.path:
             self.path = game.grid.path
 
-        self.targetpoint = self.path[1]
+        try:
+            self.targetpoint = self.path[1]
+        except IndexError:
+            logger.debug("Targetpoint not found in path, setting it to 0,0!!")
+            self.targetpoint = (0, 0)
 
         logger.debug(
             "Spawning mob ID{2}: {0}hp, {1}spd".format(

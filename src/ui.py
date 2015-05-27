@@ -364,6 +364,8 @@ class MainMenu():
         self.entries = []
         self.under_mouse = None
         self.active_entry = False
+        self.animation_running = False
+        self.animation_counter = 0
 
     def addEntry(self, title="No title", action=None, top=False):
         h = self.but_h
@@ -398,6 +400,9 @@ class MainMenu():
             batch=self.w.batches["mm_labels"],
             anchor_x="center", anchor_y="center"
         )
+        b_sprite.orig_size = self.but_w, self.but_h
+        b_sprite.bw, b_sprite.bh = b_sprite.orig_size
+
         if top:
             self.entries.insert(0, b_sprite)
             self.updateOffset()
@@ -484,6 +489,27 @@ class MainMenu():
         elif e.action == "quit":
             self.w.quitGame()
 
+    def animateIn(self):
+        if not self.animation_running:
+            self.animation_running = True
+            self.animation_counter = 30
+
+        if self.animation_counter > 0:
+            for e in self.entries:
+                e.scale = 1.0 - 1.0 / 30.0 * self.animation_counter
+            self.animation_counter -= 5
+        else:
+            print("Disabling animation.")
+            for e in self.entries:
+                e.scale = 1.0
+            self.animation_running = False
+            self.animation_counter = 0
+
+        self.updateOffset()
+
+    def animateOut(self):
+        pass
+
     def updateOffset(self):
         count = len(self.entries)
         offset_y = (count * (self.but_h + self.spacing)) // 2
@@ -500,9 +526,11 @@ class MainMenu():
             #     self.but_h, self.but_w, x, y
             # )
             e.label.x, e.x, e.label.y, e.y = x, x, y, y
-            e.rectangle = create_rectangle(x, y, self.but_w, self.but_h)
+            e.rectangle = create_rectangle(x, y, e.bw, e.bh, centered=True)
 
     def render(self):
+        if self.animation_running:
+            self.animateIn()
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         self.w.batches["mm_buttons"].draw()
         gl.glColor4f(0.3, 0.3, 0.9, 1)

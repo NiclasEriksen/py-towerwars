@@ -111,7 +111,7 @@ def expandPath(grid, path):
     for n in newpath:
         if n[0] == 8:
             print(n)
-    return newpath
+    return list(set(newpath))
 
 
 def get_dist(x1, y1, x2, y2):  # Returns distance between to points

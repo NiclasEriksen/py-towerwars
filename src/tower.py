@@ -261,7 +261,7 @@ class SplashTower(Tower):
                 for m in self.game.mobs:
                     if count >= self.splash_limit:
                         break
-                    if not m.id == t.id:
+                    if not m.id == t.id and not m.move_type == "flying":
                         dist = get_dist(t.rx, t.ry, m.x, m.y)
                         if dist <= self.splash_range:
                             dmg = (dist / self.splash_range) * self.dmg
