@@ -366,6 +366,7 @@ class MainMenu():
         self.active_entry = False
         self.animation_running = False
         self.animation_counter = 0
+        self.current_animation = None
 
     def addEntry(self, title="No title", action=None, top=False):
         h = self.but_h
@@ -458,7 +459,8 @@ class MainMenu():
         self.onUp(entry)
         e = entry
         if e.action == "newgame":
-            self.w.game.newGame(self.w.selected_mapfile)
+            self.animateOut()
+            self.on_anim_end = e.action
         elif e.action == "selectmap":
             index = self.w.maplist.index(self.w.selected_mapfile)
             if index == len(self.w.maplist) - 1:
@@ -472,12 +474,12 @@ class MainMenu():
             else:
                 string = self.w.selected_mapfile
             e.label.text = string
-
         elif e.action == "resume":
-            self.w.game.paused = False
-            self.w.mainmenu = None
+            self.animateOut()
+            self.on_anim_end = e.action
         elif e.action == "settings":
-            return self.w.showSettingsMenu()
+            self.animateOut()
+            self.on_anim_end = e.action
         elif e.action == "togglesound":
             self.w.sound_enabled = not self.w.sound_enabled
             e.label.text = "Sound: {0}".format(self.w.sound_enabled)
@@ -485,30 +487,70 @@ class MainMenu():
                 "Toggled sound_enabled to {0}.".format(self.w.sound_enabled)
             )
         elif e.action == "topmenu":
-            return self.w.showMainMenu()
+            self.animateOut()
+            self.on_anim_end = e.action
         elif e.action == "quit":
+            self.animateOut()
+            self.on_anim_end = e.action
+
+    def handleAction(self, action):
+        if action == "settings":
+            self.w.showSettingsMenu()
+        elif action == "newgame":
+            self.w.game.newGame(self.w.selected_mapfile)
+        elif action == "resume":
+            self.w.game.paused = False
+            self.w.mainmenu = None
+        elif action == "topmenu":
+            self.w.showMainMenu()
+        elif action == "quit":
             self.w.quitGame()
 
     def animateIn(self):
         if not self.animation_running:
             self.animation_running = True
+            self.current_animation = "in"
             self.animation_counter = 30
 
         if self.animation_counter > 0:
             for e in self.entries:
                 e.scale = 1.0 - 1.0 / 30.0 * self.animation_counter
-            self.animation_counter -= 5
+            self.animation_counter -= 10
         else:
             print("Disabling animation.")
             for e in self.entries:
                 e.scale = 1.0
             self.animation_running = False
+            self.current_animation = None
             self.animation_counter = 0
 
         self.updateOffset()
 
     def animateOut(self):
-        pass
+        if not self.animation_running:
+            self.animation_running = True
+            self.current_animation = "out"
+            self.animation_counter = 30
+
+        if self.animation_counter > 0:
+            for e in self.entries:
+                e.scale = 1.0 / 30.0 * self.animation_counter
+            self.animation_counter -= 6
+        else:
+            print("Disabling animation.")
+            self.animation_running = False
+            self.current_animation = None
+            self.animation_counter = 0
+            if self.on_anim_end:
+                self.handleAction(self.on_anim_end)
+
+        self.updateOffset()
+
+    def updateAnimation(self):
+        if self.current_animation == "in":
+            self.animateIn()
+        elif self.current_animation == "out":
+            self.animateOut()
 
     def updateOffset(self):
         count = len(self.entries)
@@ -529,8 +571,7 @@ class MainMenu():
             e.rectangle = create_rectangle(x, y, e.bw, e.bh, centered=True)
 
     def render(self):
-        if self.animation_running:
-            self.animateIn()
+        self.updateAnimation()
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         self.w.batches["mm_buttons"].draw()
         gl.glColor4f(0.3, 0.3, 0.9, 1)

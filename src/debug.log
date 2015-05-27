@@ -1,12 +1,48 @@
-08:07:24,872 main INFO Loading fonts.
-08:07:24,873 main INFO Loading sound files.
-08:07:24,928 main INFO Loading textures.
-08:07:24,939 main INFO Creating UI.
-08:07:24,939 main DEBUG Showing main menu.
-08:07:24,939 main DEBUG Clearing old menu screen.
-08:07:24,939 main DEBUG No main menu to clear
-08:07:27,367 main DEBUG Showing settings menu.
-08:07:27,368 main DEBUG Clearing old menu screen.
-08:07:28,281 main DEBUG Showing main menu.
-08:07:28,282 main DEBUG Clearing old menu screen.
-08:07:29,248 main INFO Exiting...
+08:38:53,776 main INFO Loading fonts.
+08:38:53,777 main INFO Loading sound files.
+08:38:53,832 main INFO Loading textures.
+08:38:53,845 main INFO Creating UI.
+08:38:53,845 main DEBUG Showing main menu.
+08:38:53,845 main DEBUG Clearing old menu screen.
+08:38:53,845 main DEBUG No main menu to clear
+08:38:55,270 main DEBUG Showing settings menu.
+08:38:55,271 main DEBUG Clearing old menu screen.
+08:38:56,266 main DEBUG Showing main menu.
+08:38:56,266 main DEBUG Clearing old menu screen.
+08:38:57,362 main DEBUG Showing settings menu.
+08:38:57,362 main DEBUG Clearing old menu screen.
+08:38:58,358 main DEBUG Showing main menu.
+08:38:58,358 main DEBUG Clearing old menu screen.
+08:38:59,227 main DEBUG Showing settings menu.
+08:38:59,227 main DEBUG Clearing old menu screen.
+08:38:59,795 main DEBUG Toggled sound_enabled to False.
+08:39:00,270 main DEBUG Toggled sound_enabled to True.
+08:39:00,744 main DEBUG Toggled sound_enabled to False.
+08:39:02,577 main DEBUG Showing main menu.
+08:39:02,577 main DEBUG Clearing old menu screen.
+08:39:05,286 main DEBUG Showing settings menu.
+08:39:05,286 main DEBUG Clearing old menu screen.
+08:39:06,167 main DEBUG Showing main menu.
+08:39:06,167 main DEBUG Clearing old menu screen.
+08:39:07,247 main INFO Starting a new game.
+08:39:07,247 main DEBUG Load screen.
+08:39:07,255 main DEBUG Removing old particle system.
+08:39:07,256 main DEBUG 'GameWindow' object has no attribute 'flame_emitter_group'
+08:39:07,318 main DEBUG Removing obstacles from game grid.
+08:39:07,792 main DEBUG generating new grid
+08:39:07,796 main DEBUG removed 159 grid points for towers
+08:39:07,796 main DEBUG removed 157 grid points for no walk
+08:39:07,844 main DEBUG Pathfinding successful!
+08:39:07,844 main DEBUG Steps: 30
+08:39:08,945 main DEBUG Showing main menu.
+08:39:08,945 main DEBUG Clearing old menu screen.
+08:39:08,945 main DEBUG No main menu to clear
+08:39:10,435 main DEBUG Showing settings menu.
+08:39:10,436 main DEBUG Clearing old menu screen.
+08:39:11,498 main DEBUG Showing main menu.
+08:39:11,498 main DEBUG Clearing old menu screen.
+08:39:12,645 main DEBUG Showing settings menu.
+08:39:12,645 main DEBUG Clearing old menu screen.
+08:39:13,542 main DEBUG Showing main menu.
+08:39:13,542 main DEBUG Clearing old menu screen.
+08:39:14,954 main INFO Exiting...
