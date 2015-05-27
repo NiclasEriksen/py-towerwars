@@ -2,6 +2,7 @@
 from pyglet.sprite import Sprite
 from pyglet import gl, graphics, text
 from functions import *
+from numpy import log2
 from main import logger
 
 
@@ -401,6 +402,7 @@ class MainMenu():
             batch=self.w.batches["mm_labels"],
             anchor_x="center", anchor_y="center"
         )
+        b_sprite.label.oldfontsize = b_sprite.label.font_size
         b_sprite.orig_size = self.but_w, self.but_h
         b_sprite.bw, b_sprite.bh = b_sprite.orig_size
 
@@ -446,12 +448,14 @@ class MainMenu():
             return False
 
     def onDown(self, entry):
+        # if entry.label:
+        #     entry.label.bold = True
         pass
 
     def onUp(self, entry):
-
         if entry.label:
             pass
+            # entry.label.bold = False
         self.active_entry = False
 
     def doAction(self, entry):
@@ -513,13 +517,15 @@ class MainMenu():
             self.animation_counter = 30
 
         if self.animation_counter > 0:
+            a = log2(self.animation_counter)*(30/log2(30)) / 30
             for e in self.entries:
-                e.scale = 1.0 - 1.0 / 30.0 * self.animation_counter
-            self.animation_counter -= 10
+                e.label.font_size = 0
+                e.scale = 1.0 - a
+            self.animation_counter -= 9
         else:
-            print("Disabling animation.")
             for e in self.entries:
                 e.scale = 1.0
+                e.label.font_size = e.label.oldfontsize
             self.animation_running = False
             self.current_animation = None
             self.animation_counter = 0
@@ -533,11 +539,12 @@ class MainMenu():
             self.animation_counter = 30
 
         if self.animation_counter > 0:
+            a = log2(self.animation_counter)*(30/log2(30)) / 30
             for e in self.entries:
-                e.scale = 1.0 / 30.0 * self.animation_counter
-            self.animation_counter -= 6
+                e.label.font_size = 0
+                e.scale = a
+            self.animation_counter -= 9
         else:
-            print("Disabling animation.")
             self.animation_running = False
             self.current_animation = None
             self.animation_counter = 0
