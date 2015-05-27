@@ -194,7 +194,6 @@ class Game():
         self.window.flushWindow()
         self.window.showGameOverMenu()
 
-
     def generateGridSettings(self):
         """ These control the grid that is the game window """
         tiles = TiledRenderer(self.window, self.map)

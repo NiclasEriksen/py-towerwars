@@ -417,16 +417,21 @@ class GameWindow(pyglet.window.Window):  # Main game window
         # Load images and create image grids for animations #
         # and centers their frame anchor point              #
         death_img = pyglet.image.load(os.path.join(RES_PATH, 'mob_death.png'))
+        ping_img = pyglet.image.load(os.path.join(RES_PATH, 'ping_anim.png'))
         pang_img = pyglet.image.load(os.path.join(RES_PATH, 'pang_01_32.png'))
         death_anim = pyglet.image.ImageGrid(death_img, 1, 7)
+        ping_anim = pyglet.image.ImageGrid(ping_img, 1, 10)
         pang_anim = pyglet.image.ImageGrid(pang_img, 1, 6)
         for i in death_anim:
+            i = center_image(i)
+        for i in ping_anim:
             i = center_image(i)
         for i in pang_anim:
             i = center_image(i)
 
         self.anim = dict(
             mob1Qdeath=death_anim,
+            ping=ping_anim,
             pang01=pang_anim
         )
 
@@ -766,6 +771,11 @@ class GameWindow(pyglet.window.Window):  # Main game window
                 if self.userinterface.checkMouse((x, y)):  # returns false if
                     pass                                    # not on a button
                 else:
+                    Animation(
+                        self,
+                        self.anim["ping"],
+                        x, y
+                    )
                     if not self.game.mouse_drag_tower:
                         try:
                             found = False

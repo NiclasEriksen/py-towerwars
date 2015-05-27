@@ -536,7 +536,7 @@ class MainMenu():
             for e in self.entries:
                 e.label.font_size = e.label.oldfontsize * (1.0 - a)
                 e.scale = 1.0 - a
-            self.animation_counter -= 9
+            self.animation_counter -= 8
         else:
             for e in self.entries:
                 e.scale = 1.0
@@ -558,7 +558,7 @@ class MainMenu():
             for e in self.entries:
                 e.label.font_size = e.label.oldfontsize * a
                 e.scale = a
-            self.animation_counter -= 9
+            self.animation_counter -= 6
         else:
             self.animation_running = False
             self.current_animation = None
