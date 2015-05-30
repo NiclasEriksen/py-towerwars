@@ -3,6 +3,8 @@ from main import logger
 
 
 def neighbors(node, all_nodes, grid):
+    cdef bool x, y
+    cdef object dirs, ddirs, result, neighbor, node
     dirs = [[0, 1], [1, 0], [-1, 0], [0, -1]]
     ddirs = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     result = []
@@ -26,13 +28,15 @@ def neighbors(node, all_nodes, grid):
                     y = True
 
             if y and x:
-                if not neighbor in result:
+                if neighbor not in result:
                     result.append(neighbor)
 
     return result
 
 
 def get_score(c, node, goal):
+    cdef int score, gx, gy
+    cdef object node, c
     score = c.score
     if c.node[0] != node[0] and c.node[1] != node[1]:
         score += 14
@@ -41,10 +45,15 @@ def get_score(c, node, goal):
     gx = abs(goal[0] - c.node[0])
     gy = abs(goal[1] - c.node[1])
     score += (gx + gy) * 5
+
     return score
 
 
-class Candidate:
+cdef class Candidate:
+
+    cdef bool visited
+    cdef int score
+    cdef object node
 
     def __init__(self, node, lastnode=None):
         self.node = node
@@ -54,6 +63,10 @@ class Candidate:
 
 
 def get_path(grid, all_nodes, node, goal):
+    cdef object open_list, closed_list, path_list, final_list, start, current
+    cdef object candidates, c, next_c
+    cdef bool closed
+    cdef int count
     open_list = []
     closed_list = []
     path_list = []
